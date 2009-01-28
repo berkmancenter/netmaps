@@ -1,0 +1,18 @@
+as-rel.20080818.a0.01000.txt   -- ASN relationship file from CAIDA
+indian_asn_list.txt            -- like ASN relationship file except "Not indian" is prepended to lines in which neither ASN is Indian.  Generated with cat as-rel.20080818.a0.01000.txt | ./mark_non_indian_asn_pairs.pl
+indian_connected_asn_list.txt
+indian_only_asn_list.txt
+indian_asn_list_rest_of_world_as_cloud.txt
+preliminary_results.txt
+indian_as.csv
+graph.png  -- cat indian_only_asn_list.txt  | grep -v "Not indian"  | ./make_asn_graph.pl --graph_viz_output | twopi -Tpng -Granksep=3 -Gratio=auto -Goverlap=scale -Gsplines=true > graph.png
+asn_to_country.csv
+as_whois.pl
+make_asn_graph.pl
+asn_intra_country_summary.csv
+generate_asn_to_country_list.pl
+as-rel-indian.txt
+mark_non_indian_asn_pairs.pl
+replace_non_indian_asns_with_rest_of_world_string.pl
+notes
+file_list.txt -- this file

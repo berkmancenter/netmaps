@@ -1,0 +1,19 @@
+ONI
+
+Country IP address list
+
+1.) Run against Indian country IP list
+
+2.) take traces with < 3 hops
+    * possbiliy determine how many traces make it to the same ASN as the dest IP address
+
+----------------------------------------
+
+Possibily look at ASN pear list
+
+Google ad plan top sites for India
+
+Rest of the world as a cloud
+
+IPX within country
+

@@ -1,0 +1,13 @@
+Questions:
+
+How many IP addresses per link.
+
+Compare connection types:
+
+        total conencitons per country
+        how many providers/peers etc.
+
+        why no Indian ASN pairs?
+
+        what countries have pairs?
+

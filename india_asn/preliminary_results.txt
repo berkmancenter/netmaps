@@ -1,0 +1,72 @@
+	Total connections for AS9498: 105
+AS      | CC | Registry | Allocated  | AS Name
+9498    | IN | apnic    | 1999-03-09 | BBIL-AP BHARTI Airtel Ltd.
+
+	Total connections for AS4755: 96
+AS      | CC | Registry | Allocated  | AS Name
+4755    | IN | apnic    | 1996-05-13 | TATACOMM-AS TATA Communications formerly VSNL is Leading ISP
+
+	Total connections for AS18101: 74
+AS      | CC | Registry | Allocated  | AS Name
+18101   | IN | apnic    | 2002-01-17 | RIL-IDC Reliance Infocom Ltd Internet Data Centre,
+
+	Total connections for AS9583: 16
+AS      | CC | Registry | Allocated  | AS Name
+9583    | IN | apnic    | 1999-07-23 | SIFY-AS-IN Sify Limited
+
+	Total connections for AS10029: 8
+AS      | CC | Registry | Allocated  | AS Name
+10029   | IN | apnic    | 2000-06-14 | SPECTRANET FIRST FIBRE BROADBAND NETWORK IN NEW DELHI, INDIA
+
+	Total connections for AS10201: 5
+AS      | CC | Registry | Allocated  | AS Name
+10201   | IN | apnic    | 2004-11-10 | DWL-AS-IN Dishnet Wireless Limited. Broadband Wireless
+
+	Total connections for AS17820: 4
+AS      | CC | Registry | Allocated  | AS Name
+17820   | IN | apnic    | 2001-07-12 | DIL-AP DIRECT INTERNET LTD.
+
+	Total connections for AS9829: 3
+AS      | CC | Registry | Allocated  | AS Name
+9829    | IN | apnic    | 2000-01-19 | BSNL-NIB National Internet Backbone
+
+	Total connections for AS18231: 3
+AS      | CC | Registry | Allocated  | AS Name
+18231   | IN | apnic    | 2002-05-31 | EXATT-AS-AP IOL NETCOM LTD
+
+	Total connections for AS18105: 2
+AS      | CC | Registry | Allocated  | AS Name
+18105   | IN | apnic    | 2002-01-24 | KARNET-AP Karuturi Networks Ltd
+
+	Total connections for AS24186: 2
+AS      | CC | Registry | Allocated  | AS Name
+24186   | IN | apnic    | 2005-10-28 | RAILTEL-AS-IN RailTel Corporation of India Ltd., Internet Service Provider, New Delhi
+
+	Total connections for AS17465: 2
+AS      | CC | Registry | Allocated  | AS Name
+17465   | IN | apnic    | 2000-11-16 | ASIANET Cable ISP in India
+
+	Total connections for AS7633: 2
+AS      | CC | Registry | Allocated  | AS Name
+7633    | IN | apnic    | 1997-09-26 | SOFTNET-AS-AP Software Technology Parks of India - Bangalore
+
+	Total connections for AS18002: 1
+AS      | CC | Registry | Allocated  | AS Name
+18002   | IN | apnic    | 2002-02-15 | WORLDPHONE-IN AS Number for Interdomain Routing
+
+	Total connections for AS17495: 1
+AS      | CC | Registry | Allocated  | AS Name
+17495   | IN | apnic    | 2000-12-08 | GATEWAY-AP BROADBAND WIRELESSS INTERNET SERVICE PROVIDER
+
+	Total connections for AS9625: 1
+AS      | CC | Registry | Allocated  | AS Name
+9625    | IN | apnic    | 1999-08-10 | PACIFIC-INTERNET-INDIA-ASN Pacific Internet India Pvt. Ltd.
+
+	Total connections for AS10077: 1
+AS      | CC | Registry | Allocated  | AS Name
+10077   | IN | apnic    | 2000-06-20 | HCL-INFINET-AS-1 HCL Infinet Limited
+
+	Total connections for AS17447: 1
+AS      | CC | Registry | Allocated  | AS Name
+17447   | IN | apnic    | 2000-11-02 | NET4INDIA Net4India Ltd.
+

@@ -12,7 +12,7 @@ make_asn_graph.pl
 asn_intra_country_summary.csv
 generate_asn_to_country_list.pl
 as-rel-indian.txt
-mark_non_indian_asn_pairs.pl
-replace_non_indian_asns_with_rest_of_world_string.pl
+mark_non_indian_asn_pairs.pl  -- see comments
+replace_non_indian_asns_with_rest_of_world_string.pl  -- see comments
 notes
 file_list.txt -- this file

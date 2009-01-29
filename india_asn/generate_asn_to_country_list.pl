@@ -4,10 +4,11 @@ use strict;
 use List::MoreUtils qw(uniq);
 use Net::Abuse::Utils qw( :all );
 use Class::CSV;
+use AsnUtils;
 
 #USAGE: parses a CAIDA ASN relationship list file and generates a csv list with asn and country.
 #Input: A CAIDIA ASN relationship file formated list
-#Output: A CSV  listing ASN and Country code.  The CSV file is sent to STDOUT.  #        The header "asn,country" is inlcuded in the output.  ASN's are listed as numeric integers values.  E.g. '102' not '102AS'
+#Output: A CSV  listing ASN and Country code.  The CSV file is sent to STDOUT.  #        The header "asn,country" is NOT included in the output.  ASN's are listed as numeric integers values.  E.g. '102' not '102AS'
 
 my $_asn_country_cache = {};
 

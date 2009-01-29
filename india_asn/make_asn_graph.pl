@@ -2,7 +2,7 @@
 
 use strict;
 use List::MoreUtils qw(uniq);
-use Net::Abuse::Utils qw( :all );
+#use Net::Abuse::Utils qw( :all );
 use GraphViz;
 use Getopt::Long;
 

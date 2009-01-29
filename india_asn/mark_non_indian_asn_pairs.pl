@@ -3,6 +3,7 @@
 use strict;
 use List::MoreUtils qw(uniq);
 use Net::Abuse::Utils qw( :all );
+use AsnUtils;
 
 my $_asn_country_cache = {};
 
@@ -17,19 +18,6 @@ my $_asn_country_cache = {};
 #
 #    cat as-rel.20080818.a0.01000.txt  | ./mark_non_indian_asn_pairs.pl | grep -v "Not indian"  > as-rel-indian.txt
 #
-sub is_indian_asn
-{
-    my ($asn) = @_;
-
-    defined($asn) || die;
-
-    if ( !defined( $_asn_country_cache->{$asn} ) )
-    {
-        $_asn_country_cache->{$asn} = get_asn_country($asn);
-    }
-
-    return $_asn_country_cache->{$asn} eq "IN";
-}
 
 sub main
 {
@@ -57,7 +45,7 @@ sub main
 
         die "defined value " unless defined($asn1) && defined($asn2) && defined($relationship);
 
-        if ( is_indian_asn($asn2) || is_indian_asn($asn1) )
+        if ( AsnUtils::is_indian_asn($asn2) || AsnUtils::is_indian_asn($asn1) )
         {
             print;
         }

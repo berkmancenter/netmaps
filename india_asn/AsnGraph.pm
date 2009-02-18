@@ -32,7 +32,7 @@ sub _total_connections
 
 sub new
 {
-    my ( $class ) = @_;
+    my ($class) = @_;
 
     my $self = {};
 
@@ -44,7 +44,7 @@ sub new
 
 sub add_relationship
 {
-    my ($self, $asn1, $asn2, $relationship) = @_;
+    my ( $self, $asn1, $asn2, $relationship ) = @_;
 
     my $asns = $self->{asn_tree};
 
@@ -67,7 +67,7 @@ sub add_relationship
     else
     {
         die "Invalid relationship value: $relationship";
-    }   
+    }
 }
 
 sub print_graphviz
@@ -75,7 +75,7 @@ sub print_graphviz
 
     my ($self) = @_;
 
-    my $g = GraphViz->new( layout => 'twopi' , ratio => 'auto');
+    my $g = GraphViz->new( layout => 'twopi', ratio => 'auto' );
 
     my $asns = $self->{asn_tree};
 

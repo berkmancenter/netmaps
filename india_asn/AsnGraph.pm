@@ -64,7 +64,7 @@ sub print_graphviz
 
     my ($self) = @_;
 
-    my $g = GraphViz->new( layout => 'twopi', ratio => 'auto' );
+    my $g = GraphViz->new( layout => 'twopi', ratio => 'auto', overlap => 'scale' );
 
     my $asns = $self->{asn_nodes};
 
@@ -72,7 +72,7 @@ sub print_graphviz
     {
         foreach my $field (qw  (customer peer))
         {
-            foreach my $child ( uniq sort { $a->get_as_number() <=> $b->get_as_number() }
+            foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
                 @{ $asns->{$key}->get_nodes_for_relationship($field) } )
             {
                 $g->add_edge( $key => $child->get_as_number() );
@@ -82,14 +82,14 @@ sub print_graphviz
         }
     }
 
-    print $g->as_canon;
+    return $g;
 }
 
 sub print_asn_graph
 {
     my ($self) = @_;
 
-    my $asns = $self->{asn_tree};
+    my $asns = $self->{asn_nodes};
 
     foreach my $key ( keys(%$asns) )
     {
@@ -104,11 +104,23 @@ sub print_asn_graph
     }
 }
 
+
+sub get_country_codes
+{
+    my ($self) = @_;
+
+    my $asns = $self->{asn_nodes};
+    
+    my @country_list = uniq (sort (map {$_->get_country_code()} values %{$asns}));
+    
+    return \@country_list
+}
+
 sub print_connections_per_asn
 {
     my ($self) = @_;
 
-    my $asns = $self->{asn_tree};
+    my $asns = $self->{asn_nodes};
 
     foreach my $key ( reverse sort { _total_connections( $asns->{$a} ) <=> _total_connections( $asns->{$b} ) } keys(%$asns) )
     {
@@ -163,14 +175,11 @@ sub get_country_specific_sub_graph
     my $asns = $self->{asn_nodes};
     foreach my $old_asn ( values %{$asns} )
     {
-        print STDERR "old_asn: " . $old_asn->get_as_number . "\n";
-
         #create a new asn node for the new graph for node that weren't in the country replace them with rest_of_world_node
         my $new_asn = $ret->get_as_node_or_rest_of_world_node( $old_asn, $country_code );
 
         foreach my $relationship_type ( $old_asn->get_relationship_types() )
         {
-            print STDERR "relation: $relationship_type\n";
             my @rel_list =
               map { $ret->get_as_node_or_rest_of_world_node( $_, $country_code ) } @{ $old_asn->{$relationship_type} };
             @rel_list = uniq @rel_list;

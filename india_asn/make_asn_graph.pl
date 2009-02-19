@@ -39,8 +39,12 @@ sub main
 
         my ( $asn1, $asn2, $relationship ) = split;
 
-        $asn_graph->add_relationship( $asn1, $asn2, $relationship );
+        my $as1 = $asn_graph->get_as_node( $asn1);
+        my $as2 = $asn_graph->get_as_node( $asn2);
+        $as2->add_relationship($as1, $relationship );
     }
+
+    #$asn_graph = $asn_graph->get_country_specific_sub_graph("IN");
 
     #    print_asn_graph($asns);
 

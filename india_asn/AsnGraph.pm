@@ -2,7 +2,10 @@ package AsnGraph;
 
 use strict;
 use List::MoreUtils qw(uniq);
+use List::Pairwise qw (grepp);
 use GraphViz;
+use AsnUtils;
+use AS;
 
 # MODULES
 
@@ -36,38 +39,24 @@ sub new
 
     my $self = {};
 
-    $self->{asn_tree} = {};
+    $self->{asn_nodes} = {};
     bless( $self, $class );
 
     return $self;
 }
 
-sub add_relationship
+my $_asn_cache = {};
+
+sub get_as_node
 {
-    my ( $self, $asn1, $asn2, $relationship ) = @_;
+    my ($self, $as_number) = @_;
 
-    my $asns = $self->{asn_tree};
+    if (!defined ($self->{asn_nodes}->{$as_number} ) )
+    {
+        $self->{asn_nodes}->{$as_number} = AS->new($as_number);
+    }
 
-    if ( $relationship == -1 )
-    {
-        push @{ $asns->{$asn2}->{customers} }, $asn1;
-    }
-    elsif ( $relationship == 0 )
-    {
-        push @{ $asns->{$asn2}->{peers} }, $asn1;
-    }
-    elsif ( $relationship == 1 )
-    {
-        push @{ $asns->{$asn2}->{providers} }, $asn1;
-    }
-    elsif ( $relationship == 2 )
-    {
-        push @{ $asns->{$asn2}->{siblings} }, $asn1;
-    }
-    else
-    {
-        die "Invalid relationship value: $relationship";
-    }
+    return  $self->{asn_nodes}->{$as_number};
 }
 
 sub print_graphviz
@@ -77,22 +66,17 @@ sub print_graphviz
 
     my $g = GraphViz->new( layout => 'twopi', ratio => 'auto' );
 
-    my $asns = $self->{asn_tree};
+    my $asns = $self->{asn_nodes};
 
     foreach my $key ( keys(%$asns) )
     {
-        foreach my $field (qw  (customers peers))
+        foreach my $field (qw  (customer peer))
         {
-
-            #            $g->add_node($key, label => $key);
-            if ( defined( $asns->{$key}->{$field} ) )
+            foreach my $child ( @{$asns->{$key}->get_nodes_for_relationship($field)}  )
             {
-                foreach my $child ( @{ $asns->{$key}->{$field} } )
-                {
-                    $g->add_edge( $key => $child );
+                $g->add_edge( $key => $child->get_as_number() );
 
-                    #                print "\t\t $field: " . (join ", " , @{$asns->{$key}->{$field}}) . "\n";
-                }
+        #                        print "\t\t $field:$key " . $child->get_as_number(). "\n";
             }
         }
     }
@@ -137,5 +121,36 @@ sub print_connections_per_asn
         }
     }
 }
+
+# sub _remove_asns_outside_of_country
+# {
+#     my ($asn, $country_code) = @_;
+
+#     foreach my $relationship_type (keys %{$asn} )
+#     {
+#         $asn->{$relationship_type} = \ grep { AsnUtils::get_asn_country_code($_) eq $country_code} @{$asn->{$relationship_type}};
+#         if (scalar(@{$asn->{$relationship_type} == 0) ) )
+#         {
+#             delete ($asn->{$relationship_type});
+#         }
+#     }
+# }
+
+# sub get_country_specific_sub_graph
+# {
+#     my ($self, $country_code) = @_;
+
+#     my $asns = $self->{asn_tree};
+
+#     my %country_specific_asns = grepp { (AsnUtils::get_asn_country_code($a) eq $country_code) } %{$asns};
+
+#     %country_specific_asns = mapp { $a => _remove_asn_outside_of_country($b, $country_code) }  %country_specific_asns;
+
+#     my $ret = AsnGraph->new();
+
+#     $ret->{asn_tree} = \%country_specific_asns;
+
+#     return $ret;
+# }
 
 1;

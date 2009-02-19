@@ -4,13 +4,12 @@ use strict;
 use Getopt::Long;
 use AsnGraph;
 
-my $get_relationship_name = 
-    {
-     -1 =>  'customer',
-     0  => 'peer',
-     1  => 'provider',
-     2  => 'sibling',
-    };
+my $get_relationship_name = {
+    -1 => 'customer',
+    0  => 'peer',
+    1  => 'provider',
+    2  => 'sibling',
+};
 
 sub main
 {
@@ -47,9 +46,9 @@ sub main
 
         my ( $asn1, $asn2, $relationship ) = split;
 
-        my $as1 = $asn_graph->get_as_node( $asn1);
-        my $as2 = $asn_graph->get_as_node( $asn2);
-        $as2->add_relationship($as1, $get_relationship_name->{$relationship} );
+        my $as1 = $asn_graph->get_as_node($asn1);
+        my $as2 = $asn_graph->get_as_node($asn2);
+        $as2->add_relationship( $as1, $get_relationship_name->{$relationship} );
     }
 
     $asn_graph = $asn_graph->get_country_specific_sub_graph("IN");

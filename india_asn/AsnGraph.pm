@@ -68,11 +68,11 @@ sub print_graphviz
 
     my $asns = $self->{asn_nodes};
 
-    foreach my $key ( keys(%$asns) )
+    foreach my $key ( sort keys(%$asns) )
     {
         foreach my $field (qw  (customer peer))
         {
-            foreach my $child ( @{$asns->{$key}->get_nodes_for_relationship($field)}  )
+            foreach my $child (uniq  sort {$a->get_as_number() <=> $b->get_as_number() }@{$asns->{$key}->get_nodes_for_relationship($field)}  )
             {
                 $g->add_edge( $key => $child->get_as_number() );
 
@@ -136,21 +136,47 @@ sub print_connections_per_asn
 #     }
 # }
 
-# sub get_country_specific_sub_graph
-# {
-#     my ($self, $country_code) = @_;
+    sub get_as_node_or_rest_of_world_node
+{
+     my ($self, $asn, $country_code) = @_;
 
-#     my $asns = $self->{asn_tree};
+     if (defined($asn->get_country_code()) &&  ($asn->get_country_code()eq $country_code))
+     {
+         return $self->get_as_node($asn->get_as_number);
+     }
+     else
+     {
+         return $self->get_as_node("REST_OF_WORLD");
+     }
+}
 
-#     my %country_specific_asns = grepp { (AsnUtils::get_asn_country_code($a) eq $country_code) } %{$asns};
+#creates a new graph based on the old graph expect that all nodes not in country are replaced with rest_of_the_world
+# We are creating new AS class objects for each of the nodes in the old graph bc/ we need to modify relationship lists.
+# The newly created AS node objects are "owned" by the new graph
+ sub get_country_specific_sub_graph
+ {
+     my ($self, $country_code) = @_;
 
-#     %country_specific_asns = mapp { $a => _remove_asn_outside_of_country($b, $country_code) }  %country_specific_asns;
+     my $ret =  AsnGraph->new();
 
-#     my $ret = AsnGraph->new();
+     my $asns = $self->{asn_nodes};
+     foreach my $old_asn (values %{$asns})
+     {
+         print STDERR "old_asn: " . $old_asn->get_as_number . "\n";
+         #create a new asn node for the new graph for node that weren't in the country replace them with rest_of_world_node
+         my $new_asn = $ret->get_as_node_or_rest_of_world_node($old_asn, $country_code);
 
-#     $ret->{asn_tree} = \%country_specific_asns;
-
-#     return $ret;
-# }
+         foreach my $relationship_type ($old_asn->get_relationship_types())
+         {
+             print STDERR "relation: $relationship_type\n";
+             my @rel_list =  map {$ret->get_as_node_or_rest_of_world_node($_, $country_code)} @{$old_asn->{$relationship_type}}  ;
+             @rel_list = uniq @rel_list;
+             push @{$new_asn->{$relationship_type}} , @rel_list;
+             $new_asn->{$relationship_type} = [uniq @{$new_asn->{$relationship_type}}];
+         }
+     }
+ 
+     return $ret;
+ }
 
 1;

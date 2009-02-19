@@ -56,12 +56,20 @@ sub get_as_number
 
 sub add_relationship
 {
-    my ($self, $other_as, $relationship_type) = @_;
+    my ($self, $other_as, $relationship_name) = @_;
 
-    my $relationship_name = $get_relationship_name->{$relationship_type};
-    die "Invalid relationship_type: $relationship_type" unless defined($relationship_name);
+   # my  = $get_relationship_name->{$relationship_type};
+   # die "Invalid relationship_type: $relationship_type" unless defined($relationship_name);
+    die unless grep {$_ eq $relationship_name} values %{$get_relationship_name};
 
     push @{$self->{$relationship_name}}, $other_as;
+}
+
+sub get_relationship_types
+{
+    my ($self) = @_;
+
+    return  values %{$get_relationship_name};
 }
 
 sub get_nodes_for_relationship

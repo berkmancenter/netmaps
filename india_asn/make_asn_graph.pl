@@ -3,6 +3,8 @@
 use strict;
 use Getopt::Long;
 use AsnGraph;
+use List::Util qw(max min);
+use Locale::Country qw(code2country);
 
 my $get_relationship_name = {
     -1 => 'customer',
@@ -49,7 +51,11 @@ sub main
         my $as1 = $asn_graph->get_as_node($asn1);
         my $as2 = $asn_graph->get_as_node($asn2);
         $as2->add_relationship( $as1, $get_relationship_name->{$relationship} );
-    }
+    } 
+
+    $asn_graph->print_connections_per_asn($asns);
+
+    exit;
 
     for my $country_code (@{$asn_graph->get_country_codes()})
     {
@@ -63,12 +69,32 @@ sub main
         }
         else
         {
+            my $graph_size =  $asn_sub_graph->get_as_nodes_count;
             die unless $graph_viz_output;
             my $g = $asn_sub_graph->print_graphviz();
-            die unless $g->as_png("graphs/asn-$country_code.png");
-            print "finished country: '$country_code'\n";
+
+            my $country_name = code2country($country_code);
+            die unless $g->as_canon("graphs/asn-$country_name-$country_code-$graph_size-nodes.dot");
+            print "finished country: '$country_name - $country_code'\n";
         }
     }
+}
+
+sub find_max_printable_graph_size
+{
+    my ($asn_sub_graph, $country_code ) = @_;
+    my $graph_size =  $asn_sub_graph->get_as_nodes_count;
+    while ($graph_size <= $asn_sub_graph->get_as_nodes_count)
+    {
+        my $g = $asn_sub_graph->print_graphviz($graph_size);
+        die unless $g->as_png("graphs/asn-". code2country($country_code). "-$country_code-$graph_size-nodes.png");
+        print "finished country: ".code2country($country_code) ."-'$country_code' graph_size: $graph_size \n";
+        last if ($graph_size == $asn_sub_graph->get_as_nodes_count);
+        
+        $graph_size *= 2;
+        $graph_size  = min($graph_size, $asn_sub_graph->get_as_nodes_count);
+    }
+    
 }
 
 main();

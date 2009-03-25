@@ -3,6 +3,7 @@ package AsnGraph;
 use strict;
 use List::MoreUtils qw(uniq);
 use List::Pairwise qw (grepp);
+use List::Util qw (sum);
 use GraphViz;
 use AsnUtils;
 use AS;
@@ -20,7 +21,7 @@ sub _total_connections
     my ($asn) = @_;
 
     my $ret = 0;
-    foreach my $field (qw (customers peers))
+    foreach my $field (qw (customer peer))
     {
         if ( defined( $asn->{$field} ) )
         {
@@ -59,17 +60,41 @@ sub get_as_node
     return $self->{asn_nodes}->{$as_number};
 }
 
+sub get_as_nodes_count
+{
+    my ($self) = @_;
+    my $asns = $self->{asn_nodes};
+
+    return scalar (keys %{$asns});
+}
+
+sub _get_total_ips
+{
+    my ($self) = @_;
+    my $asns = $self->{asn_nodes};
+    
+    return sum map { $_->get_asn_ip_address_count() } values %{$asns};
+}
+
 sub print_graphviz
 {
 
-    my ($self) = @_;
+    my ($self, $max_parent_nodes) = @_;
 
-    my $g = GraphViz->new( layout => 'twopi', ratio => 'auto', overlap => 'scale' );
+    my $g = GraphViz->new( layout => 'twopi', 
+ratio => 'auto', overlap => 'scale' 
+);
 
     my $asns = $self->{asn_nodes};
 
+    my $parent_nodes_processed = 0;
+
     foreach my $key ( sort keys(%$asns) )
     {
+        if (defined($max_parent_nodes) && ($parent_nodes_processed > $max_parent_nodes))
+        {
+            return $g;
+        }
         foreach my $field (qw  (customer peer))
         {
             foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
@@ -80,6 +105,8 @@ sub print_graphviz
                 #                        print "\t\t $field:$key " . $child->get_as_number(). "\n";
             }
         }
+
+        $parent_nodes_processed++;
     }
 
     return $g;
@@ -122,14 +149,26 @@ sub print_connections_per_asn
 
     my $asns = $self->{asn_nodes};
 
-    foreach my $key ( reverse sort { _total_connections( $asns->{$a} ) <=> _total_connections( $asns->{$b} ) } keys(%$asns) )
+    my $total_ips = $self->_get_total_ips();
+
+    print "ASN graph has $total_ips total ips\n";
+
+    foreach my $key ( reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() } keys(%$asns) )
     {
-        print "\tTotal downstream connections for AS$key: " . _total_connections( $asns->{$key} ) . "\n";
-        foreach my $field (qw (customers peers providers siblings))
+        print "\tTotal downstream connections for AS$key: " . _total_connections( $asns->{$key} )  . "\n";
+        if ($key ne 'REST_OF_WORLD') 
+        {
+            print "\tDirect IPs for AS$key: " . $asns->{$key}->get_asn_ip_address_count() . "\n";
+            print "\tDownstream IPs for AS$key: " . $asns->{$key}->get_downstream_ip_address_count() . "\n";
+            print "\tMonitorable IPs for AS$key: " . $asns->{$key}->get_monitorable_ip_address_count() . "\n";
+            print "\tPercent of all total IPs monitorable: " . $asns->{$key}->get_monitorable_ip_address_count()/ $total_ips *100.0 . "\n";
+        }
+
+        foreach my $field (qw (customer peer provider sibling))
         {
             if ( defined( $asns->{$key}->{$field} ) )
             {
-                print "\t\t $field: " . ( join ", ", @{ $asns->{$key}->{$field} } ) . "\n";
+                print "\t\t $field: " . ( join ", ", map {$_->get_as_number()} @{ $asns->{$key}->{$field} } ) . "\n";
             }
         }
     }

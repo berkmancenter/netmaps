@@ -5,6 +5,7 @@ use Readonly;
 use strict;
 
 Readonly my $ip_to_asn_csv_file => '/home/dlarochelle/Desktop/GeoIPASNum2.csv';
+Readonly my $ip_prefix_to_asn_tsv_file => '/home/dlarochelle/Desktop/routeviews-rv2-20090302-1132.pfx2as';
 
 my $_asn_count = [];
 
@@ -30,12 +31,39 @@ sub _read_asn_to_ip_file
     }
 }
 
+sub _read_ip_prefix_to_asn_file
+{
+    ;
+    print "reading ip _prefix  file\n";
+    my $csv = Class::CSV->parse(
+        filename => $ip_prefix_to_asn_tsv_file,
+        fields   => [qw /ip ip_prefix_length asn /],
+        csv_xs_options  =>  {  binary => 1, sep_char => "\t" }
+    );
+
+    for my $line ( @{ $csv->lines } )
+    {
+        my $num_ips = 2 ** (32 - $line->ip_prefix_length);
+
+        my @asns      = split("_", $line->asn);
+
+        @asns      = map {split(",", $_) } @asns;
+
+        foreach my $asn (@asns)
+        {
+            $_asn_count->[ $asn ] ||= 0;
+            $_asn_count->[ $asn ] += $num_ips;
+        }
+    }
+}
+
 sub get_ip_address_count_for_asn
 {
     my ($asn) = @_;
     if (scalar(@{$_asn_count}) == 0)
     {
-        _read_asn_to_ip_file();
+        #_read_asn_to_ip_file();
+        _read_ip_prefix_to_asn_file
     }
 
     return $_asn_count->[$asn];

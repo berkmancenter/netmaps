@@ -7,6 +7,8 @@ use List::Util qw (sum);
 use GraphViz;
 use AsnUtils;
 use AS;
+use Graph;
+use Carp;
 
 # MODULES
 
@@ -100,8 +102,13 @@ ratio => 'auto', overlap => 'scale'
             foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
                 @{ $asns->{$key}->get_nodes_for_relationship($field) } )
             {
-                $g->add_edge( $key => $child->get_as_number() );
-
+                if ( (!$child->is_rest_of_world()) && (! $child->only_connects_to_rest_of_world()) ) {
+                    $g->add_edge( $key => $child->get_as_number() );
+                }
+                else
+                {
+                    print "Skipping link $key -> " .  $child->get_as_number() . "\n";
+                }
                 #                        print "\t\t $field:$key " . $child->get_as_number(). "\n";
             }
         }
@@ -111,6 +118,41 @@ ratio => 'auto', overlap => 'scale'
 
     return $g;
 }
+
+sub _get_graph_object
+{
+    my ($self) = @_;
+
+    #print STDERR "Start _get_graph_object\n";
+
+    my $g = Graph->new;
+
+    my $asns = $self->{asn_nodes};
+
+    my $parent_nodes_processed = 0;
+
+    foreach my $key ( sort keys(%$asns) )
+    {
+        foreach my $field (qw  (customer))
+        {
+            foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
+                @{ $asns->{$key}->get_nodes_for_relationship($field) } )
+            {
+                if (! $asns->{$key}->is_rest_of_world && !$child->is_rest_of_world) 
+                {
+                    $g->add_edge( $key, $child->get_as_number() );
+                }
+            }
+        }
+
+        $parent_nodes_processed++;
+    }
+
+    #print STDERR "Finish _get_graph_object\n";
+
+    return $g;
+}
+
 
 sub print_asn_graph
 {
@@ -138,8 +180,10 @@ sub get_country_codes
 
     my $asns = $self->{asn_nodes};
     
-    my @country_list = uniq (sort (map {$_->get_country_code()} values %{$asns}));
-    
+    my @country_list = uniq  map {$_->get_country_code()} values %{$asns};
+
+    @country_list = sort @country_list;
+
     return \@country_list
 }
 
@@ -151,9 +195,22 @@ sub print_connections_per_asn
 
     my $total_ips = $self->_get_total_ips();
 
+
+    my $g = $self->_get_graph_object();
+
+    die "Graph is cyclic: " . join (" , " , $g->find_a_cycle()) if ($g->has_a_cycle() );
+
+    #print "Graph is not cyclic\n";
+
     print "ASN graph has $total_ips total ips\n";
 
-    foreach my $key ( ( reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() } keys(%$asns) ) [ 0..9])
+    my @asn_keys = reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() } keys(%$asns) ;
+    if (scalar(@asn_keys) > 9)
+    {
+        @asn_keys = @asn_keys[0..9];
+    }
+
+    foreach my $key (  @asn_keys )
     {
         my $asn_name = (AsnUtils::get_asn_whois_info($key))->{name};
         print "Total downstream connections for AS$key ($asn_name): " . _total_connections( $asns->{$key} )  . "\n";
@@ -194,6 +251,7 @@ sub get_as_node_or_rest_of_world_node
 {
     my ( $self, $asn, $country_code ) = @_;
 
+    confess unless defined($country_code);
     if ( defined( $asn->get_country_code() ) && ( $asn->get_country_code() eq $country_code ) )
     {
         return $self->get_as_node( $asn->get_as_number );
@@ -202,6 +260,13 @@ sub get_as_node_or_rest_of_world_node
     {
         return $self->get_as_node("REST_OF_WORLD");
     }
+}
+
+sub _asn_equals_country_code
+{
+    my ($asn, $country_code) = @_;
+
+    return  defined ($asn->get_country_code) && $asn->get_country_code eq $country_code
 }
 
 #creates a new graph based on the old graph expect that all nodes not in country are replaced with rest_of_the_world
@@ -217,15 +282,21 @@ sub get_country_specific_sub_graph
     foreach my $old_asn ( values %{$asns} )
     {
         #create a new asn node for the new graph for node that weren't in the country replace them with rest_of_world_node
+        #next unless _asn_equals_country_code($old_asn, $country_code);
+
         my $new_asn = $ret->get_as_node_or_rest_of_world_node( $old_asn, $country_code );
+
 
         foreach my $relationship_type ( $old_asn->get_relationship_types() )
         {
             my @rel_list =
-              map { $ret->get_as_node_or_rest_of_world_node( $_, $country_code ) } @{ $old_asn->{$relationship_type} };
+              map { $ret->get_as_node_or_rest_of_world_node( $_, $country_code ) } 
+                  #grep {_asn_equals_country_code($_, $country_code) }  
+                      @{ $old_asn->{$relationship_type} };
             @rel_list = uniq @rel_list;
             push @{ $new_asn->{$relationship_type} }, @rel_list;
             $new_asn->{$relationship_type} = [ uniq @{ $new_asn->{$relationship_type} } ];
+           # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne'REST_OF_WORLD'}   @{ $new_asn->{$relationship_type} } ];
         }
     }
 

@@ -53,16 +53,21 @@ sub main
         $as2->add_relationship( $as1, $get_relationship_name->{$relationship} );
     } 
 
-    $asn_graph->print_connections_per_asn($asns);
+    #$asn_graph->print_connections_per_asn($asns);
 
-    exit;
+    #exit;
 
-    for my $country_code (@{$asn_graph->get_country_codes()})
+    my @country_codes = @{$asn_graph->get_country_codes()};
+
+    @country_codes = grep {$_ eq 'IN' } @country_codes;
+
+
+    for my $country_code (@country_codes)
     {
         my $asn_sub_graph = $asn_graph->get_country_specific_sub_graph($country_code);
         
         #    print_asn_graph($asns);
-        
+        print "Country: $country_code\n";
         if ($text_output)
         {
             $asn_sub_graph->print_connections_per_asn($asns);
@@ -74,7 +79,7 @@ sub main
             my $g = $asn_sub_graph->print_graphviz();
 
             my $country_name = code2country($country_code);
-            die unless $g->as_canon("graphs/asn-$country_name-$country_code-$graph_size-nodes.dot");
+            die unless $g->as_png("graphs/asn-$country_name-$country_code-$graph_size-nodes.png");
             print "finished country: '$country_name - $country_code'\n";
         }
     }

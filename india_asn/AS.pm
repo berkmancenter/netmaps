@@ -1,12 +1,13 @@
 package AS;
 
 use strict;
-use List::MoreUtils qw(uniq);
+use List::MoreUtils qw(uniq none);
 use List::Util qw(sum);
 use List::Pairwise qw (grepp);
 use GraphViz;
 use AsnUtils;
 use AsnIPCount;
+use Data::Dumper;
 
 # MODULES
 
@@ -45,6 +46,23 @@ sub get_country_code
     my ($self) = @_;
 
     return AsnUtils::get_asn_country_code( $self->{as_number} );
+}
+
+sub is_rest_of_world
+{
+    my ($self) = @_;
+
+    return $self->get_as_number eq 'REST_OF_WORLD';
+}
+
+sub only_connects_to_rest_of_world
+{
+    my ($self) = @_;
+    #print Dumper($self);
+    #print Dumper(get_relationship_types());
+    #print grep {! $_->is_rest_of_world } map { @{$self->get_nodes_for_relationship($_)} } get_relationship_types();
+    #print "\n";
+    return none {! $_->is_rest_of_world } map { @{$self->get_nodes_for_relationship($_)} } get_relationship_types();
 }
 
 sub get_as_number

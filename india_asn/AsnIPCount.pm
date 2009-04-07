@@ -1,6 +1,8 @@
 package AsnIPCount;
 
 use Class::CSV;
+use DBIx::Simple;
+use DBI;
 use Readonly;
 use strict;
 
@@ -33,7 +35,6 @@ sub _read_asn_to_ip_file
 
 sub _read_ip_prefix_to_asn_file
 {
-    ;
     print "reading ip _prefix  file\n";
     my $csv = Class::CSV->parse(
         filename => $ip_prefix_to_asn_tsv_file,
@@ -57,13 +58,35 @@ sub _read_ip_prefix_to_asn_file
     }
 }
 
+sub get_asn_counts_from_ip_prefix_file
+{
+    _read_ip_prefix_to_asn_file();
+
+    return $_asn_count;
+}
+
+my $_ip_count_dbh;
+
 sub get_ip_address_count_for_asn
 {
     my ($asn) = @_;
-    if (scalar(@{$_asn_count}) == 0)
+
+    if (!defined ($_ip_count_dbh) )
     {
-        #_read_asn_to_ip_file();
-        _read_ip_prefix_to_asn_file
+        my $dbargs = {
+                      AutoCommit => 1,
+                      RaiseError => 1,
+                      PrintError => 1,
+                     };
+        
+        $_ip_count_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=asn_count.db", "", "", $dbargs ) );
+    }
+
+    if (!defined($_asn_count->[$asn] ) )
+    {
+        my $ip_count = $_ip_count_dbh->query("select ip_count from  asn_ip_counts where asn=?", $asn)->flat->[0];
+        
+        $_asn_count->[$asn] = $ip_count;
     }
 
     return $_asn_count->[$asn];
@@ -83,5 +106,4 @@ sub test
     }
 }
 
-1
-;
+1;

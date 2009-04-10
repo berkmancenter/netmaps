@@ -9,6 +9,8 @@ use AsnUtils;
 use AS;
 use Graph;
 use Carp;
+use AsnTaxonomyClass;
+use List::Compare;
 
 # MODULES
 
@@ -17,6 +19,16 @@ use Carp;
 # max number of pages the handler will download for a single story
 
 # STATICS
+
+my $_as_class_color = {
+abstained => 'grey',
+comp      => 'yellow',
+edu     => 'orange',
+ix     => 'purple',
+nic     => 'green',
+t1     => 'red',
+t2     => 'blue',
+};
 
 sub _total_connections
 {
@@ -116,6 +128,30 @@ ratio => 'auto', overlap => 'scale'
         $parent_nodes_processed++;
     }
 
+    foreach my $asn_key (@{$g->{NODELIST}} )
+    {
+        #print "$asn_key\n";
+        #if ( _total_connections( $asns->{$asn_key} ) > 2 )
+        {
+            $g->add_node($asn_key, label => $asns->{$asn_key}->get_graph_label() );
+        }
+        
+        my $as_class = AsnTaxonomyClass::get_asn_taxonomy_class($asn_key);
+
+        my $color;
+
+        if (!defined($as_class) )
+        {
+            $color = 'white';
+        }
+        else
+        {
+            $color = $_as_class_color->{$as_class};
+        }
+
+        $g->add_node($asn_key, fillcolor => $color, style => 'filled');
+    }
+
     return $g;
 }
 
@@ -187,6 +223,59 @@ sub get_country_codes
     return \@country_list
 }
 
+sub die_if_cyclic
+{
+    my ($self) = @_;
+
+    my $g = $self->_get_graph_object();
+
+    die "Graph is cyclic: " . join (" , " , $g->find_a_cycle()) if ($g->has_a_cycle() );
+
+    #print "Graph is not cyclic\n";
+    
+}
+
+#Return the top 10 Asns plus any ASNs that can monitor 90% of the countries IPs
+sub _get_top_country_asns
+{
+    my ($self) = @_;
+    my $asns = $self->{asn_nodes};
+
+    $self->die_if_cyclic();
+
+    my @asn_keys = reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() } keys(%$asns) ;
+    if (scalar(@asn_keys) > 9)
+    {
+        @asn_keys = @asn_keys[0..9];
+    }
+
+    my $total_ips = $self->_get_total_ips();
+
+    my @ninety_percent_monitoring_asns = grep {($asns->{$_}->get_monitorable_ip_address_count()/$total_ips) >= 0.9} keys (%$asns);
+
+    my $lca = List::Compare->new('-u', '-a', \@asn_keys, \@ninety_percent_monitoring_asns);
+
+    my @top_asn_keys = $lca->get_union();
+
+    @top_asn_keys = reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() }  @top_asn_keys;
+
+    return \@top_asn_keys;
+}
+
+sub get_asn_information_as_hash
+{
+    (my $asn) = @_;
+    my $ret = {};
+
+    die unless defined $asn;
+
+    $ret->{direct_ips} =  $asn->get_asn_ip_address_count();
+    $ret->{downstream_ips} = $asn->get_downstream_ip_address_count();
+    $ret->{monitorable_ips} = $asn->get_monitorable_ip_address_count();
+
+    return $ret;
+}
+
 sub print_connections_per_asn
 {
     my ($self) = @_;
@@ -195,20 +284,11 @@ sub print_connections_per_asn
 
     my $total_ips = $self->_get_total_ips();
 
-
-    my $g = $self->_get_graph_object();
-
-    die "Graph is cyclic: " . join (" , " , $g->find_a_cycle()) if ($g->has_a_cycle() );
-
-    #print "Graph is not cyclic\n";
-
     print "ASN graph has $total_ips total ips\n";
 
-    my @asn_keys = reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() } keys(%$asns) ;
-    if (scalar(@asn_keys) > 9)
-    {
-        @asn_keys = @asn_keys[0..9];
-    }
+    $self->die_if_cyclic();
+
+    my @asn_keys = @{$self->_get_top_country_asns};
 
     foreach my $key (  @asn_keys )
     {
@@ -216,11 +296,19 @@ sub print_connections_per_asn
         print "Total downstream connections for AS$key ($asn_name): " . _total_connections( $asns->{$key} )  . "\n";
         if ($key ne 'REST_OF_WORLD') 
         {
-            print "\tDirect IPs for AS$key: " . $asns->{$key}->get_asn_ip_address_count() . "\n";
-            print "\tDownstream IPs for AS$key: " . $asns->{$key}->get_downstream_ip_address_count() . "\n";
-            print "\tMonitorable IPs for AS$key: " . $asns->{$key}->get_monitorable_ip_address_count() . "\n";
-            print "\tPercent of all total IPs monitorable: " . $asns->{$key}->get_monitorable_ip_address_count()/ $total_ips *100.0 . "\n";
+            my $asn_info = get_asn_information_as_hash($asns->{$key});
+
+            print "\tDirect IPs for AS$key: " . $asn_info->{direct_ips} . "\n";
+            print "\tDownstream IPs for AS$key: " . $asn_info->{downstream_ips} . "\n";
+            print "\tMonitorable IPs for AS$key: " . $asn_info->{monitorable_ips} . "\n";
+            print "\tPercent of all total IPs monitorable: " . $asn_info->{monitorable_ips}/ $total_ips *100.0 . "\n";
             print "\n";
+
+#             print "\tDirect IPs for AS$key: " . $asns->{$key}->get_asn_ip_address_count() . "\n";
+#             print "\tDownstream IPs for AS$key: " . $asns->{$key}->get_downstream_ip_address_count() . "\n";
+#             print "\tMonitorable IPs for AS$key: " . $asns->{$key}->get_monitorable_ip_address_count() . "\n";
+#             print "\tPercent of all total IPs monitorable: " . $asns->{$key}->get_monitorable_ip_address_count()/ $total_ips *100.0 . "\n";
+#             print "\n";
         }
 
          foreach my $field (qw (customer peer provider sibling))

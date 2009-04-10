@@ -79,7 +79,8 @@ sub main
             my $g = $asn_sub_graph->print_graphviz();
 
             my $country_name = code2country($country_code);
-            die unless $g->as_png("graphs/asn-$country_name-$country_code-$graph_size-nodes.png");
+            die unless $g->as_svg("graphs/asn-$country_name-$country_code.svg");
+            die unless $g->as_text("graphs/asn-$country_name-$country_code.dot");
             print "finished country: '$country_name - $country_code'\n";
         }
     }

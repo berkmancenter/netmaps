@@ -58,11 +58,12 @@ sub is_rest_of_world
 sub only_connects_to_rest_of_world
 {
     my ($self) = @_;
+
     #print Dumper($self);
     #print Dumper(get_relationship_types());
     #print grep {! $_->is_rest_of_world } map { @{$self->get_nodes_for_relationship($_)} } get_relationship_types();
     #print "\n";
-    return none {! $_->is_rest_of_world } map { @{$self->get_nodes_for_relationship($_)} } get_relationship_types();
+    return none { !$_->is_rest_of_world } map { @{ $self->get_nodes_for_relationship($_) } } get_relationship_types();
 }
 
 sub get_as_number
@@ -96,63 +97,93 @@ sub get_nodes_for_relationship
 {
     my ( $self, $relationship_name ) = @_;
 
-    die "Invalid relationship_name: '$relationship_name'" unless grep { $_ eq $relationship_name } values %{$get_relationship_name};
+    die "Invalid relationship_name: '$relationship_name'"
+      unless grep { $_ eq $relationship_name } values %{$get_relationship_name};
 
     return $self->{$relationship_name};
 }
 
 sub get_asn_ip_address_count
 {
-    my ( $self ) = @_;
-   
+    my ($self) = @_;
+
     #print STDERR "get_asn_ip_address_count " . $self->{as_number} . "\n";
-    
-    return 0 if ($self->{as_number} eq 'REST_OF_WORLD');
 
-    my $ret = AsnIPCount::get_ip_address_count_for_asn($self->{as_number});
+    return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
 
-    return 0 if (!defined($ret));
+    my $ret = AsnIPCount::get_ip_address_count_for_asn( $self->{as_number} );
+
+    return 0 if ( !defined($ret) );
 
     return $ret;
 }
 
 sub get_downstream_asns
 {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     #print STDERR "get_downstream_asns " . $self->{as_number} . "\n";
 
-    return [uniq map {$_, @{$_->get_downstream_asns}} grep {$self->{as_number} ne 'REST_OF_WORLD'} @{$self->get_customers}];
+    return [
+        uniq map { $_, @{ $_->get_downstream_asns } }
+          grep { $self->{as_number} ne 'REST_OF_WORLD' } @{ $self->get_customers }
+    ];
 }
 
 sub get_downstream_ip_address_count
 {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
-    return 0 if ($self->{as_number} eq 'REST_OF_WORLD');
+    return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
 
     my $downstream_asns = $self->get_downstream_asns;
 
-    if ( @{$downstream_asns} == 0)
+    if ( @{$downstream_asns} == 0 )
     {
         return 0;
     }
 
-    return sum map {$_->get_asn_ip_address_count() } @{$downstream_asns};
+    return sum map { $_->get_asn_ip_address_count() } @{$downstream_asns};
 }
 
 sub get_customers
 {
-   my ( $self ) = @_;
-   
-   return $self->get_nodes_for_relationship('customer'); 
+    my ($self) = @_;
+
+    return $self->get_nodes_for_relationship('customer');
 }
 
 sub get_monitorable_ip_address_count
 {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     return $self->get_asn_ip_address_count() + $self->get_downstream_ip_address_count();
+}
+
+sub get_graph_label
+{
+
+    my ($self) = @_;
+
+    my $asn_number = $self->get_as_number;
+
+    my $ret = $self->is_rest_of_world() ? "REST OF THE WORLD" : "AS$asn_number";
+
+#        print "Total downstream connections for AS$asn_number ($asn_name): " . _total_connections( $asns->{$asn_number} )  . "\n";
+
+    if ( $asn_number ne 'REST_OF_WORLD' )
+    {
+        $ret .= "\n";
+        my $asn_name = AsnUtils::get_asn_whois_info($asn_number)->{name};
+        $ret .= "$asn_name\n";
+        $ret .= "Direct IPs for AS$asn_number: " . $self->get_asn_ip_address_count() . "\n";
+        $ret .= "Downstream IPs for AS$asn_number: " . $self->get_downstream_ip_address_count() . "\n";
+        $ret .= "Monitorable IPs for AS$asn_number: " . $self->get_monitorable_ip_address_count() . "\n";
+
+        #$ret .= "Percent of all total IPs monitorable: " . $self->get_monitorable_ip_address_count()/ $total_ips *100.0;
+    }
+
+    return $ret;
 }
 
 1;

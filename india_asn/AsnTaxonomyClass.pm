@@ -9,10 +9,8 @@ use strict;
 my $_as_taxonomy_dbh;
 my $_asn_taxonomy_cache;
 
-sub get_asn_taxonomy_class
+sub _create_db_handle_if_necessary
 {
-    my ($asn) = @_;
-
     if (!defined ($_as_taxonomy_dbh) )
     {
         my $dbargs = {
@@ -23,6 +21,12 @@ sub get_asn_taxonomy_class
         
         $_as_taxonomy_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=asn_taxonomy.db", "", "", $dbargs ) );
     }
+}
+sub get_asn_taxonomy_class
+{
+    my ($asn) = @_;
+
+    _create_db_handle_if_necessary();
 
     if (!defined($_asn_taxonomy_cache->[$asn] ) )
     {
@@ -32,6 +36,17 @@ sub get_asn_taxonomy_class
     }
 
     return $_asn_taxonomy_cache->[$asn];
+}
+
+sub get_asn_organization_description
+{
+   my ($asn) = @_;
+
+   _create_db_handle_if_necessary();
+
+   my $org_description = $_as_taxonomy_dbh->query("select organization_description from  as_taxonomy where asn=?", $asn)->flat->[0];
+ 
+   return $org_description;
 }
 
 

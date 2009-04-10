@@ -186,4 +186,22 @@ sub get_graph_label
     return $ret;
 }
 
+
+sub total_connections
+{
+    my ($self) = @_;
+
+    my $ret = 0;
+    foreach my $field (qw (customer peer))
+    {
+        if ( defined( $self->{$field} ) )
+        {
+            $ret += uniq @{ $self->{$field} };
+        }
+    }
+
+    return $ret;
+}
+
+
 1;

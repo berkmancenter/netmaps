@@ -21,30 +21,14 @@ use List::Compare;
 # STATICS
 
 my $_as_class_color = {
-abstained => 'grey',
-comp      => 'yellow',
-edu     => 'orange',
-ix     => 'purple',
-nic     => 'green',
-t1     => 'red',
-t2     => 'blue',
+    abstained => 'grey',
+    comp      => 'yellow',
+    edu       => 'orange',
+    ix        => 'purple',
+    nic       => 'green',
+    t1        => 'red',
+    t2        => 'blue',
 };
-
-sub _total_connections
-{
-    my ($asn) = @_;
-
-    my $ret = 0;
-    foreach my $field (qw (customer peer))
-    {
-        if ( defined( $asn->{$field} ) )
-        {
-            $ret += uniq @{ $asn->{$field} };
-        }
-    }
-
-    return $ret;
-}
 
 # METHODS
 
@@ -79,25 +63,27 @@ sub get_as_nodes_count
     my ($self) = @_;
     my $asns = $self->{asn_nodes};
 
-    return scalar (keys %{$asns});
+    return scalar( keys %{$asns} );
 }
 
 sub _get_total_ips
 {
     my ($self) = @_;
     my $asns = $self->{asn_nodes};
-    
+
     return sum map { $_->get_asn_ip_address_count() } values %{$asns};
 }
 
 sub print_graphviz
 {
 
-    my ($self, $max_parent_nodes) = @_;
+    my ( $self, $max_parent_nodes ) = @_;
 
-    my $g = GraphViz->new( layout => 'twopi', 
-ratio => 'auto', overlap => 'scale' 
-);
+    my $g = GraphViz->new(
+        layout  => 'twopi',
+        ratio   => 'auto',
+        overlap => 'scale'
+    );
 
     my $asns = $self->{asn_nodes};
 
@@ -105,7 +91,7 @@ ratio => 'auto', overlap => 'scale'
 
     foreach my $key ( sort keys(%$asns) )
     {
-        if (defined($max_parent_nodes) && ($parent_nodes_processed > $max_parent_nodes))
+        if ( defined($max_parent_nodes) && ( $parent_nodes_processed > $max_parent_nodes ) )
         {
             return $g;
         }
@@ -114,13 +100,15 @@ ratio => 'auto', overlap => 'scale'
             foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
                 @{ $asns->{$key}->get_nodes_for_relationship($field) } )
             {
-                if ( (!$child->is_rest_of_world()) && (! $child->only_connects_to_rest_of_world()) ) {
+                if ( ( !$child->is_rest_of_world() ) && ( !$child->only_connects_to_rest_of_world() ) )
+                {
                     $g->add_edge( $key => $child->get_as_number() );
                 }
                 else
                 {
-                    print "Skipping link $key -> " .  $child->get_as_number() . "\n";
+                    print "Skipping link $key -> " . $child->get_as_number() . "\n";
                 }
+
                 #                        print "\t\t $field:$key " . $child->get_as_number(). "\n";
             }
         }
@@ -128,19 +116,20 @@ ratio => 'auto', overlap => 'scale'
         $parent_nodes_processed++;
     }
 
-    foreach my $asn_key (@{$g->{NODELIST}} )
+    foreach my $asn_key ( @{ $g->{NODELIST} } )
     {
+
         #print "$asn_key\n";
-        #if ( _total_connections( $asns->{$asn_key} ) > 2 )
+        #if ( ( $asns->{$asn_key}->total_connections ) > 2 )
         {
-            $g->add_node($asn_key, label => $asns->{$asn_key}->get_graph_label() );
+            $g->add_node( $asn_key, label => $asns->{$asn_key}->get_graph_label() );
         }
-        
+
         my $as_class = AsnTaxonomyClass::get_asn_taxonomy_class($asn_key);
 
         my $color;
 
-        if (!defined($as_class) )
+        if ( !defined($as_class) )
         {
             $color = 'white';
         }
@@ -149,7 +138,7 @@ ratio => 'auto', overlap => 'scale'
             $color = $_as_class_color->{$as_class};
         }
 
-        $g->add_node($asn_key, fillcolor => $color, style => 'filled');
+        $g->add_node( $asn_key, fillcolor => $color, style => 'filled' );
     }
 
     return $g;
@@ -174,7 +163,7 @@ sub _get_graph_object
             foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
                 @{ $asns->{$key}->get_nodes_for_relationship($field) } )
             {
-                if (! $asns->{$key}->is_rest_of_world && !$child->is_rest_of_world) 
+                if ( !$asns->{$key}->is_rest_of_world && !$child->is_rest_of_world )
                 {
                     $g->add_edge( $key, $child->get_as_number() );
                 }
@@ -188,7 +177,6 @@ sub _get_graph_object
 
     return $g;
 }
-
 
 sub print_asn_graph
 {
@@ -209,18 +197,17 @@ sub print_asn_graph
     }
 }
 
-
 sub get_country_codes
 {
     my ($self) = @_;
 
     my $asns = $self->{asn_nodes};
-    
-    my @country_list = uniq  map {$_->get_country_code()} values %{$asns};
+
+    my @country_list = uniq map { $_->get_country_code() } values %{$asns};
 
     @country_list = sort @country_list;
 
-    return \@country_list
+    return \@country_list;
 }
 
 sub die_if_cyclic
@@ -229,10 +216,10 @@ sub die_if_cyclic
 
     my $g = $self->_get_graph_object();
 
-    die "Graph is cyclic: " . join (" , " , $g->find_a_cycle()) if ($g->has_a_cycle() );
+    die "Graph is cyclic: " . join( " , ", $g->find_a_cycle() ) if ( $g->has_a_cycle() );
 
     #print "Graph is not cyclic\n";
-    
+
 }
 
 #Return the top 10 Asns plus any ASNs that can monitor 90% of the countries IPs
@@ -243,36 +230,43 @@ sub _get_top_country_asns
 
     $self->die_if_cyclic();
 
-    my @asn_keys = reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() } keys(%$asns) ;
-    if (scalar(@asn_keys) > 9)
+    my @asn_keys =
+      reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=> $asns->{$b}->get_monitorable_ip_address_count() }
+      keys(%$asns);
+    if ( scalar(@asn_keys) > 9 )
     {
-        @asn_keys = @asn_keys[0..9];
+        @asn_keys = @asn_keys[ 0 .. 9 ];
     }
 
     my $total_ips = $self->_get_total_ips();
 
-    my @ninety_percent_monitoring_asns = grep {($asns->{$_}->get_monitorable_ip_address_count()/$total_ips) >= 0.9} keys (%$asns);
+    my @ninety_percent_monitoring_asns =
+      grep { ( $asns->{$_}->get_monitorable_ip_address_count() / $total_ips ) >= 0.9 } keys(%$asns);
 
-    my $lca = List::Compare->new('-u', '-a', \@asn_keys, \@ninety_percent_monitoring_asns);
+    my $lca = List::Compare->new( '-u', '-a', \@asn_keys, \@ninety_percent_monitoring_asns );
 
     my @top_asn_keys = $lca->get_union();
 
-    @top_asn_keys = reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=>  $asns->{$b}->get_monitorable_ip_address_count() }  @top_asn_keys;
+    @top_asn_keys =
+      reverse sort { $asns->{$a}->get_monitorable_ip_address_count() <=> $asns->{$b}->get_monitorable_ip_address_count() }
+      @top_asn_keys;
 
     return \@top_asn_keys;
 }
 
 sub get_asn_information_as_hash
 {
-    (my $asn) = @_;
+    ( my $asn ) = @_;
     my $ret = {};
 
     die unless defined $asn;
 
-    $ret->{direct_ips} =  $asn->get_asn_ip_address_count();
-    $ret->{downstream_ips} = $asn->get_downstream_ip_address_count();
-    $ret->{monitorable_ips} = $asn->get_monitorable_ip_address_count();
-
+    $ret->{total_connections} = $asn->total_connections();
+    $ret->{direct_ips}        = $asn->get_asn_ip_address_count();
+    $ret->{downstream_ips}    = $asn->get_downstream_ip_address_count();
+    $ret->{monitorable_ips}   = $asn->get_monitorable_ip_address_count();
+    $ret->{asn}               = $asn->get_as_number();
+    $ret->{organization_name} = AsnTaxonomyClass::get_asn_organization_description( $ret->{asn});
     return $ret;
 }
 
@@ -288,36 +282,32 @@ sub print_connections_per_asn
 
     $self->die_if_cyclic();
 
-    my @asn_keys = @{$self->_get_top_country_asns};
+    my @asn_keys = @{ $self->_get_top_country_asns };
 
-    foreach my $key (  @asn_keys )
+    foreach my $key (@asn_keys)
     {
-        my $asn_name = (AsnUtils::get_asn_whois_info($key))->{name};
-        print "Total downstream connections for AS$key ($asn_name): " . _total_connections( $asns->{$key} )  . "\n";
-        if ($key ne 'REST_OF_WORLD') 
+        my $asn_info = get_asn_information_as_hash( $asns->{$key} );
+
+        #my $asn_name = (AsnUtils::get_asn_whois_info($key))->{name};
+        my $asn_name = ( AsnTaxonomyClass::get_asn_organization_description($key) );
+        print "Total downstream connections for AS$asn_info->{asn} ($asn_info->{organization_name}): $asn_info->{total_connections}\n";
+        if ( $key ne 'REST_OF_WORLD' )
         {
-            my $asn_info = get_asn_information_as_hash($asns->{$key});
 
             print "\tDirect IPs for AS$key: " . $asn_info->{direct_ips} . "\n";
             print "\tDownstream IPs for AS$key: " . $asn_info->{downstream_ips} . "\n";
             print "\tMonitorable IPs for AS$key: " . $asn_info->{monitorable_ips} . "\n";
-            print "\tPercent of all total IPs monitorable: " . $asn_info->{monitorable_ips}/ $total_ips *100.0 . "\n";
+            print "\tPercent of all total IPs monitorable: " . $asn_info->{monitorable_ips} / $total_ips * 100.0 . "\n";
             print "\n";
-
-#             print "\tDirect IPs for AS$key: " . $asns->{$key}->get_asn_ip_address_count() . "\n";
-#             print "\tDownstream IPs for AS$key: " . $asns->{$key}->get_downstream_ip_address_count() . "\n";
-#             print "\tMonitorable IPs for AS$key: " . $asns->{$key}->get_monitorable_ip_address_count() . "\n";
-#             print "\tPercent of all total IPs monitorable: " . $asns->{$key}->get_monitorable_ip_address_count()/ $total_ips *100.0 . "\n";
-#             print "\n";
         }
 
-         foreach my $field (qw (customer peer provider sibling))
-         {
-             if ( defined( $asns->{$key}->{$field} ) )
-             {
-                 print "\t\t $field: " . ( join ", ", map {$_->get_as_number()} @{ $asns->{$key}->{$field} } ) . "\n";
-             }
-         }
+        foreach my $field (qw (customer peer provider sibling))
+        {
+            if ( defined( $asns->{$key}->{$field} ) )
+            {
+                print "\t\t $field: " . ( join ", ", map { $_->get_as_number() } @{ $asns->{$key}->{$field} } ) . "\n";
+            }
+        }
     }
 }
 
@@ -352,9 +342,9 @@ sub get_as_node_or_rest_of_world_node
 
 sub _asn_equals_country_code
 {
-    my ($asn, $country_code) = @_;
+    my ( $asn, $country_code ) = @_;
 
-    return  defined ($asn->get_country_code) && $asn->get_country_code eq $country_code
+    return defined( $asn->get_country_code ) && $asn->get_country_code eq $country_code;
 }
 
 #creates a new graph based on the old graph expect that all nodes not in country are replaced with rest_of_the_world
@@ -369,22 +359,24 @@ sub get_country_specific_sub_graph
     my $asns = $self->{asn_nodes};
     foreach my $old_asn ( values %{$asns} )
     {
+
         #create a new asn node for the new graph for node that weren't in the country replace them with rest_of_world_node
         #next unless _asn_equals_country_code($old_asn, $country_code);
 
         my $new_asn = $ret->get_as_node_or_rest_of_world_node( $old_asn, $country_code );
 
-
         foreach my $relationship_type ( $old_asn->get_relationship_types() )
         {
             my @rel_list =
-              map { $ret->get_as_node_or_rest_of_world_node( $_, $country_code ) } 
-                  #grep {_asn_equals_country_code($_, $country_code) }  
-                      @{ $old_asn->{$relationship_type} };
+              map { $ret->get_as_node_or_rest_of_world_node( $_, $country_code ) }
+
+              #grep {_asn_equals_country_code($_, $country_code) }
+              @{ $old_asn->{$relationship_type} };
             @rel_list = uniq @rel_list;
             push @{ $new_asn->{$relationship_type} }, @rel_list;
             $new_asn->{$relationship_type} = [ uniq @{ $new_asn->{$relationship_type} } ];
-           # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne'REST_OF_WORLD'}   @{ $new_asn->{$relationship_type} } ];
+
+    # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne'REST_OF_WORLD'}   @{ $new_asn->{$relationship_type} } ];
         }
     }
 

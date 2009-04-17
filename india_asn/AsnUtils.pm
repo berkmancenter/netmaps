@@ -33,7 +33,7 @@ sub get_asn_whois_info
 
     $asn = lc($asn);
 
-    if ($asn !~ /^as/ )
+    if ( $asn !~ /^as/ )
     {
         $asn = "as$asn";
     }
@@ -48,11 +48,48 @@ sub get_asn_whois_info
     my @whois_results = split( /\s*\|\s*/, $whois[1] );
 
     my %ret;
-    @ret{ 'as' , 'cc' ,  'registry',  'allocated',  'name' } = 
-        @whois_results;
+    @ret{ 'as', 'cc', 'registry', 'allocated', 'name' } = @whois_results;
 
     #print Dumper( \ %ret);
-    return \ %ret;
+    return \%ret;
+}
+
+sub get_asn_dig_info
+{
+    my ($asn) = @_;
+
+    $asn = lc($asn);
+
+    if ( $asn !~ /^as/ )
+    {
+        $asn = "AS$asn";
+    }
+
+    #print Dumper($asn);
+
+    my %ret;
+
+    while (1)
+    {
+        my @whois = `dig +short $asn.asn.cymru.com TXT`;
+
+        #print Dumper(@whois);
+        chomp( $whois[0] );
+
+        my $dig_response = $whois[0];
+
+        $dig_response =~ s/^"(.*)"$/$1/;
+
+        my @whois_results = split( /\s*\|\s*/, $dig_response );
+
+        @ret{ 'as', 'cc', 'registry', 'allocated', 'name' } = @whois_results;
+
+        last unless ( ( defined( $ret{as} ) ) && ( $ret{as} =~ /.*timed out.*/ ) );
+        print STDERR "retrying query for $asn\n";
+    }
+
+    #print Dumper( \ %ret);
+    return \%ret;
 }
 
 sub _read_asn_to_country_csv_file

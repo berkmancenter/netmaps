@@ -28,6 +28,8 @@ sub get_asn_taxonomy_class
 
     _create_db_handle_if_necessary();
 
+    return if ($asn eq "REST_OF_WORLD");
+
     if (!defined($_asn_taxonomy_cache->[$asn] ) )
     {
         my $ip_count = $_as_taxonomy_dbh->query("select inferred_as_class from  as_taxonomy where asn=?", $asn)->flat->[0];

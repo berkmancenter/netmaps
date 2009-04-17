@@ -5,6 +5,7 @@ use Getopt::Long;
 use AsnGraph;
 use List::Util qw(max min);
 use Locale::Country qw(code2country);
+use Readonly;
 
 my $get_relationship_name = {
     -1 => 'customer',
@@ -13,11 +14,16 @@ my $get_relationship_name = {
     2  => 'sibling',
 };
 
+my $_xml_output_file = 'results.xml';
+
+my $_output_dir      = 'results';
+
 sub main
 {
 
     my $graph_viz_output = '';
     my $text_output      = '';
+    my $xml_output       =  0;
 
     GetOptions( 'graph_viz_output' => \$graph_viz_output, 'text_output' => \$text_output )
       or die "USAGE: make_asn_graph.pl [ --graph_viz_output | --text_output ]\n";
@@ -30,7 +36,7 @@ sub main
 
     if ( !$graph_viz_output && !$text_output )
     {
-        $text_output = 1;
+        $xml_output = 1;
     }
 
     my $asn_graph = AsnGraph->new;
@@ -59,30 +65,77 @@ sub main
 
     my @country_codes = @{$asn_graph->get_country_codes()};
 
-    @country_codes = grep {$_ eq 'IN' } @country_codes;
+    @country_codes = grep {defined($_) } @country_codes;
 
+    @country_codes = grep { $_ ne 'US' } @country_codes;
+  #  @country_codes = grep { $_ eq 'AR' } @country_codes;
 
+#    @country_codes = @country_codes[0..10];
+
+    my $doc  = XML::LibXML::Document->new();
+    my $root = $doc->createElement('asn_results');
+
+    $doc->setDocumentElement($root);
+    
+    my $loop_iteration = 0;
     for my $country_code (@country_codes)
     {
+        $loop_iteration++;
+        my $country_name = code2country($country_code);
+
+        next unless defined $country_name;
+
+        print "Country: $country_name($country_code)\n";
         my $asn_sub_graph = $asn_graph->get_country_specific_sub_graph($country_code);
         
-        #    print_asn_graph($asns);
-        print "Country: $country_code\n";
-        if ($text_output)
+        if ($xml_output) 
+        {
+            my $country_element = XML::LibXML::Element->new('country');
+            $country_element->setAttribute( 'country_code' , $country_code );
+            $country_element->setAttribute( 'country_name' , code2country($country_code));
+            $country_element->appendChild($asn_sub_graph->xml_summary());
+            $root->appendChild($country_element);
+            my $g = $asn_sub_graph->print_graphviz();
+            my $svg_output_file = "$_output_dir/graphs/asn-$country_name.svg";
+            #die unless $g->as_svg($svg_output_file);
+            my $svg_to_scale = $g->as_svg;
+            die unless $svg_to_scale;
+            $svg_to_scale =~ s/<svg width=".*" height=".*"/<svg width="100%" height="100%"/;
+            $svg_to_scale =~ s/stroke:black;"/stroke:black;stroke-width:20"/g;
+            open(SVGOUTPUTFILE, ">$svg_output_file") || die "Could not create file:$svg_output_file ";
+            print SVGOUTPUTFILE $svg_to_scale;
+
+            if (($loop_iteration % 10) == 0)
+            {
+                print "Dumping current results\n";
+                print $doc->toFile( "$_output_dir/$_xml_output_file", 1 );
+            }
+
+            if ($loop_iteration == 11) { exit; }
+            
+        }
+        elsif ($text_output)
         {
             $asn_sub_graph->print_connections_per_asn($asns);
         }
-        else
+        elsif ($graph_viz_output)
         {
             my $graph_size =  $asn_sub_graph->get_as_nodes_count;
-            die unless $graph_viz_output;
             my $g = $asn_sub_graph->print_graphviz();
 
-            my $country_name = code2country($country_code);
             die unless $g->as_svg("graphs/asn-$country_name-$country_code.svg");
             die unless $g->as_text("graphs/asn-$country_name-$country_code.dot");
             print "finished country: '$country_name - $country_code'\n";
         }
+        else
+        {
+            die "SHOULD NOT BE REACHED";
+        }
+    }
+ 
+    if ($xml_output) 
+    {
+        print $doc->toFile( "$_output_dir/$_xml_output_file", 1 );
     }
 }
 
@@ -100,7 +153,6 @@ sub find_max_printable_graph_size
         $graph_size *= 2;
         $graph_size  = min($graph_size, $asn_sub_graph->get_as_nodes_count);
     }
-    
 }
 
 main();

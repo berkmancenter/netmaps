@@ -1,13 +1,16 @@
 package AS;
 
 use strict;
-use List::MoreUtils qw(uniq none);
+use List::MoreUtils qw(uniq none any);
 use List::Util qw(sum);
 use List::Pairwise qw (grepp);
 use GraphViz;
 use AsnUtils;
+use AsnInfo;
 use AsnIPCount;
 use Data::Dumper;
+use Scalar::Util qw ( weaken);
+use Encode;
 
 # MODULES
 
@@ -83,7 +86,10 @@ sub add_relationship
 
     push @{ $self->{$relationship_name} }, $other_as;
 
-    #weaken($other_as);
+    if ($relationship_name ne 'provider') {
+       #todo
+       #weaken($other_as);
+    }
 }
 
 sub get_relationship_types
@@ -111,11 +117,15 @@ sub get_asn_ip_address_count
 
     return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
 
-    my $ret = AsnIPCount::get_ip_address_count_for_asn( $self->{as_number} );
+    if (!defined($self->{_asn_ip_address_count})) 
+    {
+        my $ret = AsnIPCount::get_ip_address_count_for_asn( $self->{as_number} );
 
-    return 0 if ( !defined($ret) );
-
-    return $ret;
+        $ret ||= 0;
+        $self->{_asn_ip_address_count} = $ret;
+    }
+    
+    return $self->{_asn_ip_address_count};
 }
 
 sub get_downstream_asns
@@ -129,6 +139,7 @@ sub get_downstream_asns
           grep { $self->{as_number} ne 'REST_OF_WORLD' } @{ $self->get_customers }
     ];
 }
+
 
 sub get_downstream_ip_address_count
 {
@@ -157,13 +168,112 @@ sub get_monitorable_ip_address_count
 {
     my ($self) = @_;
 
-    return $self->get_asn_ip_address_count() + $self->get_downstream_ip_address_count();
+    if (!defined($self->{_monitorable_ips}))
+    {
+        $self->{_monitorable_ips} =  $self->get_asn_ip_address_count() + $self->get_downstream_ip_address_count();
+    }
+
+    return $self->{_monitorable_ips};
+}
+
+
+sub get_effective_monitorable_ip_address_count
+{
+    my ($self, $downstream_exclude_list) = @_;
+
+    #todo decide on caching and make work with $downstream_exclude_list
+    #if (!defined($self->{_effective_monitorable_ips}))
+    {
+        $self->{_effective_monitorable_ips} =  $self->get_asn_ip_address_count() + $self->get_effective_monitorable_downstream_ip_address_count($downstream_exclude_list);
+    }
+
+    return $self->{_effective_monitorable_ips};
+}
+
+sub get_number_of_providers
+{
+     my ($self) = @_;
+     
+     return scalar(@{ $self->{provider}});
+}
+
+sub _is_inlist
+{
+    my ($val, $list) = @_;
+
+    return 0 if (!defined($list) || (scalar(@{$list}) == 0));
+
+    #print "val: $val\n";
+    #print "list: $list->[0]\n";
+
+    return any { $_->get_as_number() eq $val->get_as_number()} @{$list};
+}
+
+sub _my_exclude
+{
+    my ($list1, $list2) = @_;
+
+    my @ret =grep {  !_is_inlist($_, $list2) } $list1;
+
+    #@ret = map {bless $_ , "AS"} @ret;
+    return \@ret;
+}
+
+sub get_effective_monitorable_downstream_ip_address_count
+{
+
+    my ($self, $downstream_exclude_list) = @_;
+
+    return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
+
+    my $customers = $self->get_customers;
+
+    return 0 if (scalar (@{$customers}) == 0 );
+
+    my $sum = 0;
+
+     foreach my $customer_asn (@{$customers})
+     {
+         if (!_is_inlist($customer_asn, $downstream_exclude_list) ) {
+             $sum += $customer_asn->get_effective_monitorable_ip_address_count($downstream_exclude_list)/$customer_asn->get_number_of_providers;
+         }
+         else
+         {
+             #print "Not double counting " . $customer_asn->get_as_number() . "\n";
+         }
+     }
+
+     return $sum;
+
+    ##todo the code below should work but it doesn't
+    if (defined($downstream_exclude_list) && scalar(@{$downstream_exclude_list})) 
+    {
+        #print Dumper ($customers->[0]);
+        print "All customers\n";
+        print join ", ", map {ref $_ } @{$customers};
+        print "\n";
+        my $lca = List::Compare->new( $customers, $downstream_exclude_list );
+        
+        #$customers = $lca->get_Lonly_ref;
+        $customers = _my_exclude($customers, $downstream_exclude_list);
+
+
+        #$customers = \ @temp;
+        
+        print "Customers after exclude\n";
+        print join ", ", map {ref $_ }  @{$customers};
+        print "\n";
+        #print Dumper ($customers->[0]);
+        return 0 if (scalar (@{$customers}) == 0 );
+    }
+
+    return sum map { ($_->get_effective_monitorable_ip_address_count/$_->get_number_of_providers) } @{ $customers };
 }
 
 sub get_graph_label
 {
 
-    my ($self) = @_;
+    my ($self, $total_country_ips) = @_;
 
     my $asn_number = $self->get_as_number;
 
@@ -173,14 +283,19 @@ sub get_graph_label
 
     if ( $asn_number ne 'REST_OF_WORLD' )
     {
-        $ret .= "\n";
-        my $asn_name = AsnUtils::get_asn_whois_info($asn_number)->{name};
-        $ret .= "$asn_name\n";
-        $ret .= "Direct IPs for AS$asn_number: " . $self->get_asn_ip_address_count() . "\n";
-        $ret .= "Downstream IPs for AS$asn_number: " . $self->get_downstream_ip_address_count() . "\n";
-        $ret .= "Monitorable IPs for AS$asn_number: " . $self->get_monitorable_ip_address_count() . "\n";
+        my $stats = $self->get_statistics();
 
-        #$ret .= "Percent of all total IPs monitorable: " . $self->get_monitorable_ip_address_count()/ $total_ips *100.0;
+        $ret .= "\n";
+        #my $asn_name = AsnUtils::get_asn_whois_info($asn_number)->{name};
+        my $asn_name = $stats->{organization_name};
+        $ret .= "$asn_name\n";
+        $ret .= "Direct IPs: " . $stats->{direct_ips} . "\n";
+        $ret .= "Downstream IPs: " . $stats->{downstream_ips}  . "\n";
+        $ret .= "Monitorable IPs: " . $stats->{monitorable_ips} . "\n";
+        if(defined($total_country_ips))
+        {
+            $ret .= "Can monitor " . $self->get_monitorable_ip_address_count()/ $total_country_ips *100.0 . "% of country";
+        }
     }
 
     return $ret;
@@ -203,5 +318,28 @@ sub total_connections
     return $ret;
 }
 
+
+sub get_statistics
+{
+    ( my $asn ) = @_;
+    my $ret = {};
+
+    die unless defined $asn;
+
+    if (!defined($asn->{_statistics}))
+    {
+        $ret->{total_connections} = $asn->total_connections();
+        $ret->{direct_ips}        = $asn->get_asn_ip_address_count();
+        $ret->{downstream_ips}    = $asn->get_downstream_ip_address_count();
+        $ret->{actual_monitorable_ips}   = $asn->get_monitorable_ip_address_count();
+        $ret->{monitorable_ips}   = $asn->get_effective_monitorable_ip_address_count();
+        $ret->{asn}               = $asn->get_as_number();
+        $ret->{organization_name} = encode("utf8", AsnInfo::get_asn_organization_description( $ret->{asn}) || "");
+        $ret->{customers}         = join "," , map {$_->get_as_number() } @{$asn->get_customers()};
+        $asn->{_statistics} = $ret;
+    }
+
+    return $asn->{_statistics};
+}
 
 1;

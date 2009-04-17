@@ -1,5 +1,4 @@
 <?
-
 include "./header.php"
 ?>
 
@@ -10,17 +9,28 @@ $xml_file_location = 'results/results.xml';
 
 $xml = new SimpleXMLElement(file_get_contents($xml_file_location));
 ?>
-
 <?
-   $country_name = $_REQUEST['cn'];
+function validate_country_code($country_code)
+{
+  if (strlen($country_code) != 2)
+    {
+      die ("illegal country code");
+    }  
+
+  if (preg_match("/[^A-Z]/", $country_code))
+    {
+      die ("illegal country code");
+    }
+}
+
+?>
+<?
+$country_code = $_REQUEST['cc'];
+validate_country_code($country_code);
 $xml_file_location = 'results/results.xml';
-$host = $_SERVER["HTTP_HOST"];
-$path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
-$country_svg_url = "http://$host$path/results/graphs/asn-$country_name.svg";
 
 $xml = new SimpleXMLElement(file_get_contents($xml_file_location));
-
-  $xquery_string = "//country[@country_name='". $country_name . "']";
+$xquery_string = "//country[@country_code='$country_code']";
 $result_array = $xml->xpath($xquery_string);
 $country_xml = $result_array[0];
 
@@ -44,21 +54,13 @@ $country_xml = $result_array[0];
 ?>
 
 <h1>Country Statistics</h1>
-<table>
-<tr>
-<td>Country Name</td>
-<td>Country Code</td>
-<td>Total IPs</td>
-</tr>
-<tr>
-<td><? echo "{$country_xml['country_name']}" ?></td>
-<td><? echo "{$country_xml['country_code']}" ?></td>
-<td><? echo ((string) $country_xml->summary->total_ips) ?></td>
-</tr>
-</table>
-<h1>Top ISPs</h1>
+
+<? country_xml_list_summary_table(array($country_xml)); ?>
+
+<h1>Top ASNs</h1>
 
 <table>
+ <? ?>
 <tr>
 <td>asn</td>
 <td>organization</td>
@@ -81,7 +83,34 @@ foreach ($country_xml->summary->as as $as)
     } 
 ?>
 </table>
+<?
+
+function get_country_svg_image_url($country_xml)
+{
+  $host = $_SERVER["HTTP_HOST"];
+  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+#print_r($country_xml);
+#print_r($country_xml["country_name"]);
+  $country_name = $country_xml['country_name'];
+ # $country_name = get_country_name_x($country_xml);
+#print_r($country_name);
+  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name) . ".svg";
+
+  $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
+  return $country_svg_url;
+}
+
+?>
+<?
+$country_svg_url = get_country_svg_image_url($country_xml);
+?>
+
+<iframe src ="<? echo $country_svg_url ?>" width="800" height="800">
+  <p>Your browser does not support iframes.</p>
+</iframe>
+
 <p>
+
 <a href="<? echo $country_svg_url ?>">Asn Image Graph</a>
 </p>
 

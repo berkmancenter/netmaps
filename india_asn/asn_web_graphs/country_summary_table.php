@@ -1,45 +1,38 @@
 <?
-
-$xml_file_location = 'results/results.xml';
-
-
-$xml = new SimpleXMLElement(file_get_contents($xml_file_location));
+//include "xml_utils.php";
 ?>
 
-<table>
-<tr>
-<td>Country</td>
-<td>Code</td>
-<td>Total IPs</td>
-<td>number of 90 controlling AS</td>
-</tr>
-
 <?
-foreach ($xml->country as $country) 
+function display_tables($sort_function, $sort_type_adjective, $sort_type_noun) 
 {
-  $country_code =  (string)$country['country_code'];
-  $country_name =  (string)$country['country_name'];
 
- # print_r( $country_code);
- # print_r($country);
+  $xml = get_xml_file();
+  $countries_xml = $xml->xpath("//country");
+  $countries_xml_tmp = array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
+  
+#print_r($countries_xml_tmp);
+  
+  $countries_xml = $countries_xml_tmp;
+  
+  usort($countries_xml, $sort_function);
+  
+  $countries_xml_bottom_15 = array_slice($countries_xml, 0, 15);
+  $countries_xml_top_15 = array_slice($countries_xml, -15);
 ?>
-  <tr>
-    
-    <td> <a href=<? echo "\"country_detail.php/?cn=$country_name\"" ?> > <? echo "{$country['country_name']}"; ?>
-</a></td>
-    <td><? echo "{$country['country_code']}"; ?></td>
-    <td><? echo $country->summary->total_ips; ?></td>
+  <h1>Countries by <?echo $sort_type_noun ?> </h1>
+  <ul class="mylist" type="disc">
+     <li><a href='#most'>most <? echo $sort_type_adjective ?></a></li>
+     <li><a href='#least'>least <? echo $sort_type_adjective ?></a></li>
+     <li><a href='#all'>all countries</a></li>
+  </ul>
 <?
-   #print_r( $country_code); print_r(' ');
-   $xquery_string = "//country[@country_code='". $country_code . "']/summary/as/percent_monitorable[. > 90]";
- #  print_r( $xquery_string);
- ?>
-    <td>
-        <?# print_r($country->xpath($xquery_string)); ?>
-        <? echo count($country->xpath($xquery_string)) ?></td>
-  </tr>
-<?  
+  print "<h1><a name='most'>most $sort_type_adjective</a></h1>";
+  country_xml_list_summary_table(array_reverse($countries_xml_bottom_15));
+
+  print "<h1><a name='least'>least $sort_type_adjective</a></h1>";
+  country_xml_list_summary_table($countries_xml_top_15);
+  
+  print "<h1><a name='all'>full country list sorted by $sort_type_noun</a></h1>";
+  country_xml_list_summary_table($countries_xml);
 }
 ?>
-
-</table>

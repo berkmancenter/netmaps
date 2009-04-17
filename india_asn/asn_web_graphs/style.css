@@ -29,30 +29,15 @@ table,tr,td,th,thead
   margin: 20px;	
 }
 
-.question
-{
-  padding: 0;
-  font-weight: bold;
-  color: blue;
-  
-}
-
-.answer
-{
- padding-bottom: 0;
- padding-top: 0;
- padding-left: 5 px;
- padding-right: 5 px;
-}
 
 /* based on Huddleston 174-175P. */
 
 #mainnav {
 	width: 100%;
 	float: left;
-	padding-left: 15 px;
-	padding-right: 15 px;
-	padding-bottom: 2 em;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 2em;
 	border-bottom: 3px solid #000000;
 	text-align: right;
 }
@@ -69,8 +54,26 @@ table,tr,td,th,thead
 	float:left;
 	margin: 1px;
 	margin-right: 10px;
+	list-style-type: none;
+	list-style-image: none;
 }
 
 #mainnav a {
 	display: block;
+}
+
+
+ul {
+	list-style-type: square;
+	list-style-position: outside;
+        margin-left: 1em;
+        padding-left: 1em;
+/*       margin : 2em;
+        padding: 10px;
+
+       
+*/
+	}
+li {
+	list-style-type: square;
 }

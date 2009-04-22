@@ -10,7 +10,7 @@ Here we list countries by the complexity of the network of autonomous systems wi
 
 include 'country_summary_table.php';
 
-display_tables("cmp_country_complexity", "complex", "complexity"); 
+display_tables("cmp_country_complexity", "complex", "complexity", "least"); 
 ?>
 <?
 include "footer.php";

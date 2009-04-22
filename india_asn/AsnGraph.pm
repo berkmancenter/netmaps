@@ -97,6 +97,44 @@ sub _get_total_ips
     return $self->{_total_ips};
 }
 
+sub add_edges_to_graph
+{
+  (my $asns, my $g, my $show_un_country_connected_nodes, my $max_parent_nodes) = @_;
+
+  my $total_edges = 0;
+  my $parent_nodes_processed = 0;
+
+  foreach my $key ( sort keys(%$asns) )
+    {
+        if ( defined($max_parent_nodes) && ( $parent_nodes_processed > $max_parent_nodes ) )
+        {
+            return $total_edges;
+        }
+        foreach my $field (qw  (customer peer))
+        {
+            foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
+                @{ $asns->{$key}->get_nodes_for_relationship($field) } )
+            {
+                if ( ( !$child->is_rest_of_world() ) && ($show_un_country_connected_nodes ||  !$child->only_connects_to_rest_of_world() ) )
+                {
+                    $g->add_edge( $key => $child->get_as_number() );
+                    $total_edges++;
+                }
+                else
+                {
+                    print "Skipping link $key -> " . $child->get_as_number() . "\n";
+                }
+
+                #                        print "\t\t $field:$key " . $child->get_as_number(). "\n";
+            }
+        }
+
+        $parent_nodes_processed++;
+    }
+
+  return $total_edges;
+}
+
 sub print_graphviz
 {
 
@@ -110,33 +148,12 @@ sub print_graphviz
 
     my $asns = $self->{asn_nodes};
 
-    my $parent_nodes_processed = 0;
+    my $edges = add_edges_to_graph($asns, $g, 0, $max_parent_nodes);
 
-    foreach my $key ( sort keys(%$asns) )
+    if ($edges == 0)
     {
-        if ( defined($max_parent_nodes) && ( $parent_nodes_processed > $max_parent_nodes ) )
-        {
-            return $g;
-        }
-        foreach my $field (qw  (customer peer))
-        {
-            foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
-                @{ $asns->{$key}->get_nodes_for_relationship($field) } )
-            {
-                if ( ( !$child->is_rest_of_world() ) && ( !$child->only_connects_to_rest_of_world() ) )
-                {
-                    $g->add_edge( $key => $child->get_as_number() );
-                }
-                else
-                {
-                    print "Skipping link $key -> " . $child->get_as_number() . "\n";
-                }
-
-                #                        print "\t\t $field:$key " . $child->get_as_number(). "\n";
-            }
-        }
-
-        $parent_nodes_processed++;
+        $edges = add_edges_to_graph($asns, $g, 1, $max_parent_nodes);
+        die "Empty graph " if ($edges == 0);
     }
 
     foreach my $asn_key ( @{ $g->{NODELIST} } )

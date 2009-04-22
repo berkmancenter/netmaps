@@ -4,7 +4,10 @@ include "header.php";
 
 <h1>Data Files</h1>
 
-<ul>The following xml file contains all of the data presented in these web pages, including
+<p>
+The following xml file contains all of the data presented in these web pages, including
+</p>
+<ul>
 <li>the basic data for each country and ASN (name, number of IPs, etc)</li>
 <li>the generated Complexity, Points of Control, and IPs per Point of Control data</li>
 <li>the network relationships for each ASN within each country.</li>

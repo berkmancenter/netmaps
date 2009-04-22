@@ -46,7 +46,7 @@ function get_page_title()
 
   switch ($page) {
   case "$path/home.php":
-    return ": home";
+    return "Home";
     break;
   case $path .'/ips_per_points_of_control_results.php':
     return "IPs per Points of Control";
@@ -85,7 +85,7 @@ function get_page_title()
 
 <link rel="stylesheet" type="text/css" href="<? echo "http://$host$path"?>/style.css" media="all" />
 
-  <title>Mapping Internet Autonomous Systems by Country: Complexity and Points of Control - <? echo get_page_title() ?></title>
+  <title>Mapping Local Internet Control - <? echo get_page_title() ?></title>
   </head>
   <body>
 <div id="mainnav">
@@ -102,4 +102,5 @@ function get_page_title()
 </div>
 <br/>
 <br/>
-<h2>PRIVATE DRAFT.  DO NOT SHARE. </h2>
+<h1>Mapping Local Internet Control [private draft - please don't share]</h1>
+<i>from the <a href="http://cyber.law.harvard.edu">Berkman Center for Intenet & Society at Harvard University</a></i>

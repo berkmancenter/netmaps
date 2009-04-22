@@ -10,7 +10,7 @@ h1{
    margin-left:auto;
    padding-top: 15px;
    padding-bottom: 10px;
-   padding-left: 10px;
+   padding-left: 0px;
    padding-right: 0px;
 }
 
@@ -20,7 +20,7 @@ h2{
    margin-left:auto
 }
 
-p {padding:1em 0em} 
+p {padding:5px 0px} 
 
 table,tr,td,th,thead
 {

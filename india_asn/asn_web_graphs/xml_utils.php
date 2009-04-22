@@ -20,7 +20,7 @@ function get_complexity($country_xml)
 { 
   $complexity = $country_xml->summary->complexity;
 
-  return (integer) $complexity;  
+  return (double) $complexity;  
 }
 
 function get_ip_address_count($country_xml)
@@ -72,7 +72,7 @@ function get_ips_per_points_of_control(SimpleXMLElement $country)
 {
   $total_ips =  get_ip_address_count($country);
   $points_of_control         =  get_points_of_control($country);  
-  return $total_ips/$points_of_control;
+  return (integer) ($total_ips/$points_of_control);
 }
 
 function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
@@ -88,7 +88,7 @@ function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
   return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
 
-function country_xml_table_row(SimpleXMLElement $country)
+function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries )
 {
   #print ("START country_xml_table_row '$country'\n");
   #if (!defined($country) ) die ("XX") ;
@@ -105,44 +105,84 @@ function country_xml_table_row(SimpleXMLElement $country)
  # print_r($country);
 ?>
   <tr>
+     <? if ($show_rank) { ?>
+     <td><? echo "$country_rank of $total_countries" ?></td>
+       <? } ?>
     
-     <td> <a href=<? echo "\"country_detail.php/?cc=". urlencode($country_code). "\"" ?> > <? echo "$country_name"; ?>
+     <td> <a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name"; ?>
 </a></td>
     <td><? echo "{$country['country_code']}"; ?></td>
-    <td><? echo $total_ips; ?></td>
-    <td><? echo $total_asns; ?></td>
+    <td><? echo htmlentities(number_format( $total_ips)); ?></td>
+    <td><? echo htmlentities(number_format( $total_asns)); ?></td>
 <?
    #print_r( $country_code); print_r(' ');
   
  #  print_r( $xquery_string);
  ?>
-    <td><? echo $points_of_control ?></td>
-    <td><? echo $ips_per_points_of_control ?></td>
-    <td><? echo $complexity ?></td>
+                                                                 <td><? echo  htmlentities(number_format($points_of_control)) ?></td>
+                                                                 <td><? echo  htmlentities(number_format($ips_per_points_of_control)) ?></td>
+                                                                 <td><? echo  htmlentities(number_format($complexity,2)) ?></td>
   </tr>
 <?  
 }
 ?>
 
+<?
+function get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun) 
+{
+  $xml = get_xml_file();
+  $countries_xml = $xml->xpath("//country");
+  $countries_xml_tmp = array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
+  $countries_xml = $countries_xml_tmp;
+  
+  usort($countries_xml, $sort_function);
+
+  return $countries_xml;
+}
+
+function top_countries_table($sort_function, $sort_type_adjective, $sort_type_noun, $list_size) 
+{
+  $countries_xml = get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun) ;
+  
+  $countries_xml_high_15 = array_slice($countries_xml, -1* $list_size);
+ 
+  print "<h1><a name='most'>most $sort_type_adjective</a></h1>";
+  country_xml_list_summary_table(array_reverse($countries_xml_high_15), true);
+}
+
+
+function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) 
+{
+  top_countries_table( $sort_function, $sort_type_adjective, $sort_type_noun, 15);
+}
+
+?>
 
 <?
-function country_xml_list_summary_table($countries_xml)
+function country_xml_list_summary_table($countries_xml, $show_rank)
 {
 ?>
 <table>
 <tr>
+    <? if ($show_rank) { ?> <td>Rank</td> <? } ?> 
 <td>Country</td>
 <td>Code</td>
 <td>Total IPs</td>
-<td>Total ANs</td>
+<td>Total Autonomous Systems</td>
 <td>Points of Control</td>
 <td>IPs Per Point of Control</td>
 <td>Complexity</td>
 </tr>
+
 <?
+    $total_countries = count($countries_xml);
+
+  $current_country_num = 0;
+
 foreach ($countries_xml as $country) 
 {
-  country_xml_table_row($country);
+  $current_country_num++;
+  country_xml_table_row($country, $show_rank, $current_country_num, $total_countries);
 }
 ?>
 </table>

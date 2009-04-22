@@ -1,7 +1,7 @@
 package AsnGraph;
 
 use strict;
-use List::MoreUtils qw(uniq);
+use List::MoreUtils qw(uniq any);
 use List::Pairwise qw (grepp);
 use List::Util qw (sum);
 use GraphViz;
@@ -28,7 +28,7 @@ my $_as_class_color = {
     edu       => 'orange',
     ix        => 'purple',
     nic       => 'green',
-    t1        => 'red',
+    t1        => 'pink',
     t2        => 'blue',
 };
 
@@ -152,15 +152,19 @@ sub print_graphviz
 
         my $color;
 
-        if ( !defined($as_class) )
-        {
-            $color = 'white';
-        }
-        else
+        if ( defined($as_class) )
         {
             $color = $_as_class_color->{$as_class};
         }
-
+        elsif ($asns->{$asn_key}->is_rest_of_world())
+        {
+            #$self->format_rest_of_world_node($g, $asns->{$asn_key});
+            $color = 'red';
+        }
+        else
+        {
+            $color = 'white';
+        }
         $g->add_node( $asn_key, fillcolor => $color, style => 'filled' );
     }
 
@@ -389,7 +393,7 @@ sub get_asns_controlling_ninty_percent
     return \@ninty_percent_list;
 }
 
-#Return the top 10 Asns plus any ASNs that can monitor 90% of the countries IPs
+#Return the top 50 Asns
 sub _get_top_country_asns
 {
     my ($self) = @_;
@@ -400,28 +404,12 @@ sub _get_top_country_asns
     my @asn_keys = $self->_get_asn_names_sorted_by_monitoring;
 
     keys(%$asns);
-    if ( scalar(@asn_keys) > 9 )
+    if ( scalar(@asn_keys) > 50 )
     {
-        @asn_keys = @asn_keys[ 0 .. 9 ];
+        @asn_keys = @asn_keys[ 0 .. 49 ];
     }
 
-    my $total_ips = $self->_get_total_ips();
-
-    my @ninety_percent_monitoring_asns =
-      grep { ( $asns->{$_}->get_effective_monitorable_ip_address_count() / $total_ips ) >= 0.9 } keys(%$asns);
-
-    my $lca = List::Compare->new( '-u', '-a', \@asn_keys, \@ninety_percent_monitoring_asns );
-
-    my @top_asn_keys = $lca->get_union();
-
-    @top_asn_keys = grep { !$asns->{$_}->is_rest_of_world() } @top_asn_keys;
-
-    @top_asn_keys =
-      reverse
-      sort { $asns->{$a}->get_effective_monitorable_ip_address_count() <=> $asns->{$b}->get_effective_monitorable_ip_address_count() }
-      @top_asn_keys;
-
-    return \@top_asn_keys;
+    return \@asn_keys;
 }
 
 sub print_connections_per_asn
@@ -432,7 +420,7 @@ sub print_connections_per_asn
 
     my $total_ips = $self->_get_total_ips();
 
-    die "Could unget total ips" unless defined($total_ips);
+    die "Could not get total ips" unless defined($total_ips);
     print "ASN graph has $total_ips total ips\n";
 
     $self->die_if_cyclic();
@@ -452,8 +440,8 @@ sub print_connections_per_asn
 
             print "\tDirect IPs for AS$key: " . $asn_info->{direct_ips} . "\n";
             print "\tDownstream IPs for AS$key: " . $asn_info->{downstream_ips} . "\n";
-            print "\tMonitorable IPs for AS$key: " . $asn_info->{monitorable_ips} . "\n";
-            print "\tPercent of all total IPs monitorable: " . $asn_info->{monitorable_ips} / $total_ips * 100.0 . "\n";
+            print "\tMonitorable IPs for AS$key: " . $asn_info->{effective_monitorable_ips} . "\n";
+            print "\tPercent of all total IPs monitorable: " . $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 . "\n";
             print "\n";
         }
 
@@ -480,7 +468,20 @@ sub get_complexity
 
     my $total_ips =  $self->_get_total_ips();
 
-    return $total_ips*$sum_monitorable_ips/$total_ips;
+    my $ret = $total_isps*$sum_monitorable_ips/$total_ips;
+
+    $ret = $ret / ($total_ips);
+
+    #scale the results.
+    $ret *= 100000;
+    return $ret;
+}
+
+sub _list_contains
+{
+    (my $value, my $list) = @_;
+
+    return any {$_ eq $value } @{$list};
 }
 
 sub xml_summary
@@ -524,7 +525,12 @@ sub xml_summary
             $asn_xml->appendTextChild( $attrib_key, $asn_info->{$attrib_key} );
         }
 
-        $asn_xml->appendTextChild( 'percent_monitorable', $asn_info->{monitorable_ips} / $total_ips * 100.0 );
+        my $is_point_of_countrol = _list_contains ($key, $ninety_percent_control_asns);
+
+        $asn_xml->setAttribute( 'point_of_control', $is_point_of_countrol );
+        
+        $asn_xml->appendTextChild( 'percent_monitorable', $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 );
+        $asn_xml->appendTextChild( 'percent_direct_ips', $asn_info->{direct_ips} / $total_ips * 100.0 );
 
         $xml_graph->appendChild($asn_xml);
     }

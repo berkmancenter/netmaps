@@ -1,15 +1,20 @@
 <?
-include "./header.php"
-?>
+$country_code = $_REQUEST['cc'];
+validate_country_code($country_code);
+$xml_file_location = 'results/results.xml';
 
-<?
+$xml = new SimpleXMLElement(file_get_contents($xml_file_location));
+$xquery_string = "//country[@country_code='$country_code']";
+$result_array = $xml->xpath($xquery_string);
+$country_xml = $result_array[0];
 
 $xml_file_location = 'results/results.xml';
 
+$country_name = $country_xml['country_name'];
 
-$xml = new SimpleXMLElement(file_get_contents($xml_file_location));
 ?>
 <?
+
 function validate_country_code($country_code)
 {
   if (strlen($country_code) != 2)
@@ -23,18 +28,28 @@ function validate_country_code($country_code)
     }
 }
 
+include "./header.php"
 ?>
+
 <?
-$country_code = $_REQUEST['cc'];
-validate_country_code($country_code);
-$xml_file_location = 'results/results.xml';
 
-$xml = new SimpleXMLElement(file_get_contents($xml_file_location));
-$xquery_string = "//country[@country_code='$country_code']";
-$result_array = $xml->xpath($xquery_string);
-$country_xml = $result_array[0];
+function get_country_svg_image_url($country_xml)
+{
+  $host = $_SERVER["HTTP_HOST"];
+  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+#print_r($country_xml);
+#print_r($country_xml["country_name"]);
+  $country_name = $country_xml['country_name'];
+ # $country_name = get_country_name_x($country_xml);
+#print_r($country_name);
+  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name) . ".svg";
+
+  $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
+  return $country_svg_url;
+}
 
 ?>
+
 
 <?
 /*
@@ -55,67 +70,56 @@ $country_xml = $result_array[0];
 
 <h1>Country Statistics</h1>
 
-<? country_xml_list_summary_table(array($country_xml)); ?>
+  <? country_xml_list_summary_table(array($country_xml), false); ?>
 
-<h1>Top ASNs</h1>
 
-<table>
- <? ?>
-<tr>
-<td>asn</td>
-<td>organization</td>
-<td>percent monitorable</td>
-<td>monitorable ips</td>
-<td>direct ips</td>
-</tr>
-<?
-foreach ($country_xml->summary->as as $as)
-{
-?>
-<tr>
-<td><? echo $as->asn ?></td>
-<td><? echo $as->organization_name ?></td>
-<td><? echo $as->percent_monitorable ?></td>
-<td><? echo $as->monitorable_ips ?></td>
-<td><? echo $as->direct_ips ?></td>
-</tr>
-<?
-    } 
-?>
-</table>
-<?
-
-function get_country_svg_image_url($country_xml)
-{
-  $host = $_SERVER["HTTP_HOST"];
-  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
-#print_r($country_xml);
-#print_r($country_xml["country_name"]);
-  $country_name = $country_xml['country_name'];
- # $country_name = get_country_name_x($country_xml);
-#print_r($country_name);
-  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name) . ".svg";
-
-  $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
-  return $country_svg_url;
-}
-
-?>
 <?
 $country_svg_url = get_country_svg_image_url($country_xml);
 ?>
-
+<h1>Country Network Map</h1>
 <iframe src ="<? echo $country_svg_url ?>" width="800" height="800">
   <p>Your browser does not support iframes.</p>
 </iframe>
 
 <p>
-
-<a href="<? echo $country_svg_url ?>">Asn Image Graph</a>
+  <b>Note: The red node depicts the wider Internet outside this country.</b>
 </p>
+
+<h1>Top 50 Autonomous Systems</h1>
+
+<table>
+ <? ?>
+<tr>
+<td>autonomous system</td>
+<td>organization</td>
+<td>connected ips</td>
+<td>direct ips</td>
+</tr>
+<?
+foreach ($country_xml->summary->as as $as)
+{
+  $percent_monitorable_str = number_format($as->percent_monitorable, 1);
+  $total_monitorable_str   = number_format($as->effective_monitorable_ips);
+
+  $percent_direct_str = number_format($as->percent_direct_ips, 1);
+  $total_direct_str   = number_format($as->direct_ips);
+  $is_point_of_control = $as["point_of_control" ]==1;
+?>
+<tr <? if ($is_point_of_control) { ?> id="poc_asn_row" <? } ?> >
+<td><? echo $as->asn ?></td>
+<td><? echo $as->organization_name ?></td>
+<td><? print htmlentities("$total_monitorable_str ($percent_monitorable_str%)",ENT_QUOTES ); ?></td>
+<td><? print htmlentities("$total_direct_str ($percent_direct_str%)",ENT_QUOTES ); ?></td>
+</tr>
+
+<?
+    } 
+?>
+</table>
 
 <p>
 <a href="../home.php">back to summary</a>
 </p>
-</body>
-</html>
+<?
+include "footer.php";
+?>

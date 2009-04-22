@@ -8,6 +8,7 @@ use GraphViz;
 use AsnUtils;
 use AsnInfo;
 use AsnIPCount;
+use AsnTaxonomyClass;
 use Data::Dumper;
 use Scalar::Util qw ( weaken);
 use Encode;
@@ -277,25 +278,34 @@ sub get_graph_label
 
     my $asn_number = $self->get_as_number;
 
-    my $ret = $self->is_rest_of_world() ? "REST OF THE WORLD" : "AS$asn_number";
+    my $ret;
 
-#        print "Total downstream connections for AS$asn_number ($asn_name): " . _total_connections( $asns->{$asn_number} )  . "\n";
-
-    if ( $asn_number ne 'REST_OF_WORLD' )
+    if ( !  $self->is_rest_of_world() )
     {
+        $ret = "AS$asn_number";
         my $stats = $self->get_statistics();
 
         $ret .= "\n";
         #my $asn_name = AsnUtils::get_asn_whois_info($asn_number)->{name};
         my $asn_name = $stats->{organization_name};
         $ret .= "$asn_name\n";
+        if (defined($stats->{type})) {
+            $ret .= "Type: ". $stats->{type}  . "\n";
+        }
         $ret .= "Direct IPs: " . $stats->{direct_ips} . "\n";
         $ret .= "Downstream IPs: " . $stats->{downstream_ips}  . "\n";
-        $ret .= "Monitorable IPs: " . $stats->{monitorable_ips} . "\n";
+        $ret .= "Monitorable IPs: " . $stats->{effective_monitorable_ips} . "\n";
         if(defined($total_country_ips))
         {
             $ret .= "Can monitor " . $self->get_monitorable_ip_address_count()/ $total_country_ips *100.0 . "% of country";
         }
+    }
+    else
+    {
+        my $ten_spaces = '           ';
+        my $header = "$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n";
+        my $footer =  "$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n$ten_spaces\n";
+        $ret = ".$header.$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces REST OF THE WORLD$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces$ten_spaces.$footer.";  
     }
 
     return $ret;
@@ -318,7 +328,6 @@ sub total_connections
     return $ret;
 }
 
-
 sub get_statistics
 {
     ( my $asn ) = @_;
@@ -332,11 +341,13 @@ sub get_statistics
         $ret->{direct_ips}        = $asn->get_asn_ip_address_count();
         $ret->{downstream_ips}    = $asn->get_downstream_ip_address_count();
         $ret->{actual_monitorable_ips}   = $asn->get_monitorable_ip_address_count();
-        $ret->{monitorable_ips}   = $asn->get_effective_monitorable_ip_address_count();
+        $ret->{effective_monitorable_ips}   = $asn->get_effective_monitorable_ip_address_count();
         $ret->{asn}               = $asn->get_as_number();
         $ret->{organization_name} = encode("utf8", AsnInfo::get_asn_organization_description( $ret->{asn}) || "");
         $ret->{customers}         = join "," , map {$_->get_as_number() } @{$asn->get_customers()};
+        $ret->{type}              =  AsnTaxonomyClass::get_asn_taxonomy_class($asn->get_as_number()) || 'unknown';
         $asn->{_statistics} = $ret;
+        
     }
 
     return $asn->{_statistics};

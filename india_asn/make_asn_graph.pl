@@ -65,12 +65,12 @@ sub main
 
     my @country_codes = @{$asn_graph->get_country_codes()};
 
-    @country_codes = grep {defined($_) } @country_codes;
+    @country_codes = grep {defined($_) && ($_ ne '') } @country_codes;
 
     @country_codes = grep { $_ ne 'US' } @country_codes;
-  #  @country_codes = grep { $_ eq 'AR' } @country_codes;
+    #@country_codes = grep { $_ eq 'EU' } @country_codes;
 
-#    @country_codes = @country_codes[0..10];
+    #@country_codes = @country_codes[0..10];
 
     my $doc  = XML::LibXML::Document->new();
     my $root = $doc->createElement('asn_results');
@@ -85,6 +85,11 @@ sub main
 
         next unless defined $country_name;
 
+        if (!$country_name or $country_name eq '')
+        {
+            $country_name ||=  $country_code;
+        }
+
         print "Country: $country_name($country_code)\n";
         my $asn_sub_graph = $asn_graph->get_country_specific_sub_graph($country_code);
         
@@ -92,7 +97,7 @@ sub main
         {
             my $country_element = XML::LibXML::Element->new('country');
             $country_element->setAttribute( 'country_code' , $country_code );
-            $country_element->setAttribute( 'country_name' , code2country($country_code));
+            $country_element->setAttribute( 'country_name' , $country_name);
             $country_element->appendChild($asn_sub_graph->xml_summary());
             $root->appendChild($country_element);
             my $g = $asn_sub_graph->print_graphviz();
@@ -111,7 +116,7 @@ sub main
                 print $doc->toFile( "$_output_dir/$_xml_output_file", 1 );
             }
 
-            if ($loop_iteration == 11) { exit; }
+            #if ($loop_iteration == 11) { exit; }
             
         }
         elsif ($text_output)

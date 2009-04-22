@@ -6,6 +6,68 @@ include "xml_utils.php";
 $host = $_SERVER["HTTP_HOST"];
 $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
 
+function get_path()
+{
+  return trim(dirname($_SERVER["PHP_SELF"]), "/\\");
+}
+
+function get_local_url($file)
+{
+  $host = $_SERVER["HTTP_HOST"];
+  $path = get_path();
+  return "http://$host/$path/$file";
+}
+
+function get_country_name_from_code()
+{
+  $country_code = $_REQUEST['cc'];
+  validate_country_code($country_code);
+  $xml_file_location = 'results/results.xml';
+  
+  $xml = new SimpleXMLElement(file_get_contents($xml_file_location));
+  $xquery_string = "//country[@country_code='$country_code']";
+  $result_array = $xml->xpath($xquery_string);
+  $country_xml = $result_array[0];
+  
+  $xml_file_location = 'results/results.xml';
+  
+  $country_name = $country_xml['country_name'];
+  return $country_name;
+}
+
+function get_page_title()
+{
+  $page = $_SERVER['SCRIPT_NAME'];
+  $page = substr($page, 1);
+
+  $path = get_path();
+
+  #print_r("$path/home.php");
+
+  switch ($page) {
+  case "$path/home.php":
+    return ": home";
+    break;
+  case $path .'/ips_per_points_of_control_results.php':
+    return "IPs per Points of Control";
+    break;
+ case $path . '/country_complexity_results.php':
+    return "Network Complexity";
+    break;
+  case $path . 'raw_data.php':
+    return "Raw Data";
+    break;
+  case $path . '/country_detail.php':
+    return "Country Report: " . get_country_name_from_code();
+     break;
+  case $path . '/methods.php':
+    return "Methods";
+    break;
+  default:
+    return "???'$page'???";
+    break;
+  }
+}
 
 ?>
 <!DOCTYPE html PUBLIC
@@ -23,18 +85,21 @@ $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
 
 <link rel="stylesheet" type="text/css" href="<? echo "http://$host$path"?>/style.css" media="all" />
 
-<title>ASN map</title>
+  <title>Mapping Internet Autonomous Systems by Country: Complexity and Points of Control - <? echo get_page_title() ?></title>
   </head>
   <body>
 <div id="mainnav">
 <div>
 <ul>
-<li><a href="<? echo "http://$host$path"?>/home.php">Home</a></li>
-<li><a href="ips_per_points_of_control_results.php">IPs per Points of Controls</a></li>
-<li><a href="country_complexity_results.php">Network complexity</a></li>
+<li><a href="<? echo get_local_url('home.php') ?>">Home</a></li>
+<li><a href="<? echo get_local_url('ips_per_points_of_control_results.php') ?>">IPs per Point of Control</a></li>
+<li><a href="<? echo get_local_url('country_complexity_results.php') ?>">Network Complexity</a></li>
+<li><a href="<? echo get_local_url('methods.php') ?>">Methods</a></li>
+<li><a href="<? echo get_local_url('raw_data.php') ?>">Raw Data</a></li>
 <li>  </li>
 </ul>
 </div>
 </div>
 <br/>
 <br/>
+<h2>PRIVATE DRAFT.  DO NOT SHARE. </h2>

@@ -103,4 +103,4 @@ function get_page_title()
 <br/>
 <br/>
 <h1>Mapping Local Internet Control [private draft - please don't share]</h1>
-<i>from the <a href="http://cyber.law.harvard.edu">Berkman Center for Intenet & Society at Harvard University</a></i>
+<i>from the <a href="http://cyber.law.harvard.edu">Berkman Center for Intenet &amp; Society at Harvard University</a></i>

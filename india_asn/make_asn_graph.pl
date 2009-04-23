@@ -6,6 +6,7 @@ use AsnGraph;
 use List::Util qw(max min);
 use Locale::Country qw(code2country);
 use Readonly;
+use Image::LibRSVG;
 
 my $get_relationship_name = {
     -1 => 'customer',
@@ -81,13 +82,17 @@ sub main
     for my $country_code (@country_codes)
     {
         $loop_iteration++;
+
+        my $country_code_is_region = 0;
+
         my $country_name = code2country($country_code);
 
-        next unless defined $country_name;
+        #next unless defined $country_name;
 
         if (!$country_name or $country_name eq '')
         {
             $country_name ||=  $country_code;
+            $country_code_is_region = 1;            
         }
 
         print "Country: $country_name($country_code)\n";
@@ -98,17 +103,25 @@ sub main
             my $country_element = XML::LibXML::Element->new('country');
             $country_element->setAttribute( 'country_code' , $country_code );
             $country_element->setAttribute( 'country_name' , $country_name);
+            $country_element->setAttribute( 'country_code_is_region' , $country_code_is_region);
             $country_element->appendChild($asn_sub_graph->xml_summary());
             $root->appendChild($country_element);
             my $g = $asn_sub_graph->print_graphviz();
-            my $svg_output_file = "$_output_dir/graphs/asn-$country_name.svg";
             #die unless $g->as_svg($svg_output_file);
             my $svg_to_scale = $g->as_svg;
             die unless $svg_to_scale;
             $svg_to_scale =~ s/<svg width=".*" height=".*"/<svg width="100%" height="100%"/;
             $svg_to_scale =~ s/stroke:black;"/stroke:black;stroke-width:20"/g;
+
+            my $output_file_base = "$_output_dir/graphs/asn-$country_name";
+            my $svg_output_file = "$output_file_base.svg";
             open(SVGOUTPUTFILE, ">$svg_output_file") || die "Could not create file:$svg_output_file ";
             print SVGOUTPUTFILE $svg_to_scale;
+            close(SVGOUTPUTFILE);
+
+            my $rsvg = new Image::LibRSVG();
+
+            $rsvg->convertAtSize($svg_output_file, "$output_file_base.png", 800, 800) || die "Could not convert file to png";
 
             if (($loop_iteration % 10) == 0)
             {

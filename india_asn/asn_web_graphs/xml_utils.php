@@ -56,7 +56,7 @@ function cmp_country_complexity(SimpleXMLElement $a, SimpleXMLElement $b)
   return ($complexity_a < $complexity_b) ? -1: 1;
 }
 
-function get_country_name_x(SimpleXMLElement $county)
+function get_country_name_x(SimpleXMLElement $country)
 {
   #print ("START get_country_name\n");
   #print("Country Object '$country_x'\n");
@@ -128,16 +128,53 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
 ?>
 
 <?
-function get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun) 
+function is_country_not_region(SimpleXMLElement $country_xml)
+{
+  return $country_xml['country_code_is_region'] == 0;
+}
+
+function get_all_countries()
 {
   $xml = get_xml_file();
   $countries_xml = $xml->xpath("//country");
+  $countries_xml_tmp = array_filter($countries_xml, "is_country_not_region");
+  $countries_xml = $countries_xml_tmp;
+  return $countries_xml;
+}
+
+function get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun) 
+{
+  $countries_xml = get_all_countries();
   $countries_xml_tmp = array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
   $countries_xml = $countries_xml_tmp;
   
   usort($countries_xml, $sort_function);
 
   return $countries_xml;
+}
+
+function get_excluded_country_names()
+{
+ $countries_xml = get_all_countries();
+ $countries_xml_included =  array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
+
+  print count( $countries_xml) . " total countries\n";
+  print count( $countries_xml_included) . " included countries\n";
+
+  $countries_xml_excluded = array();
+  #array_diff doesn't work on object arrays so write our own
+  foreach ($countries_xml as $country_xml)
+    {
+      if (!in_array($country_xml, $countries_xml_included)) {
+        array_push ($countries_xml_excluded, $country_xml);
+      }
+    }
+  #print_r($countries_xml);
+  #print_r( $countries_xml_excluded );
+  $countries_excluded_names = array_map("get_country_name_x", $countries_xml_excluded);
+
+  return $countries_excluded_names;
+
 }
 
 function top_countries_table($sort_function, $sort_type_adjective, $sort_type_noun, $list_size) 

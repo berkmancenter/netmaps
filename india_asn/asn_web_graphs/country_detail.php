@@ -48,6 +48,21 @@ function get_country_svg_image_url($country_xml)
   return $country_svg_url;
 }
 
+function get_country_png_image_url($country_xml)
+{
+  $host = $_SERVER["HTTP_HOST"];
+  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+#print_r($country_xml);
+#print_r($country_xml["country_name"]);
+  $country_name = $country_xml['country_name'];
+ # $country_name = get_country_name_x($country_xml);
+#print_r($country_name);
+  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name) . ".png";
+
+  $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
+  return $country_svg_url;
+}
+
 ?>
 
 
@@ -75,15 +90,15 @@ function get_country_svg_image_url($country_xml)
 
 <?
 $country_svg_url = get_country_svg_image_url($country_xml);
+$country_png_url = get_country_png_image_url($country_xml);
 ?>
 <h1>Country Network Map</h1>
-<iframe src ="<? echo $country_svg_url ?>" width="800" height="800">
-  <p>Your browser does not support iframes.</p>
-</iframe>
+<img src ="<? echo $country_png_url ?>" alt="country map"/>
 
 <p>
   <b>Note: The red node depicts the wider Internet outside this country.</b>
 </p>
+<p><a href="<? echo $country_svg_url ?>">Download</a> the full image in SVG format.</p>
 
 <h1>Top 50 Autonomous Systems</h1>
 

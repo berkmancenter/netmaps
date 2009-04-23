@@ -99,12 +99,12 @@ sub _get_total_ips
 
 sub add_edges_to_graph
 {
-  (my $asns, my $g, my $show_un_country_connected_nodes, my $max_parent_nodes) = @_;
+    ( my $asns, my $g, my $show_un_country_connected_nodes, my $max_parent_nodes ) = @_;
 
-  my $total_edges = 0;
-  my $parent_nodes_processed = 0;
+    my $total_edges            = 0;
+    my $parent_nodes_processed = 0;
 
-  foreach my $key ( sort keys(%$asns) )
+    foreach my $key ( sort keys(%$asns) )
     {
         if ( defined($max_parent_nodes) && ( $parent_nodes_processed > $max_parent_nodes ) )
         {
@@ -115,7 +115,8 @@ sub add_edges_to_graph
             foreach my $child ( uniq sort { $a->get_as_number() cmp $b->get_as_number() }
                 @{ $asns->{$key}->get_nodes_for_relationship($field) } )
             {
-                if ( ( !$child->is_rest_of_world() ) && ($show_un_country_connected_nodes ||  !$child->only_connects_to_rest_of_world() ) )
+                if (   ( !$child->is_rest_of_world() )
+                    && ( $show_un_country_connected_nodes || !$child->only_connects_to_rest_of_world() ) )
                 {
                     $g->add_edge( $key => $child->get_as_number() );
                     $total_edges++;
@@ -132,7 +133,7 @@ sub add_edges_to_graph
         $parent_nodes_processed++;
     }
 
-  return $total_edges;
+    return $total_edges;
 }
 
 sub print_graphviz
@@ -148,12 +149,12 @@ sub print_graphviz
 
     my $asns = $self->{asn_nodes};
 
-    my $edges = add_edges_to_graph($asns, $g, 0, $max_parent_nodes);
+    my $edges = add_edges_to_graph( $asns, $g, 0, $max_parent_nodes );
 
-    if ($edges == 0)
+    if ( $edges == 0 )
     {
-        $edges = add_edges_to_graph($asns, $g, 1, $max_parent_nodes);
-        die "Empty graph " if ($edges == 0);
+        $edges = add_edges_to_graph( $asns, $g, 1, $max_parent_nodes );
+        die "Empty graph " if ( $edges == 0 );
     }
 
     foreach my $asn_key ( @{ $g->{NODELIST} } )
@@ -173,8 +174,9 @@ sub print_graphviz
         {
             $color = $_as_class_color->{$as_class};
         }
-        elsif ($asns->{$asn_key}->is_rest_of_world())
+        elsif ( $asns->{$asn_key}->is_rest_of_world() )
         {
+
             #$self->format_rest_of_world_node($g, $asns->{$asn_key});
             $color = 'red';
         }
@@ -285,8 +287,11 @@ sub _sort_by_monitoring
 
     my @ret =
       reverse
-      sort { $asns->{$a}->get_effective_monitorable_ip_address_count() <=> $asns->{$b}->get_effective_monitorable_ip_address_count() }
-      @{$asn_names};
+      sort
+    {
+        $asns->{$a}->get_effective_monitorable_ip_address_count()
+          <=> $asns->{$b}->get_effective_monitorable_ip_address_count()
+    } @{$asn_names};
 
     return @ret;
 }
@@ -339,12 +344,14 @@ sub get_percent_controlled_by_list
     my ( $self, $asn_list ) = @_;
     my $asns = $self->{asn_nodes};
 
-#    my $asn_list_monitorable = $self->_get_asns_monitorable_by_list($asn_list);
-#    my $ips_monitorable = $self->get_ips_in_asn_list($asn_list_monitorable);
+    #    my $asn_list_monitorable = $self->_get_asns_monitorable_by_list($asn_list);
+    #    my $ips_monitorable = $self->get_ips_in_asn_list($asn_list_monitorable);
 
-    my @asn_object_list = map { $asns->{$_} } @{$asn_list}; 
+    my @asn_object_list = map { $asns->{$_} } @{$asn_list};
+
     #make sure we don't double count
-    my $ips_monitorable = sum map {$asns->{$_}->get_effective_monitorable_ip_address_count(\@asn_object_list) } @{$asn_list};
+    my $ips_monitorable =
+      sum map { $asns->{$_}->get_effective_monitorable_ip_address_count( \@asn_object_list ) } @{$asn_list};
 
     return $ips_monitorable / $self->_get_total_ips * 100;
 }
@@ -391,13 +398,14 @@ sub get_asns_controlling_ninty_percent
 
     while ( $self->get_percent_controlled_by_list( \@ninty_percent_list ) < 90.0 )
     {
-#         #Get asns not already monitorable by our list
-#         my $monitorable_asns = $self->_get_asns_monitorable_by_list( \@ninty_percent_list );
-#         my $lca = List::Compare->new( '-u', '-a', \@asns, $monitorable_asns );
-#         @asns = $lca->get_unique;
 
-#         @asns = $self->_sort_by_monitoring( \@asns )
-#            ;
+        #         #Get asns not already monitorable by our list
+        #         my $monitorable_asns = $self->_get_asns_monitorable_by_list( \@ninty_percent_list );
+        #         my $lca = List::Compare->new( '-u', '-a', \@asns, $monitorable_asns );
+        #         @asns = $lca->get_unique;
+
+        #         @asns = $self->_sort_by_monitoring( \@asns )
+        #            ;
 
         #add the asn that monitors the most ASNs to the list
         die if ( scalar(@asns) == 0 );
@@ -458,7 +466,8 @@ sub print_connections_per_asn
             print "\tDirect IPs for AS$key: " . $asn_info->{direct_ips} . "\n";
             print "\tDownstream IPs for AS$key: " . $asn_info->{downstream_ips} . "\n";
             print "\tMonitorable IPs for AS$key: " . $asn_info->{effective_monitorable_ips} . "\n";
-            print "\tPercent of all total IPs monitorable: " . $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 . "\n";
+            print "\tPercent of all total IPs monitorable: "
+              . $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 . "\n";
             print "\n";
         }
 
@@ -481,11 +490,11 @@ sub get_complexity
     my $sum_monitorable_ips = sum map { $_->get_effective_monitorable_ip_address_count() } values %{$asns};
 
     #exclude rest_of_world node
-    my $total_isps = scalar(keys %{$asns} ) - 1;
+    my $total_isps = scalar( keys %{$asns} ) - 1;
 
-    my $total_ips =  $self->_get_total_ips();
+    my $total_ips = $self->_get_total_ips();
 
-    my $ret = $total_isps*$sum_monitorable_ips/$total_ips;
+    my $ret = $total_isps * $sum_monitorable_ips / $total_ips;
 
     $ret = $ret / ($total_ips);
 
@@ -496,9 +505,9 @@ sub get_complexity
 
 sub _list_contains
 {
-    (my $value, my $list) = @_;
+    ( my $value, my $list ) = @_;
 
-    return any {$_ eq $value } @{$list};
+    return any { $_ eq $value } @{$list};
 }
 
 sub xml_summary
@@ -542,12 +551,12 @@ sub xml_summary
             $asn_xml->appendTextChild( $attrib_key, $asn_info->{$attrib_key} );
         }
 
-        my $is_point_of_countrol = _list_contains ($key, $ninety_percent_control_asns);
+        my $is_point_of_countrol = _list_contains( $key, $ninety_percent_control_asns );
 
         $asn_xml->setAttribute( 'point_of_control', $is_point_of_countrol );
-        
+
         $asn_xml->appendTextChild( 'percent_monitorable', $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 );
-        $asn_xml->appendTextChild( 'percent_direct_ips', $asn_info->{direct_ips} / $total_ips * 100.0 );
+        $asn_xml->appendTextChild( 'percent_direct_ips',  $asn_info->{direct_ips} / $total_ips * 100.0 );
 
         $xml_graph->appendChild($asn_xml);
     }

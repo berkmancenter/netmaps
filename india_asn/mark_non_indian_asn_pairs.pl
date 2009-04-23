@@ -7,7 +7,7 @@ use AsnUtils;
 my $_asn_country_cache = {};
 
 #USAGE:
-#input: CAIDA asn file format relationship list 
+#input: CAIDA asn file format relationship list
 #
 #output: Identical to the inputed asn relationship list except that lines in which neither ASN is Indian are prefixed with the string "Not indian".  (Lines beginning with '#' are not altered.
 #

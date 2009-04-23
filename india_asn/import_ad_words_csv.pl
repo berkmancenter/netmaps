@@ -9,19 +9,19 @@ use Locale::Country qw(country2code);
 
 sub main
 {
-     my $dbargs = {
-         AutoCommit => 1,
-         RaiseError => 1,
-         PrintError => 1,
-     };
+    my $dbargs = {
+        AutoCommit => 1,
+        RaiseError => 1,
+        PrintError => 1,
+    };
 
-     my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=ad_words.db", "", "", $dbargs ) );
+    my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=ad_words.db", "", "", $dbargs ) );
 
-     foreach my $file (@ARGV)
-     {
-         print "File: '$file'\n";
-         parse_file( $dbh, $file );
-     }
+    foreach my $file (@ARGV)
+    {
+        print "File: '$file'\n";
+        parse_file( $dbh, $file );
+    }
 
     $dbh->commit();
     $dbh->disconnect();

@@ -24,12 +24,13 @@ sub print_asn_country_map
     {
         my $asn_info = $_asn_info_cache->{$asn};
 
-        warn Dumper ($asn_info) unless (  !defined ($asn_info->{as}) || ($asn == $asn_info->{as}) );
+        warn Dumper($asn_info) unless ( !defined( $asn_info->{as} ) || ( $asn == $asn_info->{as} ) );
 
-        if ( $asn_info->{as} != $asn ) {
+        if ( $asn_info->{as} != $asn )
+        {
             print STDERR "No info for AS$asn\n";
         }
-        
+
         #print Dumper($asn_info);
 
         $csv->add_line(
@@ -89,7 +90,7 @@ sub main
         _look_up_asn_info($asn2);
 
         $counter++;
-        if ($counter % 300 == 0)
+        if ( $counter % 300 == 0 )
         {
             print STDERR "processed $counter records\n";
         }

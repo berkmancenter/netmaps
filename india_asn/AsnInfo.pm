@@ -11,28 +11,28 @@ my $_asn_info_cache;
 
 sub _create_db_handle_if_necessary
 {
-    if (!defined ($_as_info_dbh) )
+    if ( !defined($_as_info_dbh) )
     {
         my $dbargs = {
-                      AutoCommit => 1,
-                      RaiseError => 1,
-                      PrintError => 1,
-                     };
-        
+            AutoCommit => 1,
+            RaiseError => 1,
+            PrintError => 1,
+        };
+
         $_as_info_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=asn_info.db", "", "", $dbargs ) );
     }
 }
 
 sub get_asn_organization_description
 {
-   my ($asn) = @_;
+    my ($asn) = @_;
 
-   _create_db_handle_if_necessary();
+    _create_db_handle_if_necessary();
 
-   my $org_description = $_as_info_dbh->query("select organization_description from  as_info where asn=?", $asn)->flat->[0];
- 
-   return $org_description;
+    my $org_description =
+      $_as_info_dbh->query( "select organization_description from  as_info where asn=?", $asn )->flat->[0];
+
+    return $org_description;
 }
-
 
 1;

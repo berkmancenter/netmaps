@@ -20,7 +20,7 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 <ul>
 <li>Connected IPs: the total number of IP addresses connected to the Internet through this AS, including the IP addresses connected through any children ASs</li>
 <li>Points of Control: the minimum set of ASs required to connect to 90% of the IP addresses in each country</li>
-<li>IPs per Point of Control: the totla number of IP addresseses in each country divded by the number of points of control</li>
+<li>IPs per Point of Control: the total number of IP addresses in each country divided by the number of points of control</li>
 <li>Complexity: the overall complexity of the network connecting the ASs in each country </li>
 </ul>
 
@@ -49,8 +49,8 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 
 <ul>
 <li>Generate a list of all traced ASs in the CAIDA AS Relationships data set.</li>
-<li>Lookup the name and country of each AS using the Team Cymru service.</li>
-<li>Lookup the type of each AS using the CAIDA AS Taxonomy data set.</li>
+<li>Look up the name and country of each AS using the Team Cymru service.</li>
+<li>Look up the type of each AS using the CAIDA AS Taxonomy data set.</li>
 <li>Divide the CAIDA AS Relationships data into countries using the Cymru country data.  For each country, reassign all foreign provider ASs to the single, virtual 'Rest of World' AS and drop all other foreign relationships.</li>
 <li>Generate a network graph for each country's ASs and relationships using graphviz.</li>
 </ul>
@@ -58,7 +58,7 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 <p>To generate the Connected IPs, we:</p>
 
 <ul>
-<li>Lookup up the number of allocated IP addresses for each ASN in the CAIDA Routeviews Prefix to AS Mappings data set.</li>
+<li>Look up up the number of allocated IP addresses for each ASN in the CAIDA Routeviews Prefix to AS Mappings data set.</li>
 <li>Recursively traverse up the tree of ASs for the country, adding the number of IPs of each AS both to its own connected IPs count and to its parent's.  If an AS has more than one parent, add to each parent the connected IPs of the child divided by the number of parents. This is a gross estimation of multiple parent relationships -- see caveats below.</li>
 </ul>
 

@@ -19,7 +19,7 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 <ul>
 <li>Connected IPs: the total number of IP addresses connected to the Internet through this AS, including the IP addresses connected through any children ASs</li>
 <li>Points of Control: the minimum set of ASs required to connect to 90% of the IP addresses in each country</li>
-<li>IPs per Point of Control: the totla number of IP addresseses in each country divded by the number of points of control</li>
+<li>IPs per Point of Control: the total number of IP addresses in each country divided by the number of points of control</li>
 <li>Complexity: the overall complexity of the network connecting the ASs in each country </li>
 </ul>
 

@@ -92,7 +92,7 @@ function get_country_png_image_url($country_xml)
 <li>a list of the top 50 most connected ASs in the country, sorted by connected IPs.</li>
 </ul>
 
-<p>For more information about these terms and findings, see the <a href="../methods.php">Methods</a> page </p>
+<p>For more information about these terms and findings, see the <a href="../methods.php">Methods</a> page. </p>
 
 <h1>Country Statistics</h1>
 

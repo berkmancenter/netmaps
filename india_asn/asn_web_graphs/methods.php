@@ -12,10 +12,10 @@ ut the vast majority of those ASs are small organizations that rely on one or mo
  much smaller slice of less than a thousand large ASs.
 </p>
 <p>
-It is well understood now that governments exert various kinds of control over their local zones of the Internet, including <a href="http://opennet.net">filtering offensive sites<
-/a>, <a href="http://eur-lex.europa.eu/LexUriServ/site/en/oj/2006/l_105/l_10520060413en00540063.pdf">surveilling the activities of users</a>, and <a href="http://arstechnica.com/t
-ech-policy/news/2009/04/korea-fits-itself-for-a-3-strikes-jackboot.ars">controlling which users  can access the Internet at all</a>.  When broken down into individual countries, t
-he number of ASs that has access to the almost all of the traffic within a given country is at most a few dozen ASs and often only a few ASs, even for the biggest countries.  For 
+It is well understood now that governments exert various kinds of control over their local zones of the Internet, including <a href="http://opennet.net">filtering offensive sites</a>,
+ <a href="http://eur-lex.europa.eu/LexUriServ/site/en/oj/2006/l_105/l_10520060413en00540063.pdf">surveilling the activities of users</a>, 
+and <a href="http://arstechnica.com/tech-policy/news/2009/04/korea-fits-itself-for-a-3-strikes-jackboot.ars">controlling which users  can access the Internet at all</a>.  When broken down into individual countries, 
+the number of ASs that have access to the almost all of the traffic within a given country is at most a few dozen ASs and often only a few ASs, even for the biggest countries.  For 
 example, we have found that in <a href="country_detail.php/?cc=CN">China</a> over 90% of the country's 210 million IP addresses ultimately connect to the wider Internet through on
 e of only 3 ASs, while in <a href="country_detail.php/?cc=RU">Russia</a> 90% of the country's 22 million IP addresses connect through one of 51 ASs. 
 </p>
@@ -107,11 +107,16 @@ e of only 3 ASs, while in <a href="country_detail.php/?cc=RU">Russia</a> 90% of 
 
 <li>The core CAIDA AS Relationships data set infers the list of ASs and relationships from data gathered from a large set of traceroutes run from a distributed set of servers.  This <a href="http://www.caida.org/publications/papers/2006/as_relationships_inference/">process of collection and inference</a> finds only 86.7% of customer-provider relationships on the Internet, so not all customer links nor all ASs are represented.</li>
 
-                                                        <li>The CAIDA route data is particularly sparse for small countries, where missing a few ASs may drastically impact the mapping.  To avoid misleading results for under-sampled countries, we only include countries with observed ASs including a total of at least 25,000 IP addresses.  Accordingly, we omit the following countries: <?  echo join ("; ", get_excluded_country_names()) ?>.</li>
+<li>The CAIDA route data is particularly sparse for small countries, where missing a few ASs may drastically impact the mapping.  To avoid misleading results for under-sampled countries, we only include countries with observed ASs including a total of at least 25,000 IP addresses.  Accordingly, we omit the following countries: <?  echo join ("; ", get_excluded_country_names()) ?>. We also eliminate the following regions: the African Regional Intellectual Property Organization and the European Union.</li>
 
 <li>The AS Relationships data set only provides AS level relationships, which does not allow us to determine how traffic is routed among the many parents of a single child.  So for each child with multiple parents, we assign to each parent the connected IPs of the child divided by the number of parents.  Using more detailed, block level routing relationships would allow us to determine the real proportion of IP addresses routed to each parent.</li>
 
 <li>The AS Relationships data set only finds 38.7% of peer-to-peer relationships.  Because of the lack of peer relationships in the data set, we ignore them completely for this analysis.  If most of the traffic we care about is served either from within one of the ASs we categorize as points of control, or if most of the traffic is in the Rest of World for the country, then the peer relationships will not strongly effect the set of points of control (since the traffic will ultimately need to flow through the points of control in any case).  But whatever portion of traffic for the country is served by ASs near the edges of the network could potentially avoid the points of control by flowing through peer connections.  Likewise, a higher or lower proportion of peer connections than customer-provider connections within a country network could increase or lower the complexity of the country in relation to other countries. </li>
+
+<li>We omit the United States because the U.S. has a large number of sparse Class A networks, which vastly inflate the IP address numbers (1.2 billion addresses compared to 210 million for China, even though China and the U.S. have about the same number of Internet users).  Our current, simple visualization system (graphviz) also will not work on a graph the size of the U.S. autonomous systems set.</li>
+
+<li>We omit from the maps all customer -&gt; provider relationships from the rest of the world to an AS within a country in order to make the links out to the rest of the world (the red node in the maps) much clearer.</li>
+
 </ul>
 
 <?

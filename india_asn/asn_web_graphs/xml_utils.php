@@ -173,6 +173,7 @@ function get_excluded_country_names()
   #print_r( $countries_xml_excluded );
   $countries_excluded_names = array_map("get_country_name_x", $countries_xml_excluded);
 
+  sort ($countries_excluded_names);
   return $countries_excluded_names;
 
 }

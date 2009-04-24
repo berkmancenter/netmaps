@@ -83,6 +83,17 @@ function get_country_png_image_url($country_xml)
 */
 ?>
 
+<p>This page is an attempt to map the structure of the Internet within a single country, with an eye for exploring the controllability of the Internet (by the government as well as others), including:</p>
+<ul>
+<li>
+ the number of Autonomous Systems (ASs), the Points of Control (the minimum set of ASs required to connect to 90% of the country's IP addresses, bolded in the list below), the IPs per Point of Control (total number of IPs in the country divided by the number of Points of Control), and a Complexity metric (a measure of the number and size of connections between ASs);</li>
+
+<li>a visual map of the ASs and the connections between them for the country;</li>
+<li>a list of the top 50 most connected ASs in the country, sorted by connected IPs.</li>
+</ul>
+
+<p>For more information about these terms and findings, see the <a href="../methods.php">Methods</a> page </p>
+
 <h1>Country Statistics</h1>
 
   <? country_xml_list_summary_table(array($country_xml), false); ?>

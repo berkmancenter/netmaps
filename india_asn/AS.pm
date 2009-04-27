@@ -12,6 +12,8 @@ use AsnTaxonomyClass;
 use Data::Dumper;
 use Scalar::Util qw ( weaken);
 use Encode;
+use Set::Intersection;
+use Readonly;
 
 # MODULES
 
@@ -45,6 +47,103 @@ sub new
     return $self;
 }
 
+
+sub get_rest_of_the_world_name
+{
+    Readonly my $_rest_of_the_world_name => "REST_OF_WORLD";
+    return  $_rest_of_the_world_name;
+}
+
+#return the list of nodes that we have both customer and provider relationships with
+sub find_effective_peers
+{
+    my ($self) = @_;
+
+    my $customers = $self->get_customers();
+    my $providers = $self->get_providers();
+    print "\$providers " .  join (", ", @{$providers}) . "\n";  
+    my @intersection =  get_intersection($customers, $providers);
+    print "intersection " . Dumper(\@intersection);
+    map {bless \$_ } @intersection;
+
+    return \@intersection;
+}
+
+sub _list_contains
+{
+    ( my $value, my $list ) = @_;
+
+    print "_list_contains $value ";
+
+    my $ret = any { $_ eq $value } @{$list};
+
+    print $ret? "true\n" : "false\n";
+    return $ret;
+}
+sub purge_from_customer_list
+{
+    (my $self, my $other_as) = @_;
+    
+    my $providers = $self->get_customers();
+
+    my $i = 0;
+    while ($i < scalar(@{$providers}) )
+    {
+        if ($providers->[$i] == $other_as)
+        {
+            print "Purging " . $other_as->get_as_number() . "from " . $self->get_as_number() . "\n";
+            splice(@{$providers}, $i);
+        }
+        else
+        {
+            $i++;
+        }
+    }
+    
+}
+
+sub mark_effective_peers
+{
+  my ($self) = @_;
+
+  my $effective_peers = $self->find_effective_peers();
+
+  #no peers to mark
+  return if (scalar(@{$self->find_effective_peers}) == 0 );
+
+  print "ASN: " . $self->get_as_number() . "\n"; 
+
+  my $customers = $self->get_customers();
+  my $providers = $self->get_providers();
+
+  print 'effective_peers ' . join (", ", map {$_->get_as_number} @{$effective_peers}) . "\n";
+  #my $lc1 = List::Compare->new($customers, $effective_peers);
+  $customers = [grep { !_list_contains ($_, $effective_peers) } @{$customers}];
+
+  $self->{customer} = $customers;
+
+  #print 'providers ' . join (", ", @{$providers}) . "\n";
+  my $lc2 = List::Compare->new( $providers, $effective_peers);
+
+  $providers = [grep { !_list_contains ($_, $effective_peers) } @{$providers}];
+  #$providers= $lc2->get_Lonly_ref;
+  #print 'providers ' . join (", ", @{$providers}) . "\n";  
+  $self->{provider} = $providers;
+  $providers = $self->get_providers();
+
+  #print 'providers ' . join (", ", @{$providers}) . "\n";
+
+
+
+  foreach my $peer (@{$effective_peers})
+  {
+      $self->add_relationship($peer, 'peer');
+  }
+
+  $effective_peers = $self->find_effective_peers();
+  die  'Error effective_peers not empty ' . join (", ", @{$effective_peers}) . "\n" unless scalar(@{$effective_peers}) == 0;
+}
+
 sub get_country_code
 {
     my ($self) = @_;
@@ -56,7 +155,7 @@ sub is_rest_of_world
 {
     my ($self) = @_;
 
-    return $self->get_as_number eq 'REST_OF_WORLD';
+    return $self->get_as_number eq  AS::get_rest_of_the_world_name();
 }
 
 sub only_connects_to_rest_of_world
@@ -118,7 +217,7 @@ sub get_asn_ip_address_count
 
     #print STDERR "get_asn_ip_address_count " . $self->{as_number} . "\n";
 
-    return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
+    return 0 if ( $self->is_rest_of_world );
 
     if ( !defined( $self->{_asn_ip_address_count} ) )
     {
@@ -139,7 +238,7 @@ sub get_downstream_asns
 
     return [
         uniq map { $_, @{ $_->get_downstream_asns } }
-          grep { $self->{as_number} ne 'REST_OF_WORLD' } @{ $self->get_customers }
+          grep { ! $self->is_rest_of_world } @{ $self->get_customers }
     ];
 }
 
@@ -147,7 +246,7 @@ sub get_downstream_ip_address_count
 {
     my ($self) = @_;
 
-    return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
+    return 0 if ( $self->is_rest_of_world );
 
     my $downstream_asns = $self->get_downstream_asns;
 
@@ -165,6 +264,14 @@ sub get_customers
 
     return $self->get_nodes_for_relationship('customer');
 }
+
+sub get_providers
+{
+    my ($self) = @_;
+
+    return $self->get_nodes_for_relationship('provider');
+}
+
 
 sub get_monitorable_ip_address_count
 {
@@ -227,7 +334,7 @@ sub get_effective_monitorable_downstream_ip_address_count
 
     my ( $self, $downstream_exclude_list ) = @_;
 
-    return 0 if ( $self->{as_number} eq 'REST_OF_WORLD' );
+    return 0 if ( $self->is_rest_of_world );
 
     my $customers = $self->get_customers;
 

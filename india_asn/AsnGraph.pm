@@ -32,7 +32,7 @@ my $_as_class_color = {
     t2        => 'blue',
 };
 
-my $_dont_check_for_cycles = 1;
+my $_dont_check_for_cycles = 0;
 
 # METHODS
 
@@ -270,6 +270,44 @@ sub die_if_cyclic
     print "Checking whether graph is acyclic...\n";
     my $g = $self->_get_graph_object();
 
+     if ($g->has_a_cycle() )
+     {
+         print STDERR "Attempting to fix cyclic graph\n";
+
+         my $asns =  $self->{asn_nodes};
+
+         foreach my $asn (values (%{$asns}))
+         {
+             #$asn->mark_effective_peers();
+         }
+         #$g = $self->_get_graph_object();
+
+         while($g->has_a_cycle())
+         {
+             my @cycle = $g->find_a_cycle();
+
+             #All-Pairs Shortest Paths
+             my $apsp = $g->APSP_Floyd_Warshall();
+             print Dumper($apsp);
+
+             print "Attempting to fix cycle: " . join (", ", @cycle ) . "\n";
+             @cycle = sort {$apsp->path_length($a, AS::get_rest_of_the_world_name()) <=>$apsp->path_length($b, AS::get_rest_of_the_world_name())} @cycle;
+
+             @cycle = reverse @cycle;
+
+             print "Path Lengths: " . join (", ", map {$apsp->path_length($_, AS::get_rest_of_the_world_name())} @cycle ) . "\n";
+             
+             my $asn_to_purge = pop @cycle;
+             foreach my $asn_to_purge_from (@cycle)
+             {
+                 $asns->{$asn_to_purge_from}->purge_from_customer_list($asns->{$asn_to_purge});
+             }
+             $g = $self->_get_graph_object();
+         }
+     }
+ 
+     $g = $self->_get_graph_object();
+
     die "Graph is cyclic: " . join( " , ", $g->find_a_cycle() ) if ( $g->has_a_cycle() );
 
     $self->{_verified_acyclic} = 1;
@@ -460,7 +498,7 @@ sub print_connections_per_asn
         #my $asn_name = ( AsnTaxonomyClass::get_asn_organization_description($key) );
         print
 "Total downstream connections for AS$asn_info->{asn} ($asn_info->{organization_name}): $asn_info->{total_connections}\n";
-        if ( $key ne 'REST_OF_WORLD' )
+        if ( $key ne  AS::get_rest_of_the_world_name() )
         {
 
             print "\tDirect IPs for AS$key: " . $asn_info->{direct_ips} . "\n";
@@ -522,11 +560,12 @@ sub xml_summary
 
     die "Could not get total ips" unless defined($total_ips);
 
+    $self->die_if_cyclic();
+
     $xml_graph->appendTextChild( 'total_ips',  $total_ips );
     $xml_graph->appendTextChild( 'total_asns', $self->get_country_as_nodes_count() );
     $xml_graph->appendTextChild( 'complexity', $self->get_complexity );
 
-    $self->die_if_cyclic();
 
     my $ninety_percent_control_asns = $self->get_asns_controlling_ninty_percent();
 
@@ -575,7 +614,7 @@ sub get_as_node_or_rest_of_world_node
     }
     else
     {
-        return $self->get_as_node("REST_OF_WORLD");
+        return $self->get_as_node( AS::get_rest_of_the_world_name());
     }
 }
 
@@ -615,7 +654,7 @@ sub get_country_specific_sub_graph
             push @{ $new_asn->{$relationship_type} }, @rel_list;
             $new_asn->{$relationship_type} = [ uniq @{ $new_asn->{$relationship_type} } ];
 
-    # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne'REST_OF_WORLD'}   @{ $new_asn->{$relationship_type} } ];
+    # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne AS::get_rest_of_the_world_name()}   @{ $new_asn->{$relationship_type} } ];
         }
     }
 

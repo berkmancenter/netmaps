@@ -32,7 +32,7 @@ my $_as_class_color = {
     t2        => 'blue',
 };
 
-my $_dont_check_for_cycles = 0;
+my $_dont_check_for_cycles = 1;
 
 # METHODS
 
@@ -490,6 +490,8 @@ sub print_connections_per_asn
 
     my @asn_keys = @{ $self->_get_top_country_asns };
 
+    unshift @asn_keys , AS::get_rest_of_the_world_name();
+
     foreach my $key (@asn_keys)
     {
         my $asn_info = $asns->{$key}->get_statistics();
@@ -498,7 +500,7 @@ sub print_connections_per_asn
         #my $asn_name = ( AsnTaxonomyClass::get_asn_organization_description($key) );
         print
 "Total downstream connections for AS$asn_info->{asn} ($asn_info->{organization_name}): $asn_info->{total_connections}\n";
-        if ( $key ne  AS::get_rest_of_the_world_name() )
+        #if ( $key ne  AS::get_rest_of_the_world_name() )
         {
 
             print "\tDirect IPs for AS$key: " . $asn_info->{direct_ips} . "\n";
@@ -513,7 +515,7 @@ sub print_connections_per_asn
         {
             if ( defined( $asns->{$key}->{$field} ) )
             {
-                print "\t\t $field: " . ( join ", ", map { $_->get_as_number() } @{ $asns->{$key}->{$field} } ) . "\n";
+                print "\t\t $field: " . ( join ", ", map { $_->get_as_number() . " (" . $_->get_statistics->{organization_name} . ") " } @{ $asns->{$key}->{$field} } ) . "\n";
             }
         }
     }

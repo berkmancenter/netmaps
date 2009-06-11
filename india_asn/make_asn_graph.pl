@@ -7,6 +7,7 @@ use List::Util qw(max min);
 use Locale::Country qw(code2country);
 use Readonly;
 use Image::LibRSVG;
+use Graph::Easy::Parser::Graphviz;
 
 my $get_relationship_name = {
     -1 => 'customer',
@@ -70,7 +71,7 @@ sub main
 
     @country_codes = grep { $_ ne 'US' } @country_codes;
 
-    #@country_codes = grep { $_ eq 'EU' } @country_codes;
+    @country_codes = grep { $_ eq 'IR' } @country_codes;
 
     #@country_codes = @country_codes[0..10];
 
@@ -121,10 +122,29 @@ sub main
             print SVGOUTPUTFILE $svg_to_scale;
             close(SVGOUTPUTFILE);
 
-            my $rsvg = new Image::LibRSVG();
+            my $dot_output_file  = "$output_file_base.dot";
+            open( DOTOUTPUTFILE, ">$dot_output_file" ) || die "Could not create file:$dot_output_file ";
+            my $dot_output = $g->as_dot;
+            print DOTOUTPUTFILE $dot_output;
+            close(DOTOUTPUTFILE);
 
-            $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
-              || die "Could not convert file to png";
+            my $parser = Graph::Easy::Parser::Graphviz->new();
+            my $graph = $parser->from_file($dot_output_file);
+            
+            my $graphml_output = $graph->as_graphml();
+
+            #flex aparently doesn't like namespaces
+            $graphml_output =~ s/<graphml.*?>/<graphml>/s;
+            my $graphml_output_file  = "$output_file_base.graphml";
+
+            open( GRAPHMLOUTPUTFILE, ">$graphml_output_file" ) || die "Could not create file:$graphml_output_file ";
+            print GRAPHMLOUTPUTFILE $graphml_output;
+            close(GRAPHMLOUTPUTFILE);
+
+             my $rsvg = new Image::LibRSVG();
+
+             $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
+               || die "Could not convert file to png";
 
             if ( ( $loop_iteration % 10 ) == 0 )
             {

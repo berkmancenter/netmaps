@@ -33,7 +33,7 @@ include "./header.php"
 
 <?
 
-function get_country_svg_image_url($country_xml)
+function get_image_url_base($country_xml)
 {
   $host = $_SERVER["HTTP_HOST"];
   $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
@@ -42,7 +42,34 @@ function get_country_svg_image_url($country_xml)
   $country_name = $country_xml['country_name'];
  # $country_name = get_country_name_x($country_xml);
 #print_r($country_name);
-  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name) . ".svg";
+  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name);
+
+  return $country_svg_url;
+}
+
+function get_json_summary_url($country_xml)
+{
+  $host = $_SERVER["HTTP_HOST"];
+  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+  $country_code = $country_xml['country_code'];
+  
+  $country_json_summary_url = "http://$host$path/country_json_summary.php/?cc=$country_code";
+  return $country_json_summary_url;
+}
+
+function get_flash_url()
+{
+  $host = $_SERVER["HTTP_HOST"];
+  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+  $country_svg_url = "http://$host$path/flare_demo/demos.swf";
+
+  return $country_svg_url;
+}
+
+
+function get_country_svg_image_url($country_xml)
+{
+  $country_svg_url =  get_image_url_base($country_xml) . ".svg";
 
   $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
   return $country_svg_url;
@@ -50,19 +77,43 @@ function get_country_svg_image_url($country_xml)
 
 function get_country_png_image_url($country_xml)
 {
-  $host = $_SERVER["HTTP_HOST"];
-  $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
-#print_r($country_xml);
-#print_r($country_xml["country_name"]);
-  $country_name = $country_xml['country_name'];
- # $country_name = get_country_name_x($country_xml);
-#print_r($country_name);
-  $country_svg_url = "http://$host$path/results/graphs/asn-" .($country_name) . ".png";
-
+  $country_svg_url =  get_image_url_base($country_xml) . ".png";
   $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
   return $country_svg_url;
 }
 
+function get_country_graphml_image_url($country_xml)
+{
+  $country_svg_url =  get_image_url_base($country_xml) . ".graphml";
+  $country_svg_url = htmlentities ($country_svg_url, ENT_QUOTES );
+  return $country_svg_url;
+}
+
+function embed_flash_object($country_xml)
+{
+?>
+
+       <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
+			id="demos" width="1000" height="700"
+			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
+			<param name="movie" value="demos.swf" />
+			<param name="quality" value="high" />
+			<param name="bgcolor" value="#ffffff" />
+			<param name="allowScriptAccess" value="sameDomain" />
+                        <param name="FlashVars" value="graphurl=<?echo get_country_graphml_image_url($country_xml)?>&json_url=<? echo get_json_summary_url($country_xml) ?>" />
+			<embed src="<? echo get_flash_url() ?>" quality="high" bgcolor="#ffffff"
+				width="1000" height="700" name="demos" align="middle"
+				play="true"
+				loop="false"
+				quality="high"
+				allowScriptAccess="sameDomain"
+				type="application/x-shockwave-flash"
+                                FlashVars="graphurl=<?echo get_country_graphml_image_url($country_xml)?>&json_url=<? echo get_json_summary_url($country_xml) ?>"
+				pluginspage="http://www.adobe.com/go/getflashplayer">
+			</embed>
+	</object>
+<?
+    }
 ?>
 
 
@@ -86,7 +137,7 @@ function get_country_png_image_url($country_xml)
 <p>This page is an attempt to map the structure of the Internet within a single country, with an eye for exploring the controllability of the Internet (by the government as well as others), including:</p>
 <ul>
 <li>
- the number of Autonomous Systems (ASs), the Points of Control (the minimum set of ASs required to connect to 90% of the country's IP addresses, bolded in the list below), the IPs per Point of Control (total number of IPs in the country divided by the number of Points of Control), and a Complexity metric (a measure of the number and size of connections between ASs);</li>
+ the number of Autonomous Systems (ASs), the Points of Control (the minimum set of ASs required to connect to 90% of the country&#146;s IP addresses, bolded in the list below), the IPs per Point of Control (total number of IPs in the country divided by the number of Points of Control), and a Complexity metric (a measure of the number and size of connections between ASs);</li>
 
 <li>a visual map of the ASs and the connections between them for the country;</li>
 <li>a list of the top 50 most connected ASs in the country, sorted by connected IPs.</li>
@@ -97,6 +148,8 @@ function get_country_png_image_url($country_xml)
 <h1>Country Statistics</h1>
 
   <? country_xml_list_summary_table(array($country_xml), false); ?>
+
+<? embed_flash_object($country_xml) ?>
 
 
 <?
@@ -142,7 +195,6 @@ foreach ($country_xml->summary->as as $as)
     } 
 ?>
 </table>
-
 <p>
 <a href="../home.php">back to summary</a>
 </p>

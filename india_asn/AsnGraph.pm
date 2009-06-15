@@ -270,43 +270,50 @@ sub die_if_cyclic
     print "Checking whether graph is acyclic...\n";
     my $g = $self->_get_graph_object();
 
-     if ($g->has_a_cycle() )
-     {
-         print STDERR "Attempting to fix cyclic graph\n";
+    if ( $g->has_a_cycle() )
+    {
+        print STDERR "Attempting to fix cyclic graph\n";
 
-         my $asns =  $self->{asn_nodes};
+        my $asns = $self->{asn_nodes};
 
-         foreach my $asn (values (%{$asns}))
-         {
-             #$asn->mark_effective_peers();
-         }
-         #$g = $self->_get_graph_object();
+        foreach my $asn ( values( %{$asns} ) )
+        {
 
-         while($g->has_a_cycle())
-         {
-             my @cycle = $g->find_a_cycle();
+            #$asn->mark_effective_peers();
+        }
 
-             #All-Pairs Shortest Paths
-             my $apsp = $g->APSP_Floyd_Warshall();
-             print Dumper($apsp);
+        #$g = $self->_get_graph_object();
 
-             print "Attempting to fix cycle: " . join (", ", @cycle ) . "\n";
-             @cycle = sort {$apsp->path_length($a, AS::get_rest_of_the_world_name()) <=>$apsp->path_length($b, AS::get_rest_of_the_world_name())} @cycle;
+        while ( $g->has_a_cycle() )
+        {
+            my @cycle = $g->find_a_cycle();
 
-             @cycle = reverse @cycle;
+            #All-Pairs Shortest Paths
+            my $apsp = $g->APSP_Floyd_Warshall();
+            print Dumper($apsp);
 
-             print "Path Lengths: " . join (", ", map {$apsp->path_length($_, AS::get_rest_of_the_world_name())} @cycle ) . "\n";
-             
-             my $asn_to_purge = pop @cycle;
-             foreach my $asn_to_purge_from (@cycle)
-             {
-                 $asns->{$asn_to_purge_from}->purge_from_customer_list($asns->{$asn_to_purge});
-             }
-             $g = $self->_get_graph_object();
-         }
-     }
- 
-     $g = $self->_get_graph_object();
+            print "Attempting to fix cycle: " . join( ", ", @cycle ) . "\n";
+            @cycle = sort
+            {
+                $apsp->path_length( $a, AS::get_rest_of_the_world_name() )
+                  <=> $apsp->path_length( $b, AS::get_rest_of_the_world_name() )
+            } @cycle;
+
+            @cycle = reverse @cycle;
+
+            print "Path Lengths: "
+              . join( ", ", map { $apsp->path_length( $_, AS::get_rest_of_the_world_name() ) } @cycle ) . "\n";
+
+            my $asn_to_purge = pop @cycle;
+            foreach my $asn_to_purge_from (@cycle)
+            {
+                $asns->{$asn_to_purge_from}->purge_from_customer_list( $asns->{$asn_to_purge} );
+            }
+            $g = $self->_get_graph_object();
+        }
+    }
+
+    $g = $self->_get_graph_object();
 
     die "Graph is cyclic: " . join( " , ", $g->find_a_cycle() ) if ( $g->has_a_cycle() );
 
@@ -325,11 +332,10 @@ sub _sort_by_monitoring
 
     my @ret =
       reverse
-      sort
-    {
+      sort {
         $asns->{$a}->get_effective_monitorable_ip_address_count()
           <=> $asns->{$b}->get_effective_monitorable_ip_address_count()
-    } @{$asn_names};
+      } @{$asn_names};
 
     return @ret;
 }
@@ -490,7 +496,7 @@ sub print_connections_per_asn
 
     my @asn_keys = @{ $self->_get_top_country_asns };
 
-    unshift @asn_keys , AS::get_rest_of_the_world_name();
+    unshift @asn_keys, AS::get_rest_of_the_world_name();
 
     foreach my $key (@asn_keys)
     {
@@ -500,6 +506,7 @@ sub print_connections_per_asn
         #my $asn_name = ( AsnTaxonomyClass::get_asn_organization_description($key) );
         print
 "Total downstream connections for AS$asn_info->{asn} ($asn_info->{organization_name}): $asn_info->{total_connections}\n";
+
         #if ( $key ne  AS::get_rest_of_the_world_name() )
         {
 
@@ -515,7 +522,12 @@ sub print_connections_per_asn
         {
             if ( defined( $asns->{$key}->{$field} ) )
             {
-                print "\t\t $field: " . ( join ", ", map { $_->get_as_number() . " (" . $_->get_statistics->{organization_name} . ") " } @{ $asns->{$key}->{$field} } ) . "\n";
+                print "\t\t $field: "
+                  . (
+                    join ", ",
+                    map { $_->get_as_number() . " (" . $_->get_statistics->{organization_name} . ") " }
+                      @{ $asns->{$key}->{$field} }
+                  ) . "\n";
             }
         }
     }
@@ -568,7 +580,6 @@ sub xml_summary
     $xml_graph->appendTextChild( 'total_asns', $self->get_country_as_nodes_count() );
     $xml_graph->appendTextChild( 'complexity', $self->get_complexity );
 
-
     my $ninety_percent_control_asns = $self->get_asns_controlling_ninty_percent();
 
     my $ninty_percent_list_xml = XML::LibXML::Element->new('ninty_percent_asns');
@@ -583,26 +594,35 @@ sub xml_summary
 
     foreach my $key (@asn_keys)
     {
-        my $asn_info = $asns->{$key}->get_statistics();
 
-        my $asn_xml = XML::LibXML::Element->new('as');
-
-        foreach my $attrib_key ( sort keys %{$asn_info} )
-        {
-            $asn_xml->appendTextChild( $attrib_key, $asn_info->{$attrib_key} );
-        }
-
-        my $is_point_of_countrol = _list_contains( $key, $ninety_percent_control_asns );
-
-        $asn_xml->setAttribute( 'point_of_control', $is_point_of_countrol );
-
-        $asn_xml->appendTextChild( 'percent_monitorable', $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 );
-        $asn_xml->appendTextChild( 'percent_direct_ips',  $asn_info->{direct_ips} / $total_ips * 100.0 );
-
+        my $asn_xml = $self->get_as_node_xml($key, $ninety_percent_control_asns, $total_ips);
         $xml_graph->appendChild($asn_xml);
     }
 
     return $xml_graph;
+}
+
+sub get_as_node_xml
+{
+    my ( $self, $asn, $ninety_percent_control_asns, $total_ips ) = @_;
+    my $asns = $self->{asn_nodes};
+    my $asn_info = $asns->{$asn}->get_statistics();
+
+    my $asn_xml = XML::LibXML::Element->new('as');
+
+    foreach my $attrib_key ( sort keys %{$asn_info} )
+    {
+        $asn_xml->appendTextChild( $attrib_key, $asn_info->{$attrib_key} );
+    }
+
+    my $is_point_of_countrol = _list_contains( $asn, $ninety_percent_control_asns );
+
+    $asn_xml->setAttribute( 'point_of_control', $is_point_of_countrol );
+
+    $asn_xml->appendTextChild( 'percent_monitorable', $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 );
+    $asn_xml->appendTextChild( 'percent_direct_ips',  $asn_info->{direct_ips} / $total_ips * 100.0 );
+
+    return $asn_xml;
 }
 
 sub get_as_node_or_rest_of_world_node
@@ -616,7 +636,7 @@ sub get_as_node_or_rest_of_world_node
     }
     else
     {
-        return $self->get_as_node( AS::get_rest_of_the_world_name());
+        return $self->get_as_node( AS::get_rest_of_the_world_name() );
     }
 }
 
@@ -656,7 +676,7 @@ sub get_country_specific_sub_graph
             push @{ $new_asn->{$relationship_type} }, @rel_list;
             $new_asn->{$relationship_type} = [ uniq @{ $new_asn->{$relationship_type} } ];
 
-    # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne AS::get_rest_of_the_world_name()}   @{ $new_asn->{$relationship_type} } ];
+# $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne AS::get_rest_of_the_world_name()}   @{ $new_asn->{$relationship_type} } ];
         }
     }
 

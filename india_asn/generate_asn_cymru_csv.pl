@@ -18,7 +18,7 @@ sub print_asn_country_map
 
     my @header = qw (asn country registry allocated as_name);
 
-    my $csv = Class::CSV->new( fields => \@header );
+    my $csv = Class::CSV->new( fields => \@header, csv_xs_options => { binary => 1, sep_char => "\t" } );
 
     foreach my $asn ( sort { $a <=> $b } keys( %{$_asn_info_cache} ) )
     {

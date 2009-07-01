@@ -61,7 +61,7 @@ function get_flash_url()
 {
   $host = $_SERVER["HTTP_HOST"];
   $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
-  $country_svg_url = "http://$host$path/flare_demo/demos.swf";
+  $country_svg_url = "http://$host$path/flare_demo/asn_visualization.swf";
 
   return $country_svg_url;
 }
@@ -94,15 +94,15 @@ function embed_flash_object($country_xml)
 ?>
 
        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="demos" width="1000" height="700"
+			id="demos" width="1000" height="1000"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
-			<param name="movie" value="demos.swf" />
+			<param name="movie" value="asn_visualization.swf" />
 			<param name="quality" value="high" />
 			<param name="bgcolor" value="#ffffff" />
 			<param name="allowScriptAccess" value="sameDomain" />
                         <param name="FlashVars" value="graphurl=<?echo get_country_graphml_image_url($country_xml)?>&json_url=<? echo get_json_summary_url($country_xml) ?>" />
 			<embed src="<? echo get_flash_url() ?>" quality="high" bgcolor="#ffffff"
-				width="1000" height="700" name="demos" align="middle"
+				width="1000" height="1000" name="demos" align="middle"
 				play="true"
 				loop="false"
 				quality="high"

@@ -32,7 +32,7 @@ my $_as_class_color = {
     t2        => 'blue',
 };
 
-my $_dont_check_for_cycles = 1;
+my $_dont_check_for_cycles = 0;
 
 # METHODS
 
@@ -590,7 +590,7 @@ sub xml_summary
 
     $xml_graph->appendChild($ninty_percent_list_xml);
 
-    my @asn_keys = @{ $self->_get_top_country_asns };
+    my @asn_keys = $self->_get_asn_names_sorted_by_monitoring;
 
     foreach my $key (@asn_keys)
     {
@@ -598,6 +598,10 @@ sub xml_summary
         my $asn_xml = $self->get_as_node_xml($key, $ninety_percent_control_asns, $total_ips);
         $xml_graph->appendChild($asn_xml);
     }
+
+    #now add the rest_of_the_world_node:
+    my $rest_of_world_xml = $self->get_as_node_xml(AS::get_rest_of_the_world_name(), $ninety_percent_control_asns, $total_ips);
+    $xml_graph->appendChild($rest_of_world_xml);
 
     return $xml_graph;
 }

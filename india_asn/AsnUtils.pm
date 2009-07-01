@@ -94,6 +94,7 @@ sub get_asn_dig_info
 
 sub _read_asn_to_country_csv_file
 {
+    print STDERR "Reading asn_to_country.csv\n";
     my $csv = Class::CSV->parse(
         filename => 'asn_to_country.csv',
         fields   => [qw /asn country_code/]
@@ -103,6 +104,7 @@ sub _read_asn_to_country_csv_file
     {
         $_asn_country_cache->{ $line->asn } = $line->country_code;
     }
+    print STDERR "Done reading asn_to_country.csv\n";
 }
 
 sub is_indian_asn

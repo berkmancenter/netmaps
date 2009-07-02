@@ -33,37 +33,6 @@ sub _read_asn_to_ip_file
     }
 }
 
-sub _read_ip_prefix_to_asn_file
-{
-    print "reading ip _prefix  file\n";
-    my $csv = Class::CSV->parse(
-        filename       => $ip_prefix_to_asn_tsv_file,
-        fields         => [qw /ip ip_prefix_length asn /],
-        csv_xs_options => { binary => 1, sep_char => "\t" }
-    );
-
-    for my $line ( @{ $csv->lines } )
-    {
-        my $num_ips = 2**( 32 - $line->ip_prefix_length );
-
-        my @asns = split( "_", $line->asn );
-
-        @asns = map { split( ",", $_ ) } @asns;
-
-        foreach my $asn (@asns)
-        {
-            $_asn_count->[$asn] ||= 0;
-            $_asn_count->[$asn] += $num_ips;
-        }
-    }
-}
-
-sub get_asn_counts_from_ip_prefix_file
-{
-    _read_ip_prefix_to_asn_file();
-
-    return $_asn_count;
-}
 
 my $_ip_count_dbh;
 
@@ -79,7 +48,7 @@ sub get_ip_address_count_for_asn
             PrintError => 1,
         };
 
-        $_ip_count_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=asn_count.db", "", "", $dbargs ) );
+        $_ip_count_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=db/asn_ip_counts.db", "", "", $dbargs ) );
     }
 
     if ( !defined( $_asn_count->[$asn] ) )

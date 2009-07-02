@@ -19,7 +19,7 @@ sub _create_db_handle_if_necessary
             PrintError => 1,
         };
 
-        $_as_info_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=asn_info.db", "", "", $dbargs ) );
+        $_as_info_dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=db/as_info.db", "", "", $dbargs ) );
     }
 }
 

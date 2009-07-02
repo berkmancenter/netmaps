@@ -10,6 +10,6 @@ create table as_taxonomy (
 );
 
 .separator \t
-.import as2attr.txt as_taxonomy
+.import downloaded_data/as2attr.txt as_taxonomy
 
 CREATE UNIQUE INDEX asn_index ON as_taxonomy (asn);

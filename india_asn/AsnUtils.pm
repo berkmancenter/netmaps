@@ -96,9 +96,9 @@ sub _read_asn_to_country_csv_file
 {
     print STDERR "Reading asn_to_country.csv\n";
     my $csv = Class::CSV->parse(
-        filename => 'asn_to_country.csv',
+        filename => 'generated_data/asn_to_country.csv',
         fields   => [qw /asn country_code/]
-    );
+    ) || die;
 
     for my $line ( @{ $csv->lines } )
     {

@@ -5,8 +5,8 @@ GENERATED_DATA_DIRECTORY=generated_data
 WEB_DIRECTORY=asn_web_graphs
 DATABASE_DIRECTORY=db
 mkdir -p $GENERATED_DATA_DIRECTORY
-cat $DATA_DOWNLOAD_DIRECTORY/newest_as_rel_file_name.txt | xargs cat | head -n 200 | ./generate_asn_to_country_list.pl  >  $GENERATED_DATA_DIRECTORY/asn_to_country.csv
-cat $DATA_DOWNLOAD_DIRECTORY/newest_as_rel_file_name.txt | xargs cat | head -n 200 | ./generate_asn_cymru_tsv.pl  >  $GENERATED_DATA_DIRECTORY/asn_info.tsv
+cat $DATA_DOWNLOAD_DIRECTORY/newest_as_rel_file_name.txt | xargs cat  | ./generate_asn_to_country_list.pl  >  $GENERATED_DATA_DIRECTORY/asn_to_country.csv
+cat $DATA_DOWNLOAD_DIRECTORY/newest_as_rel_file_name.txt | xargs cat | ./generate_asn_cymru_tsv.pl  >  $GENERATED_DATA_DIRECTORY/asn_info.tsv
 mkdir -p $DATABASE_DIRECTORY
 rm $DATABASE_DIRECTORY/as_info.db
 sqlite3 $DATABASE_DIRECTORY/as_info.db < sql_scripts/as_info.sql

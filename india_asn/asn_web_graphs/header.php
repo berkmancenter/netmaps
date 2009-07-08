@@ -90,12 +90,12 @@ function get_page_title()
 
 <link rel="stylesheet" type="text/css" href="<? echo "http://$host$path"?>/style.css" media="all" />
 
-<script type="text/javascript" src="yui/build/yahoo/yahoo-min.js" ></script> 
+<script type="text/javascript" src="<? echo "http://$host$path"?>/yui/build/yahoo/yahoo-min.js" ></script> 
 
-<script type="text/javascript" src="yui/build/event/event-debug.js" ></script> 
-<script src="yui/build/connection/connection-debug.js"
+<script type="text/javascript" src="<? echo "http://$host$path"?>/yui/build/event/event-debug.js" ></script> 
+<script src="<? echo "http://$host$path"?>/yui/build/connection/connection-debug.js"
    type="text/javascript"></script> 
-  <script  type="text/javascript" src="yui/build/json/json-min.js"></script> 
+  <script  type="text/javascript" src="<? echo "http://$host$path"?>/yui/build/json/json-min.js"></script> 
 
   <script type='text/javascript' src='http://www.google.com/jsapi'></script>
 

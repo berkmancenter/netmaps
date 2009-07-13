@@ -294,8 +294,7 @@ sub die_if_cyclic
             print Dumper($apsp);
 
             print "Attempting to fix cycle: " . join( ", ", @cycle ) . "\n";
-            @cycle = sort
-            {
+            @cycle = sort {
                 $apsp->path_length( $a, AS::get_rest_of_the_world_name() )
                   <=> $apsp->path_length( $b, AS::get_rest_of_the_world_name() )
             } @cycle;
@@ -596,12 +595,13 @@ sub xml_summary
     foreach my $key (@asn_keys)
     {
 
-        my $asn_xml = $self->get_as_node_xml($key, $ninety_percent_control_asns, $total_ips);
+        my $asn_xml = $self->get_as_node_xml( $key, $ninety_percent_control_asns, $total_ips );
         $xml_graph->appendChild($asn_xml);
     }
 
     #now add the rest_of_the_world_node:
-    my $rest_of_world_xml = $self->get_as_node_xml(AS::get_rest_of_the_world_name(), $ninety_percent_control_asns, $total_ips);
+    my $rest_of_world_xml =
+      $self->get_as_node_xml( AS::get_rest_of_the_world_name(), $ninety_percent_control_asns, $total_ips );
     $xml_graph->appendChild($rest_of_world_xml);
 
     return $xml_graph;
@@ -610,7 +610,7 @@ sub xml_summary
 sub get_as_node_xml
 {
     my ( $self, $asn, $ninety_percent_control_asns, $total_ips ) = @_;
-    my $asns = $self->{asn_nodes};
+    my $asns     = $self->{asn_nodes};
     my $asn_info = $asns->{$asn}->get_statistics();
 
     my $asn_xml = XML::LibXML::Element->new('as');

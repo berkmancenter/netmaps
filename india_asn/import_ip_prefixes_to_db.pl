@@ -6,7 +6,7 @@ use Class::CSV;
 use DBIx::Simple;
 use Data::Dumper;
 use Locale::Country qw(country2code);
-use IO::Uncompress::Gunzip qw(gunzip $GunzipError) ;
+use IO::Uncompress::Gunzip qw(gunzip $GunzipError);
 
 #use AsnIPCount;
 
@@ -18,10 +18,10 @@ sub _read_ip_prefix_to_asn_file
     print "reading ip _prefix  file\n";
 
     my $z = new IO::Uncompress::Gunzip $ip_prefix_to_asn_file
-        or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
-    
+      or die "IO::Uncompress::Gunzip failed: $GunzipError\n";
+
     my $csv = Class::CSV->parse(
-        filehandle      => $z,
+        filehandle     => $z,
         fields         => [qw /ip ip_prefix_length asn /],
         csv_xs_options => { binary => 1, sep_char => "\t" }
     );
@@ -33,7 +33,7 @@ sub _read_ip_prefix_to_asn_file
     for my $line ( @{ $csv->lines } )
     {
 
-        if ($lines_read % 100 == 0)
+        if ( $lines_read % 100 == 0 )
         {
             print "Lines read: $lines_read\n";
         }
@@ -60,7 +60,6 @@ sub get_asn_counts_from_ip_prefix_file
 
     return $_asn_count;
 }
-
 
 sub main
 {

@@ -124,7 +124,7 @@ sub main
             debug       => 0,
         );
 
-        next if (!$res);
+        next if ( !$res );
 
         my @top_sites = map { $_->{site_name} } @{ $adwords_data->hashes() };
 

@@ -47,11 +47,10 @@ sub new
     return $self;
 }
 
-
 sub get_rest_of_the_world_name
 {
     Readonly my $_rest_of_the_world_name => "REST_OF_WORLD";
-    return  $_rest_of_the_world_name;
+    return $_rest_of_the_world_name;
 }
 
 #return the list of nodes that we have both customer and provider relationships with
@@ -61,10 +60,10 @@ sub find_effective_peers
 
     my $customers = $self->get_customers();
     my $providers = $self->get_providers();
-    print "\$providers " .  join (", ", @{$providers}) . "\n";  
-    my @intersection =  get_intersection($customers, $providers);
-    print "intersection " . Dumper(\@intersection);
-    map {bless \$_ } @intersection;
+    print "\$providers " . join( ", ", @{$providers} ) . "\n";
+    my @intersection = get_intersection( $customers, $providers );
+    print "intersection " . Dumper( \@intersection );
+    map { bless \$_ } @intersection;
 
     return \@intersection;
 }
@@ -80,68 +79,70 @@ sub _list_contains
     print $ret? "true\n" : "false\n";
     return $ret;
 }
+
 sub purge_from_customer_list
 {
-    (my $self, my $other_as) = @_;
-    
+    ( my $self, my $other_as ) = @_;
+
     my $providers = $self->get_customers();
 
     my $i = 0;
-    while ($i < scalar(@{$providers}) )
+    while ( $i < scalar( @{$providers} ) )
     {
-        if ($providers->[$i] == $other_as)
+        if ( $providers->[$i] == $other_as )
         {
             print "Purging " . $other_as->get_as_number() . "from " . $self->get_as_number() . "\n";
-            splice(@{$providers}, $i);
+            splice( @{$providers}, $i );
         }
         else
         {
             $i++;
         }
     }
-    
+
 }
 
 sub mark_effective_peers
 {
-  my ($self) = @_;
+    my ($self) = @_;
 
-  my $effective_peers = $self->find_effective_peers();
+    my $effective_peers = $self->find_effective_peers();
 
-  #no peers to mark
-  return if (scalar(@{$self->find_effective_peers}) == 0 );
+    #no peers to mark
+    return if ( scalar( @{ $self->find_effective_peers } ) == 0 );
 
-  print "ASN: " . $self->get_as_number() . "\n"; 
+    print "ASN: " . $self->get_as_number() . "\n";
 
-  my $customers = $self->get_customers();
-  my $providers = $self->get_providers();
+    my $customers = $self->get_customers();
+    my $providers = $self->get_providers();
 
-  print 'effective_peers ' . join (", ", map {$_->get_as_number} @{$effective_peers}) . "\n";
-  #my $lc1 = List::Compare->new($customers, $effective_peers);
-  $customers = [grep { !_list_contains ($_, $effective_peers) } @{$customers}];
+    print 'effective_peers ' . join( ", ", map { $_->get_as_number } @{$effective_peers} ) . "\n";
 
-  $self->{customer} = $customers;
+    #my $lc1 = List::Compare->new($customers, $effective_peers);
+    $customers = [ grep { !_list_contains( $_, $effective_peers ) } @{$customers} ];
 
-  #print 'providers ' . join (", ", @{$providers}) . "\n";
-  my $lc2 = List::Compare->new( $providers, $effective_peers);
+    $self->{customer} = $customers;
 
-  $providers = [grep { !_list_contains ($_, $effective_peers) } @{$providers}];
-  #$providers= $lc2->get_Lonly_ref;
-  #print 'providers ' . join (", ", @{$providers}) . "\n";  
-  $self->{provider} = $providers;
-  $providers = $self->get_providers();
+    #print 'providers ' . join (", ", @{$providers}) . "\n";
+    my $lc2 = List::Compare->new( $providers, $effective_peers );
 
-  #print 'providers ' . join (", ", @{$providers}) . "\n";
+    $providers = [ grep { !_list_contains( $_, $effective_peers ) } @{$providers} ];
 
+    #$providers= $lc2->get_Lonly_ref;
+    #print 'providers ' . join (", ", @{$providers}) . "\n";
+    $self->{provider} = $providers;
+    $providers = $self->get_providers();
 
+    #print 'providers ' . join (", ", @{$providers}) . "\n";
 
-  foreach my $peer (@{$effective_peers})
-  {
-      $self->add_relationship($peer, 'peer');
-  }
+    foreach my $peer ( @{$effective_peers} )
+    {
+        $self->add_relationship( $peer, 'peer' );
+    }
 
-  $effective_peers = $self->find_effective_peers();
-  die  'Error effective_peers not empty ' . join (", ", @{$effective_peers}) . "\n" unless scalar(@{$effective_peers}) == 0;
+    $effective_peers = $self->find_effective_peers();
+    die 'Error effective_peers not empty ' . join( ", ", @{$effective_peers} ) . "\n"
+      unless scalar( @{$effective_peers} ) == 0;
 }
 
 sub get_country_code
@@ -155,7 +156,7 @@ sub is_rest_of_world
 {
     my ($self) = @_;
 
-    return $self->get_as_number eq  AS::get_rest_of_the_world_name();
+    return $self->get_as_number eq AS::get_rest_of_the_world_name();
 }
 
 sub only_connects_to_rest_of_world
@@ -238,7 +239,7 @@ sub get_downstream_asns
 
     return [
         uniq map { $_, @{ $_->get_downstream_asns } }
-          grep { ! $self->is_rest_of_world } @{ $self->get_customers }
+          grep { !$self->is_rest_of_world } @{ $self->get_customers }
     ];
 }
 
@@ -271,7 +272,6 @@ sub get_providers
 
     return $self->get_nodes_for_relationship('provider');
 }
-
 
 sub get_monitorable_ip_address_count
 {

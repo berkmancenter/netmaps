@@ -33,7 +33,6 @@ sub _read_asn_to_ip_file
     }
 }
 
-
 my $_ip_count_dbh;
 
 sub get_ip_address_count_for_asn

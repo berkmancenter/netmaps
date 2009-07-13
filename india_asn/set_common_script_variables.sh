@@ -2,3 +2,4 @@ DATA_DOWNLOAD_DIRECTORY=downloaded_data
 NEWEST_AS_REL_LOCATION_FILE=$DATA_DOWNLOAD_DIRECTORY/newest_as_rel_file_name.txt
 LAST_AS_REL_LOCATION_FILE=$DATA_DOWNLOAD_DIRECTORY/last_mapped_as_rel_file_name.txt
 WEB_DIRECTORY=asn_web_graphs
+

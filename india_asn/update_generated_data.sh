@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 DATA_DOWNLOAD_DIRECTORY=downloaded_data
 GENERATED_DATA_DIRECTORY=generated_data

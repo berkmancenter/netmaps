@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+package AdPlannerCountryReport;
 
 use DBI;
 use strict;
@@ -80,6 +80,8 @@ sub process_country_ad_words_sites
 
     ( my $country_code ) = @_;
 
+    $country_code = lc $country_code;
+
     my $dbargs = {
         AutoCommit => 1,
         RaiseError => 1,
@@ -89,8 +91,10 @@ sub process_country_ad_words_sites
     my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=db/ad_words.db", "", "", $dbargs ) );
 
     my $adwords_data =
-      $dbh->query( "select * from adwords_country_data where country_code = ? order by audience_reach desc limit 10 ",
+      $dbh->query( "select * from adwords_country_data where country_code = ? order by audience_reach desc ",
         $country_code )->hashes;
+
+    return unless scalar (@ {$adwords_data} );
 
     #store hash and summ total page views.
 
@@ -108,17 +112,17 @@ sub process_country_ad_words_sites
     {
         my $site = $site_hash->{site_name};
 
-        print "ProcessingSite: '$site'\n";
+        #print "ProcessingSite: '$site'\n";
 
-        if ( hosted_in_country( $site, 'in' ) )
+        if ( hosted_in_country( $site, $country_code ) )
         {
-            print "Site is hosted in country\n";
+            #print "Site is hosted in country\n";
             $top_sites_in_country++;
             $page_views_in_country += $site_hash->{country_page_views};
         }
         else
         {
-            print "Site is NOT hosted in country\n";
+            #print "Site is NOT hosted in country\n";
         }
 
         #print "$site -- " . get_ip_for_host($site) . "\n";
@@ -132,20 +136,41 @@ sub process_country_ad_words_sites
     $ret->{total_page_views}      = $total_page_views;
     $ret->{country_code}          = $country_code;
 
-    print $ret->{top_sites_in_country} . " / "
-      . $ret->{top_site_count}
-      . " are in country ( "
-      . $ret->{top_sites_in_country} / $ret->{top_site_count} * 100.0 . " %)\n";
+#     print $ret->{top_sites_in_country} . " / "
+#       . $ret->{top_site_count}
+#       . " are in country ( "
+#       . $ret->{top_sites_in_country} / $ret->{top_site_count} * 100.0 . " %)\n";
 
-    print $ret->{page_views_in_country} . " / "
-      . $ret->{total_page_views}
-      . " are in country ( "
-      . $ret->{page_views_in_country} / $ret->{total_page_views} * 100.0 . " %)\n";
+#     print $ret->{page_views_in_country} . " / "
+#       . $ret->{total_page_views}
+#       . " are in country ( "
+#       . $ret->{page_views_in_country} / $ret->{total_page_views} * 100.0 . " %)\n";
 
     return $ret;
 }
 
-sub main
+
+sub country_ad_words_xml_summary
+{
+  ( my $country_code ) = @_;
+
+  my $ad_words_info = process_country_ad_words_sites($country_code);
+
+  my $xml_graph = XML::LibXML::Element->new('ad_words_summary');
+
+  if ($ad_words_info)
+  {
+      $xml_graph->appendTextChild('top_site_count', $ad_words_info->{top_site_count});
+      $xml_graph->appendTextChild('top_sites_in_country', $ad_words_info->{top_sites_in_country});
+      $xml_graph->appendTextChild('page_views_in_country', $ad_words_info->{page_views_in_country});
+      $xml_graph->appendTextChild('total_page_views', $ad_words_info->{total_page_views});
+      $xml_graph->appendTextChild('country_code', $ad_words_info->{country_code});
+  }
+
+  return $xml_graph;
+}
+
+sub test_driver_main
 {
     Readonly my $country_code_str => 'in';
 
@@ -157,4 +182,4 @@ sub main
     }
 }
 
-main;
+1;

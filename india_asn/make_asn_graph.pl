@@ -3,6 +3,7 @@
 use strict;
 use Getopt::Long;
 use AsnGraph;
+use AdPlannerCountryReport;
 use List::Util qw(max min);
 use Locale::Country qw(code2country);
 use Readonly;
@@ -71,7 +72,7 @@ sub main
 
     @country_codes = grep { $_ ne 'US' } @country_codes;
 
-    @country_codes = grep { $_ ne 'GG' } @country_codes;
+    #@country_codes = grep { $_ eq 'IN' } @country_codes;
 
     #@country_codes = @country_codes[0..10];
 
@@ -106,6 +107,8 @@ sub main
             $country_element->setAttribute( 'country_code',           $country_code );
             $country_element->setAttribute( 'country_name',           $country_name );
             $country_element->setAttribute( 'country_code_is_region', $country_code_is_region );
+            $country_element->appendChild( AdPlannerCountryReport::country_ad_words_xml_summary($country_code) );
+
             $country_element->appendChild( $asn_sub_graph->xml_summary() );
             $root->appendChild($country_element);
             my $g = $asn_sub_graph->print_graphviz();
@@ -122,15 +125,15 @@ sub main
             print SVGOUTPUTFILE $svg_to_scale;
             close(SVGOUTPUTFILE);
 
-            my $dot_output_file  = "$output_file_base.dot";
+            my $dot_output_file = "$output_file_base.dot";
             open( DOTOUTPUTFILE, ">$dot_output_file" ) || die "Could not create file:$dot_output_file ";
             my $dot_output = $g->as_dot;
             print DOTOUTPUTFILE $dot_output;
             close(DOTOUTPUTFILE);
 
             my $parser = Graph::Easy::Parser::Graphviz->new();
-            my $graph = $parser->from_file($dot_output_file);
-            
+            my $graph  = $parser->from_file($dot_output_file);
+
             my $graphml_output = $graph->as_graphml();
 
             #flex aparently doesn't like namespaces

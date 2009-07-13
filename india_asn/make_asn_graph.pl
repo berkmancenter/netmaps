@@ -72,7 +72,8 @@ sub main
 
     @country_codes = grep { $_ ne 'US' } @country_codes;
 
-    #@country_codes = grep { $_ eq 'IN' } @country_codes;
+    #TODO this country causes a divide by zero error so skip it for now.
+    @country_codes = grep { $_ ne 'GG' } @country_codes;
 
     #@country_codes = @country_codes[0..10];
 

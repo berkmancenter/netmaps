@@ -104,7 +104,7 @@ sub main
 
     Readonly my $country_code_str => 'in';
 
-    my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=ad_words.db", "", "", $dbargs ) );
+    my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=db/ad_words.db", "", "", $dbargs ) );
 
     foreach my $country ( sort keys %{$_country_dns} )
     {
@@ -124,6 +124,8 @@ sub main
             debug       => 0,
         );
 
+        next if (!$res);
+
         my @top_sites = map { $_->{site_name} } @{ $adwords_data->hashes() };
 
         push @top_sites, "google.com", "youtube.com";
@@ -132,7 +134,7 @@ sub main
             print "ProcessingSite: '$site'\n";
             get_ip_for_host( $site, $res );
 
-            #print "$site -- " . get_ip_for_host($site) . "\n";
+            print "$site -- " . get_ip_for_host($site) . "\n";
         }
     }
 }

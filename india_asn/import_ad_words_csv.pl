@@ -15,7 +15,7 @@ sub main
         PrintError => 1,
     };
 
-    my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=ad_words.db", "", "", $dbargs ) );
+    my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=db/ad_words.db", "", "", $dbargs ) );
 
     foreach my $file (@ARGV)
     {

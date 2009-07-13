@@ -71,7 +71,7 @@ sub main
 
     @country_codes = grep { $_ ne 'US' } @country_codes;
 
-    #@country_codes = grep { $_ eq 'IL' } @country_codes;
+    @country_codes = grep { $_ ne 'GG' } @country_codes;
 
     #@country_codes = @country_codes[0..10];
 

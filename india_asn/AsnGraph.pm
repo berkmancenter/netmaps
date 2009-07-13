@@ -89,6 +89,7 @@ sub _get_total_ips
     my ($self) = @_;
     my $asns = $self->{asn_nodes};
 
+    #print Dumper($asns);
     if ( !defined( $self->{_total_ips} ) )
     {
         $self->{_total_ips} = sum map { $_->get_asn_ip_address_count() } values %{$asns};

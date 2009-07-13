@@ -138,16 +138,16 @@ sub main
 
             #flex aparently doesn't like namespaces
             $graphml_output =~ s/<graphml.*?>/<graphml>/s;
-            my $graphml_output_file  = "$output_file_base.graphml";
+            my $graphml_output_file = "$output_file_base.graphml";
 
             open( GRAPHMLOUTPUTFILE, ">$graphml_output_file" ) || die "Could not create file:$graphml_output_file ";
             print GRAPHMLOUTPUTFILE $graphml_output;
             close(GRAPHMLOUTPUTFILE);
 
-             my $rsvg = new Image::LibRSVG();
+            my $rsvg = new Image::LibRSVG();
 
-             $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
-               || die "Could not convert file to png";
+            $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
+              || die "Could not convert file to png";
 
             if ( ( $loop_iteration % 10 ) == 0 )
             {

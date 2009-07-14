@@ -1,10 +1,6 @@
 #!/bin/bash
 
-#sssource ./set_common_script_variables.sh
 source ./set_common_script_variables.sh
-
-echo $DATA_DOWNLOAD_DIRECTORY 
-exit
 
 CAIDA_SERVER=as-rank.caida.org
 CAIDA_DATA_DIRECTORY_URL=http://$CAIDA_SERVER/data/2009/

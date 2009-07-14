@@ -1,5 +1,8 @@
 #!/bin/bash
 
+working_dir=`dirname $0`
+cd $working_dir
+
 source set_common_script_variables.sh
 
 ./update_caida_as_relationship_data.sh

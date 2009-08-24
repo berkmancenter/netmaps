@@ -435,6 +435,8 @@ sub get_asns_controlling_ninty_percent
 {
     my ($self) = @_;
 
+    #return $self->{ninty_percent_control_list} if (defined ($self->{ninty_percent_control_list}) );
+
     my @asns = $self->_get_asn_names_sorted_by_monitoring();
 
     my $asn                = shift @asns;
@@ -458,6 +460,8 @@ sub get_asns_controlling_ninty_percent
 
         #print " while (\n";
     }
+
+    $self->{ninty_percent_control_list} = \@ninty_percent_list;
 
     return \@ninty_percent_list;
 }
@@ -560,6 +564,13 @@ sub _list_contains
     ( my $value, my $list ) = @_;
 
     return any { $_ eq $value } @{$list};
+}
+
+sub get_point_of_control_as_numbers
+{
+    my ($self) = @_;
+  
+    return [ @{$self->get_asns_controlling_ninty_percent()}];
 }
 
 sub xml_summary

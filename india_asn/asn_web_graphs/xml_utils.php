@@ -1,4 +1,6 @@
 <?
+$show_ad_planner_results = 1;
+
 function get_xml_file() 
 {
   $xml_file_location = 'results/results.xml';
@@ -88,6 +90,137 @@ function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
   return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
 
+function get_country_top_sites(SimpleXMLElement $country_xml)
+{
+  $ret = (String) $country_xml->ad_words_summary->top_site_count;
+
+  if (!$ret)
+    {
+      $ret = 'N/A';
+    }
+
+  return $ret ;
+}
+
+function get_top_sites_in_country(SimpleXMLElement $country_xml)
+{
+  $ret = (String) $country_xml->ad_words_summary->top_sites_in_country;
+
+  if (!$ret)
+    {
+      $ret = 'N/A';
+    }
+
+  return $ret ;
+}
+
+function get_top_sites_country_percent(SimpleXMLElement $country_xml)
+{
+
+  $top_site_count = get_country_top_sites($country_xml);
+  $top_sites_in_country = get_top_sites_in_country($country_xml);
+
+  if ($top_site_count == 'N/A')
+    {
+      return 'N/A';
+    }
+
+  return $top_sites_in_country/$top_site_count*100.0;
+}
+
+function get_top_sites_PoC_percent(SimpleXMLElement $country_xml)
+{
+  $top_site_count = get_country_top_sites($country_xml);
+  $top_sites_in_country = get_top_sites_in_PoC($country_xml);
+
+  if ($top_site_count == 'N/A')
+    {
+      return 'N/A';
+    }
+
+  return $top_sites_in_country/$top_site_count*100.0;
+}
+
+function get_total_page_views(SimpleXMLElement $country_xml)
+{
+ $ret = (String) $country_xml->ad_words_summary->total_page_views;
+
+  if (!$ret)
+    {
+      $ret = 'N/A';
+    }
+
+  return $ret ;
+}
+
+function get_page_views_in_country(SimpleXMLElement $country_xml)
+{
+ $ret = (String) $country_xml->ad_words_summary->page_views_in_country;
+
+  if (!$ret)
+    {
+      $ret = 'N/A';
+    }
+
+  return $ret ;
+}
+
+function get_page_view_country_percent(SimpleXMLElement $country_xml)
+{
+
+  $total_page_views =  get_total_page_views($country_xml);
+  $page_views_in_country = get_page_views_in_country($country_xml);
+
+  if ($total_page_views == 'N/A')
+    {
+      return 'N/A';
+    }
+
+  return round(100.0*$page_views_in_country/$total_page_views, 2);
+}
+
+function get_page_view_PoC_percent(SimpleXMLElement $country_xml)
+{
+
+  $total_page_views =  get_total_page_views($country_xml);
+  $page_views_in_country = get_PoC_page_views($country_xml);
+
+  if ($total_page_views == 'N/A')
+    {
+      return 'N/A';
+    }
+
+  return round(100.0*$page_views_in_country/$total_page_views, 2);
+}
+
+function get_top_sites_in_PoC(SimpleXMLElement $country_xml)
+{
+ $ret = (String) $country_xml->ad_words_summary->top_sites_in_poc;
+
+ $total_page_views =  get_total_page_views($country_xml);
+
+ if ($ret == '')
+    {
+      $ret = 'N/A';
+    }
+
+  return $ret ;
+}
+
+function get_PoC_page_views(SimpleXMLElement $country_xml)
+{
+ $ret = (String) $country_xml->ad_words_summary->page_views_in_poc;
+
+ $total_page_views =  get_total_page_views($country_xml);
+
+ if ($ret == '')
+    {
+      $ret = get_top_sites_in_PoC($country_xml);
+    }
+
+  return $ret ;
+}
+
 function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries )
 {
   #print ("START country_xml_table_row '$country'\n");
@@ -114,14 +247,27 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
     <td><? echo "{$country['country_code']}"; ?></td>
     <td><? echo htmlentities(number_format( $total_ips)); ?></td>
     <td><? echo htmlentities(number_format( $total_asns)); ?></td>
-<?
-   #print_r( $country_code); print_r(' ');
-  
- #  print_r( $xquery_string);
- ?>
+
                                                                  <td><? echo  htmlentities(number_format($points_of_control)) ?></td>
                                                                  <td><? echo  htmlentities(number_format($ips_per_points_of_control)) ?></td>
                                                                  <td><? echo  htmlentities(number_format($complexity,2)) ?></td>
+<? 
+global $show_ad_planner_results;
+
+if ($show_ad_planner_results) { ?>
+    <td> <? echo get_country_top_sites($country) ?> </td>
+    <td> <? echo get_top_sites_in_country($country) ?> </td>
+    <td> <? echo get_top_sites_country_percent($country) ?> </td>
+    <td> <? echo get_top_sites_in_PoC($country) ?></td>
+    <td> <? echo get_top_sites_PoC_percent($country) ?></td>
+    <td> <? echo get_total_page_views($country) ?> </td>
+    <td> <? echo get_page_views_in_country($country) ?> </td>
+    <td> <? echo get_page_view_country_percent($country) ?> </td>
+    <td> <? echo get_PoC_page_views($country) ?></td>
+    <td> <? echo get_page_view_PoC_percent($country) ?></td>
+<? } ?>
+
+
   </tr>
 <?  
 }
@@ -210,6 +356,19 @@ function country_xml_list_summary_table($countries_xml, $show_rank)
 <td>Points of Control</td>
 <td>IPs Per Point of Control</td>
 <td>Complexity</td>
+<? global $show_ad_planner_results;
+if ($show_ad_planner_results) { ?>
+<td>top sites</td>
+<td>top sites in country</td>
+<td>country site %</td>
+<td>top sites in PoC</td>
+<td>PoC sites %</td>
+<td>total page views</td>
+<td>country page views</td>
+<td>country page view %</td>
+<td>PoC page views</td>
+<td>PoC page view %</td>
+<? } ?>
 </tr>
 
 <?

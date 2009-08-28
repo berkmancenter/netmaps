@@ -32,9 +32,6 @@ function geo_map_scripts($div_id)
    var geomap = null;
    var data = null;
 
-
-   
-
     function get_json_info()
    {
 
@@ -507,7 +504,7 @@ return "155";
 
     var url = 'http://localhost/asn_web_graphs/country_detail.php/?cc=' + e.region;
 
-    alert (url);
+    //alert (url);
 
       var json_url_param = document.getElementById('json_url_parm');
 

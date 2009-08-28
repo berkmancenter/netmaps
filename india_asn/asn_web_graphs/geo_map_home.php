@@ -507,7 +507,7 @@ return "155";
 
     var url = 'http://localhost/asn_web_graphs/country_detail.php/?cc=' + e.region;
 
-    //alert (url);
+    alert (url);
 
       var json_url_param = document.getElementById('json_url_parm');
 
@@ -546,7 +546,7 @@ return "155";
       
       country_flash_map_header.innerHTML='';
       
-      country_flash_map_header.innerHTML='Showing ASN map for ' + e.region;
+      country_flash_map_header.innerHTML='AUTNOMOUS SYSTEM DIAGRAM - ' + e.region;
 
       var country_flash_object_div = document.getElementById('country_flash_object');
       var country_map_html =  country_flash_object_div.innerHTML;
@@ -635,10 +635,11 @@ $country_xml = $result_array[0];
 ?>
 
 
-       <h1 id='country_flash_map_header'>Showing ASN map for CN</h1>
+       <div class="vis_head">
+<span id='country_flash_map_header' class="vis_heading">AUTNOMOUS SYSTEM DIAGRAM - <? echo $country_code ?></span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp mouse over and click on nodes</span></div>
 
        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="demos" width="1000" height="1000"
+			id="demos" width="650" height="525"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 			<param name="movie" value="asn_visualization.swf" />
 			<param name="quality" value="high" />
@@ -646,7 +647,7 @@ $country_xml = $result_array[0];
 			<param name="allowScriptAccess" value="sameDomain" />
                         <param id='json_url_parm' name="FlashVars" value="json_url=<? echo get_json_summary_url($country_xml) ?>" />
 			<embed name='flash_embed_tag_id' src="<? echo get_flash_url() ?>" bgcolor="#ffffff"
-				width="1000" height="1000" name="demos" align="middle"
+				width="650" height="525" name="demos" align="middle"
 				play="true"
 				loop="false"
 				quality="high"
@@ -664,22 +665,41 @@ $country_xml = $result_array[0];
 <?
 geo_map_scripts('map_canvas');
 ?>
-
-<table>
+<div class="geomaptable">
+<table valign="top">
+<tr valign="top">
+  <td style="height: 100%" >
+<table style="height: 100%">
 <tr valign="top">
 <td>
-<h1>World Complexity Map</h1>
-
+<div id="foo"><div class="vis_head">
+<span class="vis_heading">WORLD COMPLEXITY MAP</span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select a country to see ASN diagram</span>
+</div>
 <div id='map_canvas'></div>
+</div>
 </td>
+</tr>
+<tr valign="bottom">
 <td>
-<div id='country_flash_object'>
-  <? embed_flash_object('CN'); ?>
+<div id="foo"><div class="vis_head">
+<span class="vis_heading">COUNTRY VIEW LIST</span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select a country to see ASN diagram</span>
+</div>
+<div id='country_view_select'> XXXX</div>
 </div>
 </td>
 </tr>
 </table>
-
+</td>
+<td>
+<div id="foo">
+<div id='country_flash_object'>
+  <? embed_flash_object('CN'); ?>
+</div>
+</div>
+</td>
+</tr>
+</table>
+</div>
 <?
 include "footer.php";
 ?>

@@ -88,7 +88,16 @@ function get_page_title()
 <link rel="stylesheet" type="text/css"
  href="http://yui.yahooapis.com/2.5.2/build/fonts/fonts-min.css" />
 
+  <? 
+  global $alternate_css;
+
+  if (isset($alternate_css)) { ?>
+<link rel="stylesheet" type="text/css" href="<? echo "http://$host$path/$alternate_css"?>" media="all" />
+                                  <?  }
+ else {
+      ?>
 <link rel="stylesheet" type="text/css" href="<? echo "http://$host$path"?>/style.css" media="all" />
+     <? } ?>
 
 <script type="text/javascript" src="<? echo "http://$host$path"?>/yui/build/yahoo/yahoo-min.js" ></script> 
 

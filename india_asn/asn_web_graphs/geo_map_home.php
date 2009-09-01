@@ -1,5 +1,6 @@
 <?
-
+ global $alternate_css;
+$alternate_css='geo_map.css';
 include "./header.php"
 ?>
 

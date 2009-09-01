@@ -1,17 +1,21 @@
+html{
+ background-color: #e2e2e2;
+}
+
 body{
 text-align: left;
- margin: 20px;
- background-color: white;
+  margin: 20px; 
 }
 
 h1{
    font-weight:bold;
-   font-size:large;
+   font-size:x-large;
    margin-left:auto;
    padding-top: 15px;
    padding-bottom: 10px;
    padding-left: 0px;
    padding-right: 0px;
+   color: #5da01c;
 }
 
 h2{
@@ -27,6 +31,63 @@ table,tr,td,th,thead
   border: 2px solid #555555;
   padding : 10px;
   margin: 20px;	
+}
+
+
+.vis_heading
+{
+text-align: left; 
+/* float: left;  */
+  font-weight:bold;
+   font-size:large;
+/* background-color:#B0B0B0; */
+}
+
+
+.vis_sub_heading
+{
+text-align: right; 
+/* float: right;  */
+ /* background-color:#B0B0B0; */
+}
+
+.vis_head
+{
+     color: #ffffff;
+      background-color: #797979;
+}
+
+
+.geomaptable
+{
+   padding-top: 0px;
+   padding-bottom: 0px;
+   padding-left: 0px;
+   padding-right: 0px;
+  
+}
+
+#foo 
+{
+  border: 5px solid #ffffff;
+  padding : 0px;
+ #padding-left: 10px;
+  margin: 20px;
+}
+
+.geomaptable table,tr,td,th,thead
+{
+  border: 0px solid #ffffff;
+  padding : 0px;
+  margin: 0px;
+  #background-color: #ffffff;
+}
+
+
+.geomaptable h1
+{
+     color: #ffffff;
+      background-color: #b0b0b0;
 }
 
 

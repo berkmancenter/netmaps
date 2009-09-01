@@ -463,16 +463,16 @@ return "155";
 
     var filter = [{column: 1, value: country_code}];
 
-    alert(filter);
+    //alert(filter);
 
-    alert(filter[0]);
+    //alert(filter[0]);
 
     //filter[0][value] = country_code;
 
 
-    alert (data.getFilteredRows(filter) + "'");
+    //alert (data.getFilteredRows(filter) + "'");
 
-    alert ("baz");
+    //alert ("baz");
 
     switch(continent)
       {
@@ -500,10 +500,9 @@ return "155";
       }
   }
 
-  function regionClick_event_handler(e)
+  function update_asn_graph_country(country_code)
   {
-
-    var url = 'http://localhost/asn_web_graphs/country_detail.php/?cc=' + e.region;
+    var url = 'http://localhost/asn_web_graphs/country_detail.php/?cc=' + country_code;
 
     //alert (url);
 
@@ -516,7 +515,7 @@ return "155";
 
       //alert(json_url_param_value);
 
-      var json_url_param_new_value = json_url_param_value.replace(/cc=../, 'cc=' + e.region);
+      var json_url_param_new_value = json_url_param_value.replace(/cc=../, 'cc=' + country_code);
 
       // alert(json_url_param_value.replace(/cc=../, 'cc=' + e.region));
 
@@ -544,17 +543,21 @@ return "155";
       
       country_flash_map_header.innerHTML='';
       
-      country_flash_map_header.innerHTML='AUTNOMOUS SYSTEM DIAGRAM - ' + e.region;
+      country_flash_map_header.innerHTML='AUTNOMOUS SYSTEM DIAGRAM - ' + country_code;
 
       var country_flash_object_div = document.getElementById('country_flash_object');
       var country_map_html =  country_flash_object_div.innerHTML;
 
       country_flash_object_div.innerHTML =  '';
       country_flash_object_div.innerHTML =  country_map_html + '';
+      return;
+  }
 
-      //options['region'] =  get_zoom_region(e.region);
+  function regionClick_event_handler(e)
+  {
+    update_asn_graph_country(e.region);
 
-      redrawMap(get_zoom_region(e.region));
+    redrawMap(get_zoom_region(e.region));
   }
 
 //--><!]]>

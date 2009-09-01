@@ -458,9 +458,6 @@ return "155";
 
     var continent = country_to_continent[country_code];
 
-    alert(country_code);
-
-
     var filter = [{column: 1, value: country_code}];
 
     //alert(filter);
@@ -553,11 +550,24 @@ return "155";
       return;
   }
 
+<?  include "./mapped_countries_list.php" ?>
+
   function regionClick_event_handler(e)
   {
-    update_asn_graph_country(e.region);
+    var country_code = e.region;
 
-    redrawMap(get_zoom_region(e.region));
+    if (country_has_map(country_code) )
+      {
+        //alert (country_code + "has map");
+
+    update_asn_graph_country(country_code);
+
+    redrawMap(get_zoom_region(country_code));
+      }
+    else
+      {
+        //alert (country_code + "has no map");        
+      }
   }
 
 //--><!]]>

@@ -1,0 +1,90 @@
+body{
+text-align: left;
+ margin: 20px;
+ background-color: white;
+}
+
+h1{
+   font-weight:bold;
+   font-size:large;
+   margin-left:auto;
+   padding-top: 15px;
+   padding-bottom: 10px;
+   padding-left: 0px;
+   padding-right: 0px;
+}
+
+h2{
+   font-weight:bold;
+   font-size:large;
+   margin-left:auto
+}
+
+p {padding:5px 0px} 
+
+table,tr,td,th,thead
+{
+  border: 2px solid #555555;
+  padding : 10px;
+  margin: 20px;	
+}
+
+
+/* based on Huddleston 174-175P. */
+
+#mainnav {
+	width: 100%;
+	float: left;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 2em;
+	border-bottom: 3px solid #000000;
+	text-align: right;
+}
+
+#mainnav ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	list-style-image: none;
+	float: right;
+}
+
+#mainnav li{
+	float:left;
+	margin: 1px;
+	margin-right: 10px;
+	list-style-type: none;
+	list-style-image: none;
+}
+
+#mainnav a {
+	display: block;
+}
+
+
+ul {
+	list-style-type: square;
+	list-style-position: outside;
+        margin-left: 1em;
+        padding-left: 1em;
+/*       margin : 2em;
+        padding: 10px;
+
+       
+*/
+	}
+li {
+	list-style-type: square;
+}
+
+#poc_asn_row tr
+{
+    font-weight: bold;
+}
+
+#poc_asn_row td
+{
+    font-weight: bold;
+}
+

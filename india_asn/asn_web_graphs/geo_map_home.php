@@ -473,6 +473,22 @@ return "155";
 
     var continent = country_to_continent[country_code];
 
+    alert(country_code);
+
+
+    var filter = [{column: 1, value: country_code}];
+
+    alert(filter);
+
+    alert(filter[0]);
+
+    //filter[0][value] = country_code;
+
+
+    alert (data.getFilteredRows(filter) + "'");
+
+    alert ("baz");
+
     switch(continent)
       {
       case "AF":
@@ -633,7 +649,7 @@ $country_xml = $result_array[0];
 
 
        <div class="vis_head">
-<span id='country_flash_map_header' class="vis_heading">AUTNOMOUS SYSTEM DIAGRAM - <? echo $country_code ?></span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp mouse over and click on nodes</span></div>
+          <span id='country_flash_map_header' class="vis_heading">AUTNOMOUS SYSTEM DIAGRAM - <? echo $country_code ?></span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mouse over and click on nodes</span></div>
 
        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 			id="demos" width="650" height="525"
@@ -678,10 +694,33 @@ geo_map_scripts('map_canvas');
 </tr>
 <tr valign="bottom">
 <td>
-<div id="foo"><div class="vis_head">
+<div id="foo">
+<table valign="top"  width='100%' border='1'>
+<tr>
+<td colspan="3">
+<div class="vis_head">
 <span class="vis_heading">COUNTRY VIEW LIST</span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select a country to see ASN diagram</span>
 </div>
-<div id='country_view_select'> XXXX</div>
+</td>
+</tr>
+<tr valign="top" style="background: white; color: #aeaeae;">
+<td style="border-right: 1px solid #a0a0a0;">
+ASN DIAGRAM SHORTCUT
+<br/>
+ <select name="asn_diagram_shortcut">
+  <option value="Select a Country">Select a Country</option>
+  <option value="foo">foo</option>
+ </select>
+</td>
+<td style="padding-left: 10px;">
+COUNTRY HIGHLIGHTS
+<br/>
+China compared to Russia<br/>
+Nigeria compared to China<br/>
+Country compared to Country<br/>
+</td>
+</tr>
+</table>
 </div>
 </td>
 </tr>

@@ -497,6 +497,9 @@ return "155";
       }
   }
 
+<?  include "./mapped_countries_list.php" ?>
+
+
   function update_asn_graph_country(country_code)
   {
     var url = 'http://localhost/asn_web_graphs/country_detail.php/?cc=' + country_code;
@@ -538,9 +541,11 @@ return "155";
       var country_flash_map_header = document.getElementById('country_flash_map_header');
 
       
+      var country_name = country_code_to_name(country_code);
+
       country_flash_map_header.innerHTML='';
       
-      country_flash_map_header.innerHTML='AUTNOMOUS SYSTEM DIAGRAM - ' + country_code;
+      country_flash_map_header.innerHTML='AUTNOMOUS SYSTEM DIAGRAM - ' + country_name;
 
       var country_flash_object_div = document.getElementById('country_flash_object');
       var country_map_html =  country_flash_object_div.innerHTML;
@@ -549,8 +554,6 @@ return "155";
       country_flash_object_div.innerHTML =  country_map_html + '';
       return;
   }
-
-<?  include "./mapped_countries_list.php" ?>
 
   function regionClick_event_handler(e)
   {

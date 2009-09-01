@@ -33,3 +33,10 @@ function create_code_to_country_array()
      }
  }
 
+ function country_code_to_name(country_code)
+ {
+   return _cc_to_country_name[country_code];
+ }
+
+
+

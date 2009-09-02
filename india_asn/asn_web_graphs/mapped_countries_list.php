@@ -3,16 +3,13 @@
 #generate a javascript global array  _cc_to_country_name
 function create_code_to_country_array()
 {
-  $countries_list =  get_sorted_country_list("cmp_country_complexity", "complex", "complexity"); 
+  $country_code_to_name_map = get_country_code_to_name_map();
 
   print "var _cc_to_country_name = { \n";
 
-  foreach ($countries_list as $country_xml)
+  foreach ($country_code_to_name_map as $country_code => $country_name)
     {
-      $country_name =  $country_xml['country_name']; 
-      $country_code =  (string)$country_xml['country_code'];
       print "$country_code : \"$country_name\",\n";
-
     }
   print "};\n";
 }

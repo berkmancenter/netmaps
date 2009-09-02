@@ -573,6 +573,17 @@ return "155";
       }
   }
 
+  function update_select_country()
+  {
+    //alert('in update_select_country');
+    var country_drop_down = document.getElementById('country_drop_down');
+    var country_code =  country_drop_down.value;
+    //alert(country_code);
+    update_asn_graph_country(country_code);
+    redrawMap(get_zoom_region(country_code));
+    //alert('exiting update_select_country');
+  }
+
 //--><!]]>
   </script>
 

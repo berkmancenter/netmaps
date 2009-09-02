@@ -271,9 +271,26 @@ if ($show_ad_planner_results) { ?>
   </tr>
 <?  
 }
-?>
 
-<?
+function get_country_code_to_name_map()
+{
+  $countries_xml = get_sorted_country_list("cmp_country_complexity", "complex", "complexity"); 
+
+  $result_array = Array();
+
+  $i = 0;
+  foreach ($countries_xml as $country_xml)
+  {
+    $country_code =  (string)$country_xml['country_code'];
+    $country_name  = (string) $country_xml['country_name'];
+    
+    $result_array[$country_code] = $country_name;
+  }
+  
+  asort($result_array);
+  return $result_array;
+}
+
 function is_country_not_region(SimpleXMLElement $country_xml)
 {
   return $country_xml['country_code_is_region'] == 0;

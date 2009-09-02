@@ -109,6 +109,25 @@ $country_name =  $country_xml['country_name'];
 	</object>
 <?
     }
+
+
+function create_asn_country_drop_down()
+{
+?>
+<select id="country_drop_down" onChange="update_select_country()" name="asn_diagram_shortcut">
+<?
+    $country_code_to_name_map = get_country_code_to_name_map();
+?>
+
+  <option value="Select a Country">Select a Country</option>
+<?
+  foreach ($country_code_to_name_map as $country_code => $country_name) {
+?>    
+  <option value="<? echo $country_code ?>"><? echo $country_name ?></option>
+<? } ?>
+ </select>
+<?
+    }
 ?>
 
 
@@ -144,10 +163,9 @@ geo_map_scripts('map_canvas');
 <td style="border-right: 1px solid #a0a0a0;">
 ASN DIAGRAM SHORTCUT
 <br/>
- <select name="asn_diagram_shortcut">
-  <option value="Select a Country">Select a Country</option>
-  <option value="foo">foo</option>
- </select>
+<?
+   create_asn_country_drop_down();
+?> 
 </td>
 <td style="padding-left: 10px;">
 COUNTRY HIGHLIGHTS

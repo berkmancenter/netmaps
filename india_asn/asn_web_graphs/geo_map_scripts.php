@@ -74,8 +74,8 @@ function geo_map_scripts($div_id)
 
    
       options['dataMode'] = 'regions';
-      //options['height']   = '500px';
-      //options['width']   = '500px';
+      options['height']   = '250px';
+      options['width']   = '500px';
       options['showZoomOut']   = true;
       options['region'] = 'world';
 
@@ -88,7 +88,7 @@ function geo_map_scripts($div_id)
     geomap = new google.visualization.GeoMap(container);
 
     google.visualization.events.addListener(geomap, 'regionClick', regionClick_event_handler);
-    
+        google.visualization.events.addListener(geomap, 'select', select_event_handler);
     google.visualization.events.addListener(geomap, 'zoomOut', function () {
         options['region'] = 'world';
         redrawMap();
@@ -566,11 +566,18 @@ return "155";
     update_asn_graph_country(country_code);
 
     redrawMap(get_zoom_region(country_code));
+    geomap.setSelection(country_code);
       }
     else
       {
         //alert (country_code + "has no map");        
       }
+  }
+
+  function select_event_handler()
+  {
+    var selection = geomap.getSelection();
+    alert(selection);
   }
 
   function update_select_country()

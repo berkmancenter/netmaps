@@ -1,4 +1,11 @@
 <?
+/**
+ * home.php
+ *
+ * @package default
+ */
+
+
 include "header.php";
 ?>
 
@@ -24,7 +31,7 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 </ul>
 
 <p>
-To see the map for a given country, click on either of the lists below and then click on the desired country name.  For more information about the methodology used for the metrics and the maps, see the <a href="methods.php">Methods</a> page.  For an xml file containing the raw data, including the network connections and the metrics for every country, see the <a href="raw_data.php">Raw Data</a> page. 
+To see the map for a given country, click on either of the lists below and then click on the desired country name.  For more information about the methodology used for the metrics and the maps, see the <a href="methods.php">Methods</a> page.  For an xml file containing the raw data, including the network connections and the metrics for every country, see the <a href="raw_data.php">Raw Data</a> page.
 </p>
 
     <? // top_countries_table("cmp_ips_per_points_of_control", "IPs per point of control", "IPs per point of control", 10); ?>

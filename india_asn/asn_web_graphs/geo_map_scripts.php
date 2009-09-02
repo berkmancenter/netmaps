@@ -486,37 +486,19 @@ function get_zoom_region(country_code) {
 <? include "./mapped_countries_list.php" ?>
 
 function update_asn_graph_country(country_code) {
-    var url = 'http://localhost/asn_web_graphs/country_detail.php/?cc=' + country_code;
 
-    //alert (url);
     var json_url_param = document.getElementById('json_url_parm');
-
     var json_url_param_value = json_url_param.value;
-
-    //.replace(/cc=??/, 'cc=' . e.region);
-    //alert(json_url_param_value);
     var json_url_param_new_value = json_url_param_value.replace(/cc=../, 'cc=' + country_code);
-
-    // alert(json_url_param_value.replace(/cc=../, 'cc=' + e.region));
-    // alert ('json_url_param.value ' + json_url_param.value);
-    var flash_embed_tag_id = document.getElementsByName('flash_embed_tag_id')[0];
-
-    //flash_embed_tag_id = flash_embed_tag_id.attributes['FlashVars'];
-    //alert ('flash_embed_tag_id.flashvars ' + flash_embed_tag_id.getAttribute('FlashVars'));
-
     json_url_param.value = json_url_param_new_value;
+
+    var flash_embed_tag_id = document.getElementsByName('flash_embed_tag_id')[0];
     flash_embed_tag_id.setAttribute('FlashVars', json_url_param_new_value);
     flash_embed_tag_id.setAttribute('flashvars', json_url_param_new_value);
 
-    // alert ('json_url_param.value ' + json_url_param.value);
-    //alert ('flash_embed_tag_id.flashvars' + flash_embed_tag_id.getAttribute('FlashVars'));
-
     var country_flash_map_header = document.getElementById('country_flash_map_header');
-
     var country_name = country_code_to_name(country_code);
-
     country_flash_map_header.innerHTML = '';
-
     country_flash_map_header.innerHTML = 'AUTNOMOUS SYSTEM DIAGRAM - ' + country_name;
 
     var country_flash_object_div = document.getElementById('country_flash_object');

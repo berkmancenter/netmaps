@@ -8,6 +8,8 @@
 
 global $alternate_css;
 $alternate_css='geo_map.css';
+global $nav_index;
+$show_nav_index=0;
 include "./header.php";
 include "./get_url_routines.php";
 include "./geo_map_scripts.php";
@@ -76,8 +78,8 @@ create_asn_country_drop_down();
 <td style="padding-left: 10px;">
 COUNTRY HIGHLIGHTS
 <br/>
-China compared to Russia<br/>
-Nigeria compared to China<br/>
+<a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>
+<a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php?cc1=NG&cc2=CN">Nigeria compared to China</a><br/>
 Country compared to Country<br/>
 </td>
 </tr>

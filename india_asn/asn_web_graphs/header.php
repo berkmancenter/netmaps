@@ -146,6 +146,17 @@ else {
   <title>Mapping Local Internet Control - <? echo get_page_title() ?></title>
   </head>
   <body>
+<?
+  global $show_nav_index;
+
+  if (!isset($show_nav_index) ) {
+    $show_nav_index=1;
+  }
+
+if ($show_nav_index) {
+
+?>
+
 <div id="mainnav">
 <div>
 <ul>
@@ -160,5 +171,6 @@ else {
 </div>
 <br/>
 <br/>
+    <? } ?>
 <h1>Mapping Local Internet Control [private draft - please don't share]</h1>
 <i>from the <a href="http://cyber.law.harvard.edu">Berkman Center for Intenet &amp; Society at Harvard University</a></i>

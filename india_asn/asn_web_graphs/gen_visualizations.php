@@ -21,7 +21,7 @@ function embed_flash_object($country_code) {
           <span id='country_flash_map_header' class="vis_heading">AUTNOMOUS SYSTEM DIAGRAM - <? echo $country_name ?></span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mouse over and click on nodes</span></div>
 
        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
-			id="demos" width="650" height="525"
+			id="demos" width="600" height="500"
 			codebase="http://fpdownload.macromedia.com/get/flashplayer/current/swflash.cab">
 			<param name="movie" value="asn_visualization.swf" />
 			<param name="quality" value="high" />
@@ -29,7 +29,7 @@ function embed_flash_object($country_code) {
 			<param name="allowScriptAccess" value="sameDomain" />
                         <param id='json_url_parm' name="FlashVars" value="json_url=<? echo get_json_summary_url($country_xml) ?>" />
 			<embed name='flash_embed_tag_id' src="<? echo get_flash_url() ?>" bgcolor="#ffffff"
-				width="650" height="525" name="demos" align="middle"
+				width="600" height="500" name="demos" align="middle"
 				play="true"
 				loop="false"
 				quality="high"

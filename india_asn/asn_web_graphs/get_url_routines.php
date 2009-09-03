@@ -88,4 +88,16 @@ function get_country_graphml_image_url($country_xml) {
     $country_svg_url = htmlentities($country_svg_url, ENT_QUOTES );
     return $country_svg_url;
 }
-?>
+
+/**
+ *
+ *
+ * @return unknown
+ */
+function get_json_complexity_url() {
+    $host = $_SERVER["HTTP_HOST"];
+    $path = rtrim(dirname($_SERVER["PHP_SELF"]), "/\\");
+    $json_complexity_url = "http://$host$path//complexity_json.php";
+
+    return $json_complexity_url;
+}

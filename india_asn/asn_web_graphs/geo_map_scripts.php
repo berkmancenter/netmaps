@@ -485,23 +485,27 @@ function get_zoom_region(country_code) {
 
 <? include "./mapped_countries_list.php" ?>
 
-function update_asn_graph_country(country_code) {
+function update_asn_graph_country(country_code, asn_diagram_wrapper_id) {
 
-  var asn_diagram_wrapper = document.getElementById('asn_diagram_wrapper');
+  //Javascript should have real default params but we can fake them...
+  asn_diagram_wrapper_id 
+      = typeof(asn_diagram_wrapper_id) != 'undefined' ? asn_diagram_wrapper_id : "asn_diagram_wrapper";
+
+  var asn_diagram_wrapper = document.getElementById(asn_diagram_wrapper_id);
   
-  var json_url_param = document.evaluate("//div[@id='asn_diagram_wrapper']//param[@name='FlashVars']", asn_diagram_wrapper, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
+  var json_url_param = document.evaluate("//div[@id='" + asn_diagram_wrapper_id + "']//param[@name='FlashVars']", asn_diagram_wrapper, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
 
     var json_url_param_value = json_url_param.value;
     var json_url_param_new_value = json_url_param_value.replace(/cc=../, 'cc=' + country_code);
     json_url_param.value = json_url_param_new_value;
 
-    var flash_embed_tag_id = document.evaluate("//div[@id='asn_diagram_wrapper']//embed[@name='flash_embed_tag_id']", asn_diagram_wrapper, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
+    var flash_embed_tag_id = document.evaluate("//div[@id='" + asn_diagram_wrapper_id + "']//embed[@name='flash_embed_tag_id']", asn_diagram_wrapper, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
 
     flash_embed_tag_id.setAttribute('FlashVars', json_url_param_new_value);
     flash_embed_tag_id.setAttribute('flashvars', json_url_param_new_value);
 
     var country_flash_map_header 
-      = document.evaluate("//div[@id='asn_diagram_wrapper']//div[@class='vis_head']/span[@class='vis_heading']",
+      = document.evaluate("//div[@id='" + asn_diagram_wrapper_id + "']//div[@class='vis_head']/span[@class='vis_heading']",
                           asn_diagram_wrapper, null, 
                           XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
 

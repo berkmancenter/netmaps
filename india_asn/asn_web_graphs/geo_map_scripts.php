@@ -487,25 +487,31 @@ function get_zoom_region(country_code) {
 
 function update_asn_graph_country(country_code) {
 
-    var json_url_param = document.getElementById('json_url_parm');
+  var asn_diagram_wrapper = document.getElementById('asn_diagram_wrapper');
+  
+  var json_url_param = document.evaluate("//div[@id='asn_diagram_wrapper']//param[@name='FlashVars']", asn_diagram_wrapper, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
+
     var json_url_param_value = json_url_param.value;
     var json_url_param_new_value = json_url_param_value.replace(/cc=../, 'cc=' + country_code);
     json_url_param.value = json_url_param_new_value;
 
-    var flash_embed_tag_id = document.getElementsByName('flash_embed_tag_id')[0];
+    var flash_embed_tag_id = document.evaluate("//div[@id='asn_diagram_wrapper']//embed[@name='flash_embed_tag_id']", asn_diagram_wrapper, null, XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
+
     flash_embed_tag_id.setAttribute('FlashVars', json_url_param_new_value);
     flash_embed_tag_id.setAttribute('flashvars', json_url_param_new_value);
 
-    var country_flash_map_header = document.getElementById('country_flash_map_header');
+    var country_flash_map_header 
+      = document.evaluate("//div[@id='asn_diagram_wrapper']//div[@class='vis_head']/span[@class='vis_heading']",
+                          asn_diagram_wrapper, null, 
+                          XPathResult.FIRST_ORDERED_NODE_TYPE, null ).singleNodeValue;
+
     var country_name = country_code_to_name(country_code);
     country_flash_map_header.innerHTML = '';
     country_flash_map_header.innerHTML = 'AUTNOMOUS SYSTEM DIAGRAM - ' + country_name;
 
-    var country_flash_object_div = document.getElementById('country_flash_object');
-    var country_map_html = country_flash_object_div.innerHTML;
-
-    country_flash_object_div.innerHTML = '';
-    country_flash_object_div.innerHTML = country_map_html + '';
+    var asn_diagram_wrapper_html = asn_diagram_wrapper.innerHTML;
+    asn_diagram_wrapper.innerHTML = '';
+    asn_diagram_wrapper.innerHTML =  asn_diagram_wrapper_html  + '';
     return;
 }
 
@@ -526,7 +532,7 @@ function regionClick_event_handler(e) {
 
 function select_event_handler() {
     var selection = geomap.getSelection();
-    alert(selection);
+    //alert(selection);
 }
 
 function update_select_country() {

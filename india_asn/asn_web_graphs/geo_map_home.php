@@ -136,7 +136,7 @@ function embed_flash_object($country_code) {
     $country_name =  $country_xml['country_name'];
 ?>
 
-
+       <div id="asn_diagram_wrapper">
        <div class="vis_head">
           <span id='country_flash_map_header' class="vis_heading">AUTNOMOUS SYSTEM DIAGRAM - <? echo $country_name ?></span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; mouse over and click on nodes</span></div>
 
@@ -159,6 +159,7 @@ function embed_flash_object($country_code) {
 				pluginspage="http://www.adobe.com/go/getflashplayer">
 			</embed>
 	</object>
+       </div>
 <?
 }
 

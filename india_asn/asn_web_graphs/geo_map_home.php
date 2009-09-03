@@ -15,24 +15,6 @@ include "./get_url_routines.php";
 include "./geo_map_scripts.php";
 include "./gen_visualizations.php";
 
-function create_asn_country_drop_down($name, $id="", $onchange="") {
-?>
-<select id="<? echo $id ?>" onChange="<? echo $onchange ?>" name="<? echo $name ?>">
-<?
-    $country_code_to_name_map = get_country_code_to_name_map();
-?>
-
-  <option value="">Select a Country</option>
-<?
-    foreach ($country_code_to_name_map as $country_code => $country_name) {
-?>
-  <option value="<? echo $country_code ?>"><? echo $country_name ?></option>
-<? } ?>
- </select>
-<?
-}
-
-
 ?>
 
 

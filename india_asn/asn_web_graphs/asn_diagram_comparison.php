@@ -15,9 +15,26 @@ include "./get_url_routines.php";
 include "./geo_map_scripts.php";
 include "./gen_visualizations.php";
 
-$cc_1= $_REQUEST['cc1'];
-$cc_2= $_REQUEST['cc2'];
+if (isset($_REQUEST['cc1']) )
+  {
+    $cc_1= $_REQUEST['cc1'];
+  }
+else
+  {
+    $cc_1='CN';
+  }
+
+if (isset($_REQUEST['cc2']) )
+  {
+    $cc_2= $_REQUEST['cc2'];
+  }
+else
+  {
+    $cc_2='RU';
+  }
+
 ?>
+
 <br/>
 <table valign="top" style="border:0px;margin: 0px;padding:0px; ">
 <tr>
@@ -28,8 +45,22 @@ $cc_2= $_REQUEST['cc2'];
   <? embed_flash_object($cc_2); ?>
 </td>
 </tr>
+<form id="selection_countries" action="<? echo $_SERVER['PHP_SELF'] ?>"  method="get">
+<tr>
+
+<td><? create_asn_country_drop_down("cc1"); ?></td>
+<td> <? create_asn_country_drop_down("cc2"); ?></td>
+</tr>
+<tr>
+<td>
+ <input type="submit" value="submit"/>
+</td>
+</tr>
+</form>
+
 </table>
-</div>
+
+
 <?
 include "footer.php";
 ?>

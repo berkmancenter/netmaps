@@ -15,17 +15,14 @@ include "./get_url_routines.php";
 include "./geo_map_scripts.php";
 include "./gen_visualizations.php";
 
-/**
- *
- */
-function create_asn_country_drop_down() {
+function create_asn_country_drop_down($name, $id="", $onchange="") {
 ?>
-<select id="country_drop_down" onChange="update_select_country()" name="asn_diagram_shortcut">
+<select id="<? echo $id ?>" onChange="<? echo $onchange ?>" name="<? echo $name ?>">
 <?
     $country_code_to_name_map = get_country_code_to_name_map();
 ?>
 
-  <option value="Select a Country">Select a Country</option>
+  <option value="">Select a Country</option>
 <?
     foreach ($country_code_to_name_map as $country_code => $country_name) {
 ?>
@@ -72,7 +69,7 @@ geo_map_scripts('map_canvas');
 ASN DIAGRAM SHORTCUT
 <br/>
 <?
-create_asn_country_drop_down();
+create_asn_country_drop_down("asn_diagram_shortcut","country_drop_down","update_select_country()" );
 ?>
 </td>
 <td style="padding-left: 10px;">
@@ -80,7 +77,7 @@ COUNTRY HIGHLIGHTS
 <br/>
 <a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>
 <a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php?cc1=NG&cc2=CN">Nigeria compared to China</a><br/>
-Country compared to Country<br/>
+<a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php">Country compared to Country</a><br/>
 </td>
 </tr>
 </table>

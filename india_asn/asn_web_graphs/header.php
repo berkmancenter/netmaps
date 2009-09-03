@@ -101,6 +101,10 @@ function get_page_title() {
         return "GeoMap Visualization Demo";
         break;
 
+    case $path . '/asn_diagram_comparison.php':
+        return "AUTNOMOUS SYSTEMS COMPARISON";
+        break;
+
     default:
         return "???'$page'???";
         break;

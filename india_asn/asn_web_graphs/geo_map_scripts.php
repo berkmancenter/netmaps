@@ -77,8 +77,8 @@ function drawMapFromJson(json_data) {
     }
 
     options['dataMode'] = 'regions';
-    options['height'] = '250px';
-    options['width'] = '500px';
+    options['height'] = '300px';
+    options['width'] = '490px';
     options['showZoomOut'] = true;
     options['region'] = 'world';
 

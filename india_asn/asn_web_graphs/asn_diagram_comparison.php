@@ -53,7 +53,8 @@ else
 </tr>
 <tr>
 <td>
- <input type="submit" value="submit"/>
+ <input type="submit" value="submit"/> 
+ <a href="geo_map_home.php?cc=<?  print $cc_2  ?>"><input type="button" value="Show World Map"></a>
 </td>
 </tr>
 </form>

@@ -39,7 +39,7 @@ table,tr,td,th,thead
 text-align: left; 
 /* float: left;  */
   font-weight:bold;
-   font-size:large;
+   font-size:medium;
 /* background-color:#B0B0B0; */
 }
 
@@ -47,6 +47,8 @@ text-align: left;
 .vis_sub_heading
 {
 text-align: right; 
+font-size:  x-small;
+font-style: italic;
 /* float: right;  */
  /* background-color:#B0B0B0; */
 }

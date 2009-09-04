@@ -15,6 +15,15 @@ include "./get_url_routines.php";
 include "./geo_map_scripts.php";
 include "./gen_visualizations.php";
 
+if (isset($_REQUEST['cc']) )
+  {
+    $asn_cc= $_REQUEST['cc'];
+  }
+else
+  {
+    $asn_cc='CN';
+  }
+
 ?>
 
 
@@ -29,7 +38,7 @@ geo_map_scripts('map_canvas');
 <tr valign="top">
 <td>
 <div id="foo"><div class="vis_head">
-<span class="vis_heading">WORLD COMPLEXITY MAP</span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select a country to see ASN diagram</span>
+<span class="vis_heading">WORLD COMPLEXITY MAP</span> <span class="vis_sub_heading">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; select a country to see ASN diagram</span>
 </div>
 <div id='map_canvas'></div>
 </div>
@@ -57,9 +66,9 @@ create_asn_country_drop_down("asn_diagram_shortcut","country_drop_down","update_
 <td style="padding-left: 10px;">
 COUNTRY HIGHLIGHTS
 <br/>
-<a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>
-<a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php?cc1=NG&cc2=CN">Nigeria compared to China</a><br/>
-<a href="http://localhost/asn_web_graphs/asn_diagram_comparison.php">Country compared to Country</a><br/>
+<a href="asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>
+<a href="asn_diagram_comparison.php?cc1=NG&cc2=CN">Nigeria compared to China</a><br/>
+<a href="asn_diagram_comparison.php">Country compared to Country</a><br/>
 </td>
 </tr>
 </table>
@@ -71,7 +80,7 @@ COUNTRY HIGHLIGHTS
 <td>
 <div id="foo">
 <div id='country_flash_object'>
-  <? embed_flash_object('CN'); ?>
+  <? embed_flash_object($asn_cc); ?>
 </div>
 </div>
 </td>

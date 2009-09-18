@@ -30,6 +30,8 @@ else
 <?
 geo_map_scripts('map_canvas');
 ?>
+
+<br/>
 <div class="geomaptable">
 <table valign="top">
 <tr valign="top">

@@ -177,4 +177,4 @@ if ($show_nav_index) {
 <br/>
     <? } ?>
 <h1>Mapping Local Internet Control [private draft - please don't share]</h1>
-<i>from the <a href="http://cyber.law.harvard.edu">Berkman Center for Intenet &amp; Society at Harvard University</a></i>
+<h2><span style="color:white">from the Berkman Center for Intenet &amp; Society at Harvard University</span></h2>

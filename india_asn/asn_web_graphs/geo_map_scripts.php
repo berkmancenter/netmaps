@@ -72,8 +72,11 @@ function drawMapFromJson(json_data) {
 
         data.setValue(i, 0, country_code);
         //alert(data);
-        data.setValue(i, 1, countries[i]['complexity']);
-        data.setValue(i, 2, country_name + " -- " + countries[i]['complexity']);
+        var complexity =  countries[i]['complexity'];
+        complexity = Number(complexity.toFixed(2));
+        //alert(complexity);
+        data.setValue(i, 1, complexity);
+        data.setValue(i, 2, country_name );
     }
 
     options['dataMode'] = 'regions';

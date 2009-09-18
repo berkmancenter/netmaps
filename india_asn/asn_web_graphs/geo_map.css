@@ -4,24 +4,26 @@ html{
 
 body{
 text-align: left;
-  margin: 20px; 
+  margin: 10px; 
 }
 
 h1{
    font-weight:bold;
    font-size:x-large;
-   margin-left:auto;
+   margin-left: 10px;
+  /* margin-left:auto;*/
    /* padding-top: 15px; */
-   padding-bottom: 10px;
-   padding-left: 0px;
+   padding-bottom: 0px;
+   padding-left: 20px;
    padding-right: 0px;
    color: #5da01c;
 }
 
 h2{
    font-weight:bold;
-   font-size:large;
-   margin-left:auto
+   color:white;
+   margin-left:10px;
+   padding-left: 20px;
 }
 
 p {padding:5px 0px} 
@@ -74,7 +76,7 @@ font-style: italic;
   border: 5px solid #ffffff;
   padding : 0px;
  #padding-left: 10px;
-  margin: 20px;
+  margin: 5px;
 }
 
 .geomaptable table,tr,td,th,thead

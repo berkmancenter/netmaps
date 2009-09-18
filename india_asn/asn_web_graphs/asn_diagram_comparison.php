@@ -45,15 +45,15 @@ else
   <? embed_flash_object($cc_2); ?>
 </td>
 </tr>
-<form id="selection_countries" action="<? echo $_SERVER['PHP_SELF'] ?>"  method="get">
+<form name="select_countries" id="select_countries" action="<? echo $_SERVER['PHP_SELF'] ?>"  method="get">
 <tr>
 
-<td><? create_asn_country_drop_down("cc1"); ?></td>
-<td> <? create_asn_country_drop_down("cc2"); ?></td>
+  <td><? create_asn_country_drop_down("cc1", "", "document.select_countries.submit()", $cc_1); ?></td>
+  <td> <? create_asn_country_drop_down("cc2", "","document.select_countries.submit()" ,$cc_2 ); ?></td>
 </tr>
 <tr>
 <td>
- <input type="submit" value="submit"/> 
+  <!-- //TODO enable if no javascript <input type="submit" value="submit"/>  -->
  <a href="geo_map_home.php?cc=<?  print $cc_2  ?>"><input type="button" value="Show World Map"></a>
 </td>
 </tr>

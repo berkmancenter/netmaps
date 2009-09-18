@@ -5,6 +5,7 @@
  * @package default
  */
 
+include 'xml_utils.php';
 
 $country_code = $_REQUEST['cc'];
 validate_country_code($country_code);
@@ -12,9 +13,11 @@ $xml_file_location = 'results/results.xml';
 
 $xml = new SimpleXMLElement(file_get_contents($xml_file_location));
 $xquery_string = "//country[@country_code='$country_code']";
-$result_array = $xml->xpath($xquery_string);
-$country_xml = $result_array[0];
+$xq_array = $xml->xpath($xquery_string);
+$country_xml = $xq_array[0];
 
+
+$asn_list_array = array();
 
 $i = 0;
 foreach ($country_xml->summary->as as $as) {
@@ -33,7 +36,7 @@ foreach ($country_xml->summary->as as $as) {
 
     $asn = $as->asn . '';
 
-    $result_array[$i] = array(
+    $asn_list_array[$i] = array(
         'asn' => $asn,
         'organization_name' => $organization_name,
         'percent_monitorable' => $percent_monitorable_str,
@@ -44,7 +47,14 @@ foreach ($country_xml->summary->as as $as) {
     $i++;
 }
 
-print json_encode($result_array);
+$country_info = get_country_info_hash($country_xml);
+
+$ret_array = array(
+                   'asns' => $asn_list_array,
+                   'country_level_info' => $country_info,
+                   );
+
+print json_encode($ret_array);
 
 
 /**

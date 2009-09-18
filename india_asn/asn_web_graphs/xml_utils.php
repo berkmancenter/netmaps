@@ -333,6 +333,31 @@ function get_PoC_page_views(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
+function get_country_info_hash(SimpleXMLElement $country)
+{
+    $country_name =  $country['country_name'];
+    //$country_name = get_country_name_x($country);
+    $country_code =  (string)$country['country_code'];
+    $xquery_string = "//country[@country_code='". $country_code . "']/summary/ninty_percent_asns";
+    $total_ips =  get_ip_address_count($country);
+    $total_asns = $country->summary->total_asns;
+    $points_of_control         =  get_points_of_control($country);
+    $complexity =  get_complexity($country);
+    $ips_per_points_of_control  = get_ips_per_points_of_control($country);
+
+    $ret = Array(
+         "country_name" => $country_name,
+         "country_code" => $country_code,
+         "xquery_string" => $xquery_string,
+         "total_ips" => $total_ips,
+         "total_asns" => $total_asns,
+         "points_of_control" => $points_of_control,
+         "complexity" => $complexity,
+         "ips_per_points_of_control" => $ips_per_points_of_control,
+                 );
+
+      return $ret;
+}
 
 /**
  *
@@ -345,17 +370,18 @@ function get_PoC_page_views(SimpleXMLElement $country_xml) {
 function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries ) {
     //print ("START country_xml_table_row '$country'\n");
     //if (!defined($country) ) die ("XX") ;
-    $country_name =  $country['country_name'];
-    //$country_name = get_country_name_x($country);
-    $country_code =  (string)$country['country_code'];
-    $xquery_string = "//country[@country_code='". $country_code . "']/summary/ninty_percent_asns";
-    $total_ips =  get_ip_address_count($country);
-    $total_asns = $country->summary->total_asns;
-    $points_of_control         =  get_points_of_control($country);
-    $complexity =  get_complexity($country);
-    $ips_per_points_of_control  = get_ips_per_points_of_control($country);
-    // print_r( $country_code);
-    // print_r($country);
+
+  $info_hash = get_country_info_hash($country);
+
+    $country_name  = $info_hash['country_name'];
+
+    $country_code  = $info_hash['country_code'];
+    $xquery_string = $info_hash['xquery_string'];
+    $total_ips  = $info_hash['total_ips'];
+    $total_asns  = $info_hash['total_asns'];
+    $points_of_control          = $info_hash['points_of_control'];
+    $complexity  = $info_hash['complexity'];
+    $ips_per_points_of_control   = $info_hash['ips_per_points_of_control'];
 ?>
   <tr>
      <? if ($show_rank) { ?>

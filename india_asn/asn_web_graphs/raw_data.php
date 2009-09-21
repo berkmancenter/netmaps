@@ -6,8 +6,16 @@
  */
 
 
-include "header.php";
+global $alternate_css;
+$alternate_css='geo_map.css';
+global $nav_index;
+$show_nav_index=0;
+include "./header.php";
+
 ?>
+<table class="info_box">
+<tr>
+<td>
 
 <h1>Data Files</h1>
 
@@ -24,6 +32,11 @@ The following xml file contains all of the data presented in these web pages, in
 
 <p>For more information about the methodology used to generate this data, see the <a href="methods.php">Methods</a> page.<p>
 
+</td>
+</tr>
+</table>
+
 <?
-include "footer.php";
+include "footer_new.php";
 ?>
+

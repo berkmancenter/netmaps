@@ -5,9 +5,17 @@
  * @package default
  */
 
+global $alternate_css;
+$alternate_css='geo_map.css';
+global $nav_index;
+$show_nav_index=0;
+include "./header.php";
 
-include "header.php";
 ?>
+
+<table class="info_box">
+<tr>
+<td>
 
 <h1>Overview</h1>
 <p>
@@ -120,6 +128,10 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 
 </ul>
 
+</td>
+</tr>
+</table>
+
 <?
-include "footer.php";
+include "footer_new.php";
 ?>

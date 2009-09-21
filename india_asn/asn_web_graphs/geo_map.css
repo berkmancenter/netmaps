@@ -79,6 +79,25 @@ font-style: italic;
   margin: 5px;
 }
 
+.footer
+{
+    margin-left: 20px;
+    font-size:10px;
+    color: blue;
+}
+
+.info_box
+{
+    background-color : white;  
+    border: 0px solid #ffffff;
+}
+
+.info_box td
+{
+ margin : 20px; 
+ padding: 20px;
+}
+
 .geomaptable table,tr,td,th,thead
 {
   border: 0px solid #ffffff;

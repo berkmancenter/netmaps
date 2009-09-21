@@ -63,5 +63,5 @@ else
 
 
 <?
-include "footer.php";
+include "footer_new.php";
 ?>

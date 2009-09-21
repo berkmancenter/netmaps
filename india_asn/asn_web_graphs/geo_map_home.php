@@ -68,9 +68,9 @@ create_asn_country_drop_down("asn_diagram_shortcut","country_drop_down","update_
 <td style="padding-left: 10px;">
 COUNTRY HIGHLIGHTS
 <br/>
-<a href="asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>
-<a href="asn_diagram_comparison.php?cc1=NG&cc2=CN">Nigeria compared to China</a><br/>
-<a href="asn_diagram_comparison.php">Country compared to Country</a><br/>
+<a href="./asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>
+<a href="./asn_diagram_comparison.php?cc1=NG&cc2=CN">Nigeria compared to China</a><br/>
+<a href="./asn_diagram_comparison.php">Country compared to Country</a><br/>
 </td>
 </tr>
 </table>
@@ -90,5 +90,5 @@ COUNTRY HIGHLIGHTS
 </table>
 </div>
 <?
-include "footer.php";
+include "footer_new.php";
 ?>

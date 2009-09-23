@@ -10,13 +10,11 @@ text-align: left;
 h1{
    font-weight:bold;
    font-size:x-large;
-   margin-left: 10px;
   /* margin-left:auto;*/
    /* padding-top: 15px; */
-   padding-bottom: 0px;
-   padding-left: 20px;
+   padding-bottom: 10px;
+   padding-top: 10px;
    padding-right: 0px;
-   color: #5da01c;
 }
 
 .page_title_heading h1 

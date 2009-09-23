@@ -94,7 +94,15 @@ function get_page_title() {
         return "Country Report: " . get_country_name_from_code();
         break;
     case $path . '/methods.php':
-        return "Methods";
+        return "Research Methods";
+        break;
+
+    case $path . '/about.php':
+        return "About Project";
+        break;
+
+    case $path . '/raw_data.php':
+        return "Raw Data";
         break;
 
     case $path . '/geo_map_home.php':

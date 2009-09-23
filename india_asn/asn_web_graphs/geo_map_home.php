@@ -58,14 +58,14 @@ geo_map_scripts('map_canvas');
 </td>
 </tr>
 <tr valign="top" style="background: white; color: #aeaeae;">
-<td style="border-right: 1px solid #a0a0a0;">
+<td style="border-right: 1px solid #a0a0a0; padding-top: 10px;padding-bottom: 50px">
 ASN DIAGRAM SHORTCUT
 <br/>
 <?
 create_asn_country_drop_down("asn_diagram_shortcut","country_drop_down","update_select_country()" );
 ?>
 </td>
-<td style="padding-left: 10px;">
+<td style="padding-left: 10px; padding-top: 10px;padding-bottom: 50px ">
 COUNTRY HIGHLIGHTS
 <br/>
 <a href="./asn_diagram_comparison.php?cc1=CN&cc2=RU">China compared to Russia</a><br/>

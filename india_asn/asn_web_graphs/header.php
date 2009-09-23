@@ -176,5 +176,5 @@ if ($show_nav_index) {
 <br/>
 <br/>
     <? } ?>
-<h1>Mapping Local Internet Control [private draft - please don't share]</h1>
+<h1 class="page_title_heading"><a href="./geo_map_home.php">Mapping Local Internet Control [private draft - please don't share]</a></h1>
 <h2><span style="color:white">from the Berkman Center for Intenet &amp; Society at Harvard University</span></h2>

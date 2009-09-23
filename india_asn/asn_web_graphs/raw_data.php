@@ -16,6 +16,13 @@ include "./header.php";
 <table class="info_box">
 <tr>
 <td>
+<div class="vis_head">
+<span class="vis_heading">RAW DATA</span>
+</div>
+</td>
+</tr>
+<tr>
+<td>
 
 <h1>Data Files</h1>
 

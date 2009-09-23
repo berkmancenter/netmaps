@@ -16,6 +16,13 @@ include "./header.php";
 <table class="info_box">
 <tr>
 <td>
+<div class="vis_head">
+<span class="vis_heading">RESEARCH METHODS</span>
+</div>
+</td>
+</tr>
+<tr>
+<td>
 
 <h1>Overview</h1>
 <p>

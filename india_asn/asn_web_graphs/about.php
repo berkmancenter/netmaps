@@ -16,6 +16,13 @@ include "./header.php";
 <table class="info_box">
 <tr>
 <td>
+<div class="vis_head">
+<span class="vis_heading">ABOUT PROJECT</span>
+</div>
+</td>
+</tr>
+<tr>
+<td>
 <? include "about_text.php"; ?>
 </td>
 </tr>

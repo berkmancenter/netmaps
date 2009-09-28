@@ -575,17 +575,24 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
  */
 function country_xml_list_summary_table($countries_xml, $show_rank) {
 
-    $column_list = array ('country_rank',  'country_name', 'country_code', 'total_ips', 'total_asns', 'points_of_control', 'ips_per_points_of_control',  'complexity',
-                            'ad_planner_country_top_sites',
-        'ad_planner_top_sites_in_country',
-        'ad_planner_top_sites_country_percent',
-        'ad_planner_top_sites_in_PoC',
-        'ad_planner_top_sites_PoC_percent',
-        'ad_planner_total_page_views',
-        'ad_planner_page_views_in_country',
-        'ad_planner_page_view_country_percent',
-        'ad_planner_PoC_page_views',
-        'ad_planner_page_view_PoC_percent',
+    $column_list = array ('country_rank',  
+                          'country_name',
+                          'country_code',
+                          'total_ips',
+                          'total_asns', 
+                          'points_of_control', 
+                          'ips_per_points_of_control',
+                          'complexity',
+                          'ad_planner_country_top_sites',
+                          'ad_planner_top_sites_in_country',
+                          'ad_planner_top_sites_country_percent',
+                          'ad_planner_top_sites_in_PoC',
+                          'ad_planner_top_sites_PoC_percent',
+                          'ad_planner_total_page_views',
+                          'ad_planner_page_views_in_country',
+                          'ad_planner_page_view_country_percent',
+                          'ad_planner_PoC_page_views',
+                          'ad_planner_page_view_PoC_percent',
  );
 
     if (!$show_rank) {

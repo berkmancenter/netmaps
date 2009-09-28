@@ -367,9 +367,10 @@ function get_country_info_hash(SimpleXMLElement $country)
  * @param unknown $country_rank
  * @param unknown $total_countries
  */
-function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries ) {
+function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries, $column_list ) {
     //print ("START country_xml_table_row '$country'\n");
     //if (!defined($country) ) die ("XX") ;
+
 
   $info_hash = get_country_info_hash($country);
 
@@ -382,21 +383,28 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
     $points_of_control          = $info_hash['points_of_control'];
     $complexity  = $info_hash['complexity'];
     $ips_per_points_of_control   = $info_hash['ips_per_points_of_control'];
+    $info_hash['country_rank'] = "$country_rank of $total_countries";
 ?>
   <tr>
-     <? if ($show_rank) { ?>
-     <td><? echo "$country_rank of $total_countries" ?></td>
-       <? } ?>
+    <? foreach ($column_list as $column) { ?>
 
-     <td> <a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name"; ?>
-</a></td>
-    <td><? echo "{$country['country_code']}"; ?></td>
-    <td><? echo htmlentities(number_format( $total_ips)); ?></td>
-    <td><? echo htmlentities(number_format( $total_asns)); ?></td>
-
-                                                                 <td><? echo  htmlentities(number_format($points_of_control)) ?></td>
-                                                                 <td><? echo  htmlentities(number_format($ips_per_points_of_control)) ?></td>
-                                                                 <td><? echo  htmlentities(number_format($complexity, 2)) ?></td>
+      <td><? if ($column == 'complexity') { 
+        echo htmlentities(number_format( $info_hash[$column], 2)); 
+      } 
+      else if ($column == 'country_code') { 
+        echo htmlentities($info_hash[$column]); 
+      } 
+      else if ($column == 'country_rank') { 
+        echo htmlentities($info_hash[$column]); 
+      } 
+      else if ($column == 'country_name') { 
+   ?><a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
+      }
+      else {
+        echo htmlentities(number_format( $info_hash[$column])); 
+      }
+      ?></td>
+    <? } ?>
 <?
     global $show_ad_planner_results;
 
@@ -557,17 +565,33 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
  * @param unknown $show_rank
  */
 function country_xml_list_summary_table($countries_xml, $show_rank) {
+
+  $column_list = array ('country_rank', 'country_name', 'country_code', 'total_ips', 'total_asns','points_of_control', 'ips_per_points_of_control',  'complexity', );
+
+  if (!$show_rank)
+    {
+      array_shift($column_list);
+    }
+
+  $column_headings = array('country_rank' => 'Rank',
+                           'country_code' => 'Code',
+                           'country_name' => 'Country',
+                           'total_ips' => 'Total IPs',
+                           'total_asns'=> 'Total Autonomous Systems',
+                           'points_of_control' => 'Points of Control',
+                           'ips_per_points_of_control' => 'IPs Per Point of Control',
+                           'complexity' => 'Complexity',
+                           );
 ?>
 <table>
 <tr>
-    <? if ($show_rank) { ?> <td>Rank</td> <? } ?>
-<td>Country</td>
-<td>Code</td>
-<td>Total IPs</td>
-<td>Total Autonomous Systems</td>
-<td>Points of Control</td>
-<td>IPs Per Point of Control</td>
-<td>Complexity</td>
+<?
+   foreach ($column_list as $column) 
+   {
+?>
+<td><? echo $column_headings[$column] ?></td>
+       <? } ?>
+
 <? global $show_ad_planner_results;
     if ($show_ad_planner_results) { ?>
 <td>top sites</td>
@@ -590,7 +614,7 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
 
     foreach ($countries_xml as $country) {
         $current_country_num++;
-        country_xml_table_row($country, $show_rank, $current_country_num, $total_countries);
+        country_xml_table_row($country, $show_rank, $current_country_num, $total_countries, $column_list);
     }
 ?>
 </table>

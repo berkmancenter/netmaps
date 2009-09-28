@@ -2,9 +2,9 @@
 /**
  * xml_utils.php
  *
- * @package default
  * @see complexity_json.php
  * @see header.php
+ * @package default
  */
 
 
@@ -333,8 +333,14 @@ function get_PoC_page_views(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
-function get_country_info_hash(SimpleXMLElement $country)
-{
+
+/**
+ *
+ *
+ * @param object  $country
+ * @return unknown
+ */
+function get_country_info_hash(SimpleXMLElement $country) {
     $country_name =  $country['country_name'];
     //$country_name = get_country_name_x($country);
     $country_code =  (string)$country['country_code'];
@@ -345,19 +351,20 @@ function get_country_info_hash(SimpleXMLElement $country)
     $complexity =  get_complexity($country);
     $ips_per_points_of_control  = get_ips_per_points_of_control($country);
 
-    $ret = Array(
-         "country_name" => $country_name,
-         "country_code" => $country_code,
-         "xquery_string" => $xquery_string,
-         "total_ips" => $total_ips,
-         "total_asns" => $total_asns,
-         "points_of_control" => $points_of_control,
-         "complexity" => $complexity,
-         "ips_per_points_of_control" => $ips_per_points_of_control,
-                 );
+    $ret = array(
+        "country_name" => $country_name,
+        "country_code" => $country_code,
+        "xquery_string" => $xquery_string,
+        "total_ips" => $total_ips,
+        "total_asns" => $total_asns,
+        "points_of_control" => $points_of_control,
+        "complexity" => $complexity,
+        "ips_per_points_of_control" => $ips_per_points_of_control,
+    );
 
-      return $ret;
+    return $ret;
 }
+
 
 /**
  *
@@ -366,13 +373,14 @@ function get_country_info_hash(SimpleXMLElement $country)
  * @param unknown $show_rank
  * @param unknown $country_rank
  * @param unknown $total_countries
+ * @param unknown $column_list
  */
 function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries, $column_list ) {
     //print ("START country_xml_table_row '$country'\n");
     //if (!defined($country) ) die ("XX") ;
 
 
-  $info_hash = get_country_info_hash($country);
+    $info_hash = get_country_info_hash($country);
 
     $country_name  = $info_hash['country_name'];
 
@@ -388,22 +396,22 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
   <tr>
     <? foreach ($column_list as $column) { ?>
 
-      <td><? if ($column == 'complexity') { 
-        echo htmlentities(number_format( $info_hash[$column], 2)); 
-      } 
-      else if ($column == 'country_code') { 
-        echo htmlentities($info_hash[$column]); 
-      } 
-      else if ($column == 'country_rank') { 
-        echo htmlentities($info_hash[$column]); 
-      } 
-      else if ($column == 'country_name') { 
-   ?><a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
-      }
-      else {
-        echo htmlentities(number_format( $info_hash[$column])); 
-      }
-      ?></td>
+      <td><? if ($column == 'complexity') {
+            echo htmlentities(number_format( $info_hash[$column], 2));
+        }
+        else if ($column == 'country_code') {
+                echo htmlentities($info_hash[$column]);
+            }
+        else if ($column == 'country_rank') {
+                echo htmlentities($info_hash[$column]);
+            }
+        else if ($column == 'country_name') {
+                ?><a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
+            }
+        else {
+            echo htmlentities(number_format( $info_hash[$column]));
+        }
+        ?></td>
     <? } ?>
 <?
     global $show_ad_planner_results;
@@ -566,28 +574,26 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
  */
 function country_xml_list_summary_table($countries_xml, $show_rank) {
 
-  $column_list = array ('country_rank', 'country_name', 'country_code', 'total_ips', 'total_asns','points_of_control', 'ips_per_points_of_control',  'complexity', );
+    $column_list = array ('country_rank', 'country_name', 'country_code', 'total_ips', 'total_asns', 'points_of_control', 'ips_per_points_of_control',  'complexity', );
 
-  if (!$show_rank)
-    {
-      array_shift($column_list);
+    if (!$show_rank) {
+        array_shift($column_list);
     }
 
-  $column_headings = array('country_rank' => 'Rank',
-                           'country_code' => 'Code',
-                           'country_name' => 'Country',
-                           'total_ips' => 'Total IPs',
-                           'total_asns'=> 'Total Autonomous Systems',
-                           'points_of_control' => 'Points of Control',
-                           'ips_per_points_of_control' => 'IPs Per Point of Control',
-                           'complexity' => 'Complexity',
-                           );
+    $column_headings = array('country_rank' => 'Rank',
+        'country_code' => 'Code',
+        'country_name' => 'Country',
+        'total_ips' => 'Total IPs',
+        'total_asns'=> 'Total Autonomous Systems',
+        'points_of_control' => 'Points of Control',
+        'ips_per_points_of_control' => 'IPs Per Point of Control',
+        'complexity' => 'Complexity',
+    );
 ?>
 <table>
 <tr>
 <?
-   foreach ($column_list as $column) 
-   {
+    foreach ($column_list as $column) {
 ?>
 <td><? echo $column_headings[$column] ?></td>
        <? } ?>

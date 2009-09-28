@@ -351,6 +351,17 @@ function get_country_info_hash(SimpleXMLElement $country) {
     $complexity =  get_complexity($country);
     $ips_per_points_of_control  = get_ips_per_points_of_control($country);
 
+    $ad_planner_country_top_sites = get_country_top_sites($country);
+    $ad_planner_top_sites_in_country = get_top_sites_in_country($country);
+    $ad_planner_top_sites_country_percent = get_top_sites_country_percent($country);
+    $ad_planner_top_sites_in_PoC = get_top_sites_in_PoC($country);
+    $ad_planner_top_sites_PoC_percent = get_top_sites_PoC_percent($country);
+    $ad_planner_total_page_views = get_total_page_views($country);
+    $ad_planner_page_views_in_country = get_page_views_in_country($country);
+    $ad_planner_page_view_country_percent = get_page_view_country_percent($country);
+    $ad_planner_PoC_page_views = get_PoC_page_views($country);
+    $ad_planner_page_view_PoC_percent = get_page_view_PoC_percent($country);
+
     $ret = array(
         "country_name" => $country_name,
         "country_code" => $country_code,
@@ -360,6 +371,16 @@ function get_country_info_hash(SimpleXMLElement $country) {
         "points_of_control" => $points_of_control,
         "complexity" => $complexity,
         "ips_per_points_of_control" => $ips_per_points_of_control,
+        "ad_planner_country_top_sites" => $ad_planner_country_top_sites,
+        "ad_planner_top_sites_in_country" => $ad_planner_top_sites_in_country,
+        "ad_planner_top_sites_country_percent" => $ad_planner_top_sites_country_percent,
+        "ad_planner_top_sites_in_PoC" => $ad_planner_top_sites_in_PoC,
+        "ad_planner_top_sites_PoC_percent" => $ad_planner_top_sites_PoC_percent,
+        "ad_planner_total_page_views" => $ad_planner_total_page_views,
+        "ad_planner_page_views_in_country" => $ad_planner_page_views_in_country,
+        "ad_planner_page_view_country_percent" => $ad_planner_page_view_country_percent,
+        "ad_planner_PoC_page_views" => $ad_planner_PoC_page_views,
+        "ad_planner_page_view_PoC_percent" => $ad_planner_page_view_PoC_percent,
     );
 
     return $ret;
@@ -399,37 +420,17 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
       <td><? if ($column == 'complexity') {
             echo htmlentities(number_format( $info_hash[$column], 2));
         }
-        else if ($column == 'country_code') {
-                echo htmlentities($info_hash[$column]);
-            }
-        else if ($column == 'country_rank') {
-                echo htmlentities($info_hash[$column]);
-            }
-        else if ($column == 'country_name') {
+         else if ($column == 'country_name') {
                 ?><a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
+            }
+       else if (!is_numeric($info_hash[$column])) {
+                echo htmlentities($info_hash[$column]);
             }
         else {
             echo htmlentities(number_format( $info_hash[$column]));
         }
         ?></td>
     <? } ?>
-<?
-    global $show_ad_planner_results;
-
-    if ($show_ad_planner_results) { ?>
-    <td> <? echo get_country_top_sites($country) ?> </td>
-    <td> <? echo get_top_sites_in_country($country) ?> </td>
-    <td> <? echo get_top_sites_country_percent($country) ?> </td>
-    <td> <? echo get_top_sites_in_PoC($country) ?></td>
-    <td> <? echo get_top_sites_PoC_percent($country) ?></td>
-    <td> <? echo get_total_page_views($country) ?> </td>
-    <td> <? echo get_page_views_in_country($country) ?> </td>
-    <td> <? echo get_page_view_country_percent($country) ?> </td>
-    <td> <? echo get_PoC_page_views($country) ?></td>
-    <td> <? echo get_page_view_PoC_percent($country) ?></td>
-<? } ?>
-
-
   </tr>
 <?
 }
@@ -574,7 +575,18 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
  */
 function country_xml_list_summary_table($countries_xml, $show_rank) {
 
-    $column_list = array ('country_rank', 'country_name', 'country_code', 'total_ips', 'total_asns', 'points_of_control', 'ips_per_points_of_control',  'complexity', );
+    $column_list = array ('country_rank',  'country_name', 'country_code', 'total_ips', 'total_asns', 'points_of_control', 'ips_per_points_of_control',  'complexity',
+                            'ad_planner_country_top_sites',
+        'ad_planner_top_sites_in_country',
+        'ad_planner_top_sites_country_percent',
+        'ad_planner_top_sites_in_PoC',
+        'ad_planner_top_sites_PoC_percent',
+        'ad_planner_total_page_views',
+        'ad_planner_page_views_in_country',
+        'ad_planner_page_view_country_percent',
+        'ad_planner_PoC_page_views',
+        'ad_planner_page_view_PoC_percent',
+ );
 
     if (!$show_rank) {
         array_shift($column_list);
@@ -588,6 +600,16 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
         'points_of_control' => 'Points of Control',
         'ips_per_points_of_control' => 'IPs Per Point of Control',
         'complexity' => 'Complexity',
+        'ad_planner_country_top_sites' => 'top sites',
+        'ad_planner_top_sites_in_country' => 'top sites in country',
+        'ad_planner_top_sites_country_percent' => 'country site %',
+        'ad_planner_top_sites_in_PoC' => 'top sites in PoC',
+        'ad_planner_top_sites_PoC_percent' => 'PoC sites %',
+        'ad_planner_total_page_views' => 'total page views',
+        'ad_planner_page_views_in_country' => 'country page views',
+        'ad_planner_page_view_country_percent' => 'country page view ',
+        'ad_planner_PoC_page_views' => 'PoC page views',
+        'ad_planner_page_view_PoC_percent' => 'PoC page view %',
     );
 ?>
 <table>
@@ -597,20 +619,6 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
 ?>
 <td><? echo $column_headings[$column] ?></td>
        <? } ?>
-
-<? global $show_ad_planner_results;
-    if ($show_ad_planner_results) { ?>
-<td>top sites</td>
-<td>top sites in country</td>
-<td>country site %</td>
-<td>top sites in PoC</td>
-<td>PoC sites %</td>
-<td>total page views</td>
-<td>country page views</td>
-<td>country page view %</td>
-<td>PoC page views</td>
-<td>PoC page view %</td>
-<? } ?>
 </tr>
 
 <?

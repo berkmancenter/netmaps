@@ -83,6 +83,9 @@ function country_ip_address_count_gt_noise_threshold($country_xml) {
     }
 }
 
+function country_has_adplanner_data($country_xml) {
+  return (get_page_view_country_percent($country_xml) != 'N/A');
+}
 
 /**
  *
@@ -152,6 +155,23 @@ function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
     return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
 
+/**
+ *
+ *
+ * @param object  $a
+ * @param object  $b
+ * @return unknown
+ */
+function cmp_page_view_country_percent(SimpleXMLElement $a, SimpleXMLElement $b) {
+    $ips_per_points_of_control_a = get_page_view_country_percent($a);
+    $ips_per_points_of_control_b = get_page_view_country_percent($b);
+
+    if ( $ips_per_points_of_control_a  ==  $ips_per_points_of_control_b) {
+        return 0;
+    }
+
+    return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
+}
 
 /**
  *
@@ -575,24 +595,25 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
  */
 function country_xml_list_summary_table($countries_xml, $show_rank) {
 
-    $column_list = array ('country_rank',  
+    $column_list = array (
+                          'country_rank',  
                           'country_name',
-                          'country_code',
+                          // 'country_code',
                           'total_ips',
                           'total_asns', 
                           'points_of_control', 
                           'ips_per_points_of_control',
                           'complexity',
-                          'ad_planner_country_top_sites',
-                          'ad_planner_top_sites_in_country',
-                          'ad_planner_top_sites_country_percent',
-                          'ad_planner_top_sites_in_PoC',
-                          'ad_planner_top_sites_PoC_percent',
-                          'ad_planner_total_page_views',
-                          'ad_planner_page_views_in_country',
-                          'ad_planner_page_view_country_percent',
-                          'ad_planner_PoC_page_views',
-                          'ad_planner_page_view_PoC_percent',
+//                           'ad_planner_country_top_sites',
+//                           'ad_planner_top_sites_in_country',
+//                           'ad_planner_top_sites_country_percent',
+//                           'ad_planner_top_sites_in_PoC',
+//                           'ad_planner_top_sites_PoC_percent',
+//                           'ad_planner_total_page_views',
+//                          'ad_planner_page_views_in_country',
+                           'ad_planner_page_view_country_percent',
+//                           'ad_planner_PoC_page_views',
+//                           'ad_planner_page_view_PoC_percent',
  );
 
     if (!$show_rank) {
@@ -614,7 +635,7 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
         'ad_planner_top_sites_PoC_percent' => 'PoC sites %',
         'ad_planner_total_page_views' => 'total page views',
         'ad_planner_page_views_in_country' => 'country page views',
-        'ad_planner_page_view_country_percent' => 'country page view ',
+        'ad_planner_page_view_country_percent' => 'Country Page View %',
         'ad_planner_PoC_page_views' => 'PoC page views',
         'ad_planner_page_view_PoC_percent' => 'PoC page view %',
     );

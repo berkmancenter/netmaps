@@ -2,10 +2,10 @@
 /**
  * country_summary_table.php
  *
- * @package default
  * @see complexity_json.php
  * @see country_complexity_results.php
  * @see ips_per_points_of_control_results.php
+ * @package default
  */
 
 
@@ -18,6 +18,26 @@
 /**
  *
  *
+ * @param unknown $filter_function
+ * @param unknown $sort_function
+ * @param unknown $sort_type_adjective
+ * @param unknown $sort_type_noun
+ * @param unknown $least_word
+ */
+function filter_and_display_tables($filter_function, $sort_function, $sort_type_adjective, $sort_type_noun, $least_word) {
+
+    $countries_xml = get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun);
+
+    $countries_xml_tmp = array_filter($countries_xml, $filter_function);
+    $countries_xml = $countries_xml_tmp;
+
+    display_tables_impl($countries_xml, $sort_type_adjective, $sort_type_noun, $least_word);
+}
+
+
+/**
+ *
+ *
  * @param unknown $sort_function
  * @param unknown $sort_type_adjective
  * @param unknown $sort_type_noun
@@ -25,8 +45,22 @@
  */
 function display_tables($sort_function, $sort_type_adjective, $sort_type_noun, $least_word) {
 
-    $countries_xml = get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun) ;
+    $countries_xml = get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun);
 
+    display_tables_impl($countries_xml, $sort_type_adjective, $sort_type_noun, $least_word);
+}
+
+
+/**
+ *
+ *
+ * @param unknown $countries_xml
+ * @param unknown $sort_type_adjective
+ * @param unknown $sort_type_noun
+ * @param unknown $least_word
+ */
+function display_tables_impl($countries_xml, $sort_type_adjective, $sort_type_noun, $least_word)
+{
     $countries_xml_low_15 = array_slice($countries_xml, 0, 15);
     $countries_xml_high_15 = array_slice($countries_xml, -15);
 ?>

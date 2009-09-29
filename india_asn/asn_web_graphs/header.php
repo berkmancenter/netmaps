@@ -84,6 +84,9 @@ function get_page_title() {
     case $path .'/ips_per_points_of_control_results.php':
         return "IPs per Points of Control";
         break;
+    case $path . '/country_page_view_percent_results.php':
+        return "In Country Page View Percent";
+        break;
     case $path . '/country_complexity_results.php':
         return "Network Complexity";
         break;

@@ -24,12 +24,6 @@ function get_xml_file() {
     return $xml;
 }
 
-
-?>
-
-<?
-
-
 /**
  *
  *
@@ -663,5 +657,3 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
 <?
 }
 
-
-?>

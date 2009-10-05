@@ -1,29 +1,10 @@
 <?
-/**
- * raw_data.php
- *
- * @package default
- */
 
-
-global $alternate_css;
-$alternate_css='geo_map.css';
-global $nav_index;
-$show_nav_index=0;
-include "./header.php";
+global $header_text;
+$header_text="RAW DATA";
+include "./info_page_header.php";
 
 ?>
-<table class="info_box">
-<tr>
-<td>
-<div class="vis_head">
-<span class="vis_heading">RAW DATA</span>
-</div>
-</td>
-</tr>
-<tr>
-<td>
-
 <h1>Data Files</h1>
 
 <p>
@@ -40,11 +21,5 @@ The following xml file contains all of the data presented in these web pages, in
 
 <p>For more information about the methodology used to generate this data, see the <a href="methods.php">Methods</a> page.<p>
 
-</td>
-</tr>
-</table>
-
-<?
-include "footer_new.php";
-?>
-
+<? 
+  include "./info_page_footer.php";

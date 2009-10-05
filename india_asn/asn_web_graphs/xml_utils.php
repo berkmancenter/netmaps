@@ -11,11 +11,6 @@
 $show_ad_planner_results = 1;
 
 
-/**
- *
- *
- * @return unknown
- */
 function get_xml_file() {
     $xml_file_location = 'results/results.xml';
 
@@ -25,23 +20,11 @@ function get_xml_file() {
 }
 
 
-/**
- *
- *
- * @param unknown $country_xml
- * @return unknown
- */
 function get_points_of_control($country_xml) {
     return (string)$country_xml->summary->ninty_percent_asns["count"];
 }
 
 
-/**
- *
- *
- * @param unknown $country_xml
- * @return unknown
- */
 function get_complexity($country_xml) {
     $complexity = $country_xml->summary->complexity;
 
@@ -49,23 +32,11 @@ function get_complexity($country_xml) {
 }
 
 
-/**
- *
- *
- * @param unknown $country_xml
- * @return unknown
- */
 function get_ip_address_count($country_xml) {
     return (string)$country_xml->summary->total_ips;
 }
 
 
-/**
- *
- *
- * @param unknown $country_xml
- * @return unknown
- */
 function country_ip_address_count_gt_noise_threshold($country_xml) {
     $ip_address_noise_threshold = 25000;
 
@@ -83,14 +54,6 @@ function country_has_adplanner_data($country_xml) {
     return get_page_view_country_percent($country_xml) != 'N/A';
 }
 
-
-/**
- *
- *
- * @param object  $a
- * @param object  $b
- * @return unknown
- */
 function cmp_country_complexity(SimpleXMLElement $a, SimpleXMLElement $b) {
     $complexity_a = get_complexity($a);
     $complexity_b = get_complexity($b);
@@ -102,13 +65,6 @@ function cmp_country_complexity(SimpleXMLElement $a, SimpleXMLElement $b) {
     return ($complexity_a < $complexity_b) ? -1: 1;
 }
 
-
-/**
- *
- *
- * @param object  $country
- * @return unknown
- */
 function get_country_name_x(SimpleXMLElement $country) {
     //print ("START get_country_name\n");
     //print("Country Object '$country_x'\n");
@@ -121,26 +77,12 @@ function get_country_name_x(SimpleXMLElement $country) {
 }
 
 
-/**
- *
- *
- * @param object  $country
- * @return unknown
- */
 function get_ips_per_points_of_control(SimpleXMLElement $country) {
     $total_ips =  get_ip_address_count($country);
     $points_of_control         =  get_points_of_control($country);
     return (integer) ($total_ips/$points_of_control);
 }
 
-
-/**
- *
- *
- * @param object  $a
- * @param object  $b
- * @return unknown
- */
 function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b) {
     $ips_per_points_of_control_a = get_ips_per_points_of_control($a);
     $ips_per_points_of_control_b = get_ips_per_points_of_control($b);
@@ -152,14 +94,6 @@ function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
     return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
 
-
-/**
- *
- *
- * @param object  $a
- * @param object  $b
- * @return unknown
- */
 function cmp_page_view_country_percent(SimpleXMLElement $a, SimpleXMLElement $b) {
     $ips_per_points_of_control_a = get_page_view_country_percent($a);
     $ips_per_points_of_control_b = get_page_view_country_percent($b);
@@ -171,13 +105,6 @@ function cmp_page_view_country_percent(SimpleXMLElement $a, SimpleXMLElement $b)
     return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_country_top_sites(SimpleXMLElement $country_xml) {
     $ret = (string) $country_xml->ad_words_summary->top_site_count;
 
@@ -188,13 +115,6 @@ function get_country_top_sites(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_top_sites_in_country(SimpleXMLElement $country_xml) {
     $ret = (string) $country_xml->ad_words_summary->top_sites_in_country;
 
@@ -205,13 +125,6 @@ function get_top_sites_in_country(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_top_sites_country_percent(SimpleXMLElement $country_xml) {
 
     $top_site_count = get_country_top_sites($country_xml);
@@ -224,13 +137,6 @@ function get_top_sites_country_percent(SimpleXMLElement $country_xml) {
     return $top_sites_in_country/$top_site_count*100.0;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_top_sites_PoC_percent(SimpleXMLElement $country_xml) {
     $top_site_count = get_country_top_sites($country_xml);
     $top_sites_in_country = get_top_sites_in_PoC($country_xml);
@@ -242,13 +148,6 @@ function get_top_sites_PoC_percent(SimpleXMLElement $country_xml) {
     return $top_sites_in_country/$top_site_count*100.0;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_total_page_views(SimpleXMLElement $country_xml) {
     $ret = (string) $country_xml->ad_words_summary->total_page_views;
 
@@ -259,13 +158,6 @@ function get_total_page_views(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_page_views_in_country(SimpleXMLElement $country_xml) {
     $ret = (string) $country_xml->ad_words_summary->page_views_in_country;
 
@@ -277,12 +169,6 @@ function get_page_views_in_country(SimpleXMLElement $country_xml) {
 }
 
 
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_page_view_country_percent(SimpleXMLElement $country_xml) {
 
     $total_page_views =  get_total_page_views($country_xml);
@@ -295,13 +181,6 @@ function get_page_view_country_percent(SimpleXMLElement $country_xml) {
     return round(100.0*$page_views_in_country/$total_page_views, 2);
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_page_view_PoC_percent(SimpleXMLElement $country_xml) {
 
     $total_page_views =  get_total_page_views($country_xml);
@@ -314,13 +193,6 @@ function get_page_view_PoC_percent(SimpleXMLElement $country_xml) {
     return round(100.0*$page_views_in_country/$total_page_views, 2);
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_top_sites_in_PoC(SimpleXMLElement $country_xml) {
     $ret = (string) $country_xml->ad_words_summary->top_sites_in_poc;
 
@@ -333,13 +205,6 @@ function get_top_sites_in_PoC(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function get_PoC_page_views(SimpleXMLElement $country_xml) {
     $ret = (string) $country_xml->ad_words_summary->page_views_in_poc;
 
@@ -352,13 +217,6 @@ function get_PoC_page_views(SimpleXMLElement $country_xml) {
     return $ret ;
 }
 
-
-/**
- *
- *
- * @param object  $country
- * @return unknown
- */
 function get_country_info_hash(SimpleXMLElement $country) {
     $country_name =  $country['country_name'];
     //$country_name = get_country_name_x($country);
@@ -405,16 +263,6 @@ function get_country_info_hash(SimpleXMLElement $country) {
     return $ret;
 }
 
-
-/**
- *
- *
- * @param object  $country
- * @param unknown $show_rank
- * @param unknown $country_rank
- * @param unknown $total_countries
- * @param unknown $column_list
- */
 function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_rank, $total_countries, $column_list ) {
     //print ("START country_xml_table_row '$country'\n");
     //if (!defined($country) ) die ("XX") ;
@@ -454,12 +302,6 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
 <?
 }
 
-
-/**
- *
- *
- * @return unknown
- */
 function get_country_code_to_name_map() {
     $countries_xml = get_sorted_country_list("cmp_country_complexity", "complex", "complexity");
 
@@ -477,23 +319,10 @@ function get_country_code_to_name_map() {
     return $result_array;
 }
 
-
-/**
- *
- *
- * @param object  $country_xml
- * @return unknown
- */
 function is_country_not_region(SimpleXMLElement $country_xml) {
     return $country_xml['country_code_is_region'] == 0;
 }
 
-
-/**
- *
- *
- * @return unknown
- */
 function get_all_countries() {
     $xml = get_xml_file();
     $countries_xml = $xml->xpath("//country");
@@ -502,15 +331,6 @@ function get_all_countries() {
     return $countries_xml;
 }
 
-
-/**
- *
- *
- * @param unknown $sort_function
- * @param unknown $sort_type_adjective
- * @param unknown $sort_type_noun
- * @return unknown
- */
 function get_sorted_country_list($sort_function, $sort_type_adjective, $sort_type_noun) {
     $countries_xml = get_all_countries();
     $countries_xml_tmp = array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
@@ -521,12 +341,6 @@ function get_sorted_country_list($sort_function, $sort_type_adjective, $sort_typ
     return $countries_xml;
 }
 
-
-/**
- *
- *
- * @return unknown
- */
 function get_excluded_country_names() {
     $countries_xml = get_all_countries();
     $countries_xml_included =  array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
@@ -550,15 +364,6 @@ function get_excluded_country_names() {
 
 }
 
-
-/**
- *
- *
- * @param unknown $sort_function
- * @param unknown $sort_type_adjective
- * @param unknown $sort_type_noun
- * @param unknown $list_size
- */
 function top_countries_table($sort_function, $sort_type_adjective, $sort_type_noun, $list_size) {
     $countries_xml = get_sorted_country_list ($sort_function, $sort_type_adjective, $sort_type_noun) ;
 
@@ -568,30 +373,10 @@ function top_countries_table($sort_function, $sort_type_adjective, $sort_type_no
     country_xml_list_summary_table(array_reverse($countries_xml_high_15), true);
 }
 
-
-/**
- *
- *
- * @param unknown $sort_function
- * @param unknown $sort_type_adjective
- * @param unknown $sort_type_noun
- */
 function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
     top_countries_table( $sort_function, $sort_type_adjective, $sort_type_noun, 15);
 }
 
-
-?>
-
-<?
-
-
-/**
- *
- *
- * @param unknown $countries_xml
- * @param unknown $show_rank
- */
 function country_xml_list_summary_table($countries_xml, $show_rank) {
 
     $column_list = array (

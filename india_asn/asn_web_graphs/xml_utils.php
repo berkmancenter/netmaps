@@ -24,6 +24,7 @@ function get_xml_file() {
     return $xml;
 }
 
+
 /**
  *
  *
@@ -77,9 +78,11 @@ function country_ip_address_count_gt_noise_threshold($country_xml) {
     }
 }
 
+
 function country_has_adplanner_data($country_xml) {
-  return (get_page_view_country_percent($country_xml) != 'N/A');
+    return get_page_view_country_percent($country_xml) != 'N/A';
 }
+
 
 /**
  *
@@ -149,6 +152,7 @@ function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
     return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
 
+
 /**
  *
  *
@@ -166,6 +170,7 @@ function cmp_page_view_country_percent(SimpleXMLElement $a, SimpleXMLElement $b)
 
     return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
 }
+
 
 /**
  *
@@ -434,10 +439,10 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
       <td><? if ($column == 'complexity') {
             echo htmlentities(number_format( $info_hash[$column], 2));
         }
-         else if ($column == 'country_name') {
+        else if ($column == 'country_name') {
                 ?><a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
             }
-       else if (!is_numeric($info_hash[$column])) {
+        else if (!is_numeric($info_hash[$column])) {
                 echo htmlentities($info_hash[$column]);
             }
         else {
@@ -590,25 +595,25 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
 function country_xml_list_summary_table($countries_xml, $show_rank) {
 
     $column_list = array (
-                          'country_rank',  
-                          'country_name',
-                          // 'country_code',
-                          'total_ips',
-                          'total_asns', 
-                          'points_of_control', 
-                          'ips_per_points_of_control',
-                          'complexity',
-//                           'ad_planner_country_top_sites',
-//                           'ad_planner_top_sites_in_country',
-//                           'ad_planner_top_sites_country_percent',
-//                           'ad_planner_top_sites_in_PoC',
-//                           'ad_planner_top_sites_PoC_percent',
-//                           'ad_planner_total_page_views',
-//                          'ad_planner_page_views_in_country',
-                           'ad_planner_page_view_country_percent',
-//                           'ad_planner_PoC_page_views',
-//                           'ad_planner_page_view_PoC_percent',
- );
+        'country_rank',
+        'country_name',
+        // 'country_code',
+        'total_ips',
+        'total_asns',
+        'points_of_control',
+        'ips_per_points_of_control',
+        'complexity',
+        //                           'ad_planner_country_top_sites',
+        //                           'ad_planner_top_sites_in_country',
+        //                           'ad_planner_top_sites_country_percent',
+        //                           'ad_planner_top_sites_in_PoC',
+        //                           'ad_planner_top_sites_PoC_percent',
+        //                           'ad_planner_total_page_views',
+        //                          'ad_planner_page_views_in_country',
+        'ad_planner_page_view_country_percent',
+        //                           'ad_planner_PoC_page_views',
+        //                           'ad_planner_page_view_PoC_percent',
+    );
 
     if (!$show_rank) {
         array_shift($column_list);
@@ -656,4 +661,3 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
 </table>
 <?
 }
-

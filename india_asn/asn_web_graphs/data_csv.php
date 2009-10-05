@@ -5,16 +5,11 @@
  * @package default
  */
 header("Content-type: application/octet-stream");
-header("Content-Disposition: attachment; filename=\"my-data.csv\"");
-
-global $alternate_css;
-$alternate_css='geo_map.css';
-global $nav_index;
-$show_nav_index=0;
+header("Content-Disposition: attachment; filename=\"internet_mapping_data.csv\"");
 
 include "./xml_utils.php";
 
-$countries_xml = get_sorted_country_list ("cmp_ips_per_points_of_control", "IPs per point of control", "IPs per point of control", "fewest");
+$countries_xml = get_all_countries();
 
 csv_dump($countries_xml);
 

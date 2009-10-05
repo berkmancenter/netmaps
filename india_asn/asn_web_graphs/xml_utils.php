@@ -319,10 +319,17 @@ function get_all_countries() {
     return $countries_xml;
 }
 
-function get_sorted_country_list($sort_function, $sort_type_adjective, $sort_type_noun) {
+function get_unsorted_country_list()
+{
     $countries_xml = get_all_countries();
     $countries_xml_tmp = array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
     $countries_xml = $countries_xml_tmp;
+    return $countries_xml;
+}
+
+function get_sorted_country_list($sort_function, $sort_type_adjective, $sort_type_noun) {
+
+  $countries_xml = get_unsorted_country_list();
 
     usort($countries_xml, $sort_function);
 

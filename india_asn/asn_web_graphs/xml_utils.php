@@ -372,7 +372,29 @@ function high_15_table($sort_function, $sort_type_adjective, $sort_type_noun) {
     top_countries_table( $sort_function, $sort_type_adjective, $sort_type_noun, 15);
 }
 
+ $column_headings = array('country_rank' => 'Rank',
+        'country_code' => 'Code',
+        'country_name' => 'Country',
+        'total_ips' => 'Total IPs',
+        'total_asns'=> 'Total Autonomous Systems',
+        'points_of_control' => 'Points of Control',
+        'ips_per_points_of_control' => 'IPs Per Point of Control',
+        'complexity' => 'Complexity',
+        'ad_planner_country_top_sites' => 'top sites',
+        'ad_planner_top_sites_in_country' => 'top sites in country',
+        'ad_planner_top_sites_country_percent' => 'country site %',
+        'ad_planner_top_sites_in_PoC' => 'top sites in PoC',
+        'ad_planner_top_sites_PoC_percent' => 'PoC sites %',
+        'ad_planner_total_page_views' => 'total page views',
+        'ad_planner_page_views_in_country' => 'country page views',
+        'ad_planner_page_view_country_percent' => 'Country Page View %',
+        'ad_planner_PoC_page_views' => 'PoC page views',
+        'ad_planner_page_view_PoC_percent' => 'PoC page view %',
+    );
+
 function country_xml_list_summary_table($countries_xml, $show_rank) {
+
+  global $column_headings;
 
     $column_list = array (
         'country_rank',
@@ -399,25 +421,6 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
         array_shift($column_list);
     }
 
-    $column_headings = array('country_rank' => 'Rank',
-        'country_code' => 'Code',
-        'country_name' => 'Country',
-        'total_ips' => 'Total IPs',
-        'total_asns'=> 'Total Autonomous Systems',
-        'points_of_control' => 'Points of Control',
-        'ips_per_points_of_control' => 'IPs Per Point of Control',
-        'complexity' => 'Complexity',
-        'ad_planner_country_top_sites' => 'top sites',
-        'ad_planner_top_sites_in_country' => 'top sites in country',
-        'ad_planner_top_sites_country_percent' => 'country site %',
-        'ad_planner_top_sites_in_PoC' => 'top sites in PoC',
-        'ad_planner_top_sites_PoC_percent' => 'PoC sites %',
-        'ad_planner_total_page_views' => 'total page views',
-        'ad_planner_page_views_in_country' => 'country page views',
-        'ad_planner_page_view_country_percent' => 'Country Page View %',
-        'ad_planner_PoC_page_views' => 'PoC page views',
-        'ad_planner_page_view_PoC_percent' => 'PoC page view %',
-    );
 ?>
 <table>
 <tr>
@@ -445,25 +448,7 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
 function csv_dump($countries_xml)
 {
 
-  $column_headings = array(#'country_rank' => 'Rank',
-        'country_code' => 'Code',
-        'country_name' => 'Country',
-        'total_ips' => 'Total IPs',
-        'total_asns'=> 'Total Autonomous Systems',
-        'points_of_control' => 'Points of Control',
-        'ips_per_points_of_control' => 'IPs Per Point of Control',
-        'complexity' => 'Complexity',
-        'ad_planner_country_top_sites' => 'top sites',
-        'ad_planner_top_sites_in_country' => 'top sites in country',
-        'ad_planner_top_sites_country_percent' => 'country site %',
-        'ad_planner_top_sites_in_PoC' => 'top sites in PoC',
-        'ad_planner_top_sites_PoC_percent' => 'PoC sites %',
-        'ad_planner_total_page_views' => 'total page views',
-        'ad_planner_page_views_in_country' => 'country page views',
-        'ad_planner_page_view_country_percent' => 'Country Page View %',
-        'ad_planner_PoC_page_views' => 'PoC page views',
-        'ad_planner_page_view_PoC_percent' => 'PoC page view %',
-    );
+  global $column_headings;
 
  $csv_columns = array(
         'country_code',

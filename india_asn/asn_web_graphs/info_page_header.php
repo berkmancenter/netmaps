@@ -13,7 +13,7 @@ include "./header.php";
 
 global $header_text;
 ?>
-<table style="width: 90%;" class="info_box">
+<table style="width: 96%;" class="info_box">
 <tr>
 <td>
 <div class="vis_head">

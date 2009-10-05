@@ -276,7 +276,10 @@ function country_xml_table_row(SimpleXMLElement $country, $show_rank, $country_r
             echo htmlentities(number_format( $info_hash[$column], 2));
         }
         else if ($column == 'country_name') {
-                ?><a href="<? echo get_local_url("country_detail.php/?cc=". urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
+          $country_detail_url_prefix = "geo_map_home.php/?cc=";
+          #uncomment to display old country detail page.
+          #$country_detail_url_prefix = "country_detail.php/?cc=";
+                ?><a href="<? echo get_local_url($country_detail_url_prefix . urlencode($country_code)) ?>" > <? echo "$country_name";?></a><?
             }
         else if (!is_numeric($info_hash[$column])) {
                 echo htmlentities($info_hash[$column]);

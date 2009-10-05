@@ -36,6 +36,16 @@ function get_ip_address_count($country_xml) {
     return (string)$country_xml->summary->total_ips;
 }
 
+//implements the perl spaceship operator
+function spaceship($a, $b)
+{
+
+    if ( $a  ==  $b) {
+        return 0;
+    }
+
+    return ($a < $b) ? -1: 1;
+}
 
 function country_ip_address_count_gt_noise_threshold($country_xml) {
     $ip_address_noise_threshold = 25000;
@@ -58,11 +68,7 @@ function cmp_country_complexity(SimpleXMLElement $a, SimpleXMLElement $b) {
     $complexity_a = get_complexity($a);
     $complexity_b = get_complexity($b);
 
-    if ( $complexity_a  ==  $complexity_b) {
-        return 0;
-    }
-
-    return ($complexity_a < $complexity_b) ? -1: 1;
+    return spaceship($complexity_a,  $complexity_b);
 }
 
 function get_country_name_x(SimpleXMLElement $country) {
@@ -87,22 +93,12 @@ function cmp_ips_per_points_of_control(SimpleXMLElement $a, SimpleXMLElement $b)
     $ips_per_points_of_control_a = get_ips_per_points_of_control($a);
     $ips_per_points_of_control_b = get_ips_per_points_of_control($b);
 
-    if ( $ips_per_points_of_control_a  ==  $ips_per_points_of_control_b) {
-        return 0;
-    }
-
-    return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
+    return spaceship( $ips_per_points_of_control_a,  $ips_per_points_of_control_b);
 }
 
 function cmp_page_view_country_percent(SimpleXMLElement $a, SimpleXMLElement $b) {
-    $ips_per_points_of_control_a = get_page_view_country_percent($a);
-    $ips_per_points_of_control_b = get_page_view_country_percent($b);
 
-    if ( $ips_per_points_of_control_a  ==  $ips_per_points_of_control_b) {
-        return 0;
-    }
-
-    return ($ips_per_points_of_control_a < $ips_per_points_of_control_b) ? -1: 1;
+  return  spaceship(get_page_view_country_percent($a), get_page_view_country_percent($b));
 }
 
 function get_country_top_sites(SimpleXMLElement $country_xml) {

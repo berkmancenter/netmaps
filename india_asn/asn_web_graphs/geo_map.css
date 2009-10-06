@@ -137,6 +137,30 @@ font-style: italic;
       background-color: #b0b0b0;
 }
 
+.country_list_table
+{
+  border: 2px solid #555555;
+  padding : 10px;
+  margin: 25px;
+  width: 95%;
+}
+.country_list_table table
+{
+  border: 2px solid #555555;
+  padding : 10px;
+  margin: 25px;
+  width: 97%;
+}
+.country_list_table table, thead
+{
+  border: 2px solid #555555;
+  padding : 10px;
+  margin: 25px;	
+}
+.country_list_table td
+{
+  border: 2px solid #555555;
+}
 
 /* based on Huddleston 174-175P. */
 

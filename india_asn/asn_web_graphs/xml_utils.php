@@ -425,7 +425,7 @@ function country_xml_list_summary_table($countries_xml, $show_rank) {
     }
 
 ?>
-<table>
+<table class="country_list_table">
 <tr>
 <?
     foreach ($column_list as $column) {

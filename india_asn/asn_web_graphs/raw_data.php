@@ -16,8 +16,8 @@ The following xml file contains all of the data presented in these web pages, in
 <li>the network relationships for each ASN within each country.</li>
 </ul>
 
-<p> <a href="results/results.xml">Our results in XML format.</a></p>
-<p> <a href="./data_csv.php">Our results in CSV format.</a></p>
+<p> <a href="results/results.xml">Complete country, autonomous system, and relationship data (XML file).</a></p>
+<p> <a href="./data_csv.php">Summary of country data (CSV file).</a></p>
 
 <p>For more information about the methodology used to generate this data, see the <a href="methods.php">Methods</a> page.<p>
 

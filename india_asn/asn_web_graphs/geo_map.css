@@ -116,6 +116,12 @@ font-style: italic;
  padding: 5px;
 }
 
+.info_box h1
+{
+ color: #797979;
+ font-size: large;
+}
+
 .geomaptable table,tr,td,th,thead
 {
   border: 0px solid #ffffff;

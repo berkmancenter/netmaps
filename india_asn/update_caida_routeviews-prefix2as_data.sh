@@ -42,4 +42,10 @@ get_month_of_routeviews_data $YEAR $MONTH
 }
 
 find $DATA_DOWNLOAD_DIRECTORY/$CAIDA_ROUTEVIEWS_SERVER -iname 'routeviews-rv2*.pfx2as.*gz' -print0 | xargs -0 ls -tdr | tail -n 1 > $DATA_DOWNLOAD_DIRECTORY/newest_prefix2as_file_name.txt
+
+if [ -f "$DATA_DOWNLOAD_DIRECTORY/newest_prefix2as_file.txt" ] 
+then  
+rm $DATA_DOWNLOAD_DIRECTORY/newest_prefix2as_file.txt; 
+fi
+
 ln -sf `pwd`/`cat  $DATA_DOWNLOAD_DIRECTORY/newest_prefix2as_file_name.txt` $DATA_DOWNLOAD_DIRECTORY/newest_prefix2as_file.txt

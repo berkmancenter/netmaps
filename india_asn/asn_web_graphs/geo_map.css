@@ -1,8 +1,12 @@
 html{
- background-color: #e2e2e2;
+ background-color: #c6c5c5;
 }
 
 body{
+  background-image: url("just-map.gif");
+  background-position: 60% 0%;
+  background-repeat: no-repeat;
+
 text-align: left;
   margin: 10px; 
 }
@@ -17,13 +21,15 @@ h1{
    padding-right: 0px;
 }
 
-.page_title_heading h1 
+.page_title_heading 
 {
    font-weight:bold;
-   font-size:x-large;
+   font-size: 22pt;
+   text-transform: uppercase;
    margin-left: 10px;
    padding-bottom: 0px;
-   padding-left: 20px;
+   padding-top: 45px;
+   padding-left: 0px;
    padding-right: 0px;
    color: #5da01c;
 } 

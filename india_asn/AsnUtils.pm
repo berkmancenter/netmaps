@@ -71,7 +71,7 @@ sub get_asn_dig_info
 
     while (1)
     {
-        my @whois = `dig +short $asn.asn.cymru.com TXT`;
+        my @whois = `dig +short $asn.asn.cymru.com TXT` || die;
 
         #print Dumper(@whois);
         chomp( $whois[0] );

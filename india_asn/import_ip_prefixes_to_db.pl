@@ -436,7 +436,7 @@ sub main
         $dbh->query( 'insert into asn_ip_counts (asn, ip_count) values (?, ? ) ', $asn, round($asn_counts->{$asn}) );
         $rows_inserted++;
 
-        say "$rows_inserted rows inserted" if ($rows_inserted % 500) = 0;
+        say "$rows_inserted rows inserted" if ($rows_inserted % 500) == 0;
     }
 
     say "Done inserting into table asn_ip_counts";

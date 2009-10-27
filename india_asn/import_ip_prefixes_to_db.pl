@@ -102,7 +102,8 @@ sub cmp
 
     if ($self->is_start_point != $other->is_start_point)
     {
-        #The only time the same ip will be both a start and end boundary is 
+
+        #The same ip will be both a start and end boundary is 
         # when a single block has length 1
         if ($self->ip_prefix == $other->ip_prefix)
         {
@@ -110,7 +111,21 @@ sub cmp
             
             if ($self->is_start_point)
             {
-                return 0;
+                return -1;
+            }
+            else
+            {
+                return 1;
+            }
+        }
+        # one of the blocks may be only a single 1
+        elsif ($self->ip_prefix->ip_count == 1 || $other->ip_prefix->ip_count == 1)
+        {
+            die if ($self->ip_prefix->ip_count == 1) && ($other->ip_prefix->ip_count == 1);
+
+            if ($self->ip_prefix->ip_count == 1)
+            {
+                return -1;
             }
             else
             {
@@ -224,6 +239,16 @@ sub _read_ip_prefix_to_asn_file
     for my $line ( @{ $csv->lines } )
     {
         $lines_read++;
+
+        my $asn_list_string = $line->asn;
+
+        if ($asn_list_string !~ /^[0-9_,]*$/ )
+        {
+            warn "invalid asn_list_string: '$asn_list_string' "; 
+            #die "invalid asn_list_string: '$asn_list_string' " 
+            next;
+        }
+
         my $num_ips = 2**( 32 - $line->ip_prefix_length );
 
 
@@ -236,6 +261,10 @@ sub _read_ip_prefix_to_asn_file
 
         my $start_ip = new NetAddr::IP::Lite $ip_1;
         my $end_ip   = new NetAddr::IP::Lite $ip_2;
+
+
+        #die "invalid asn_list_string: '$asn_list_string' " unless $asn_list_string =~ /^[0-9_,]*$/;
+
 
         my $prefix = IP_Prefix->new( asn_list => $line->asn, start_ip => $start_ip, end_ip => $end_ip );
 
@@ -267,7 +296,7 @@ sub _read_ip_prefix_to_asn_file
     {
         my $current_prefix_boundary = $prefix_boundaries->[$i];
 
-        say "i = $i";
+        say "i = $i" if ($i%1000 == 0 );
 
         next if $current_prefix_boundary->is_end_point;
 
@@ -340,6 +369,8 @@ sub _read_ip_prefix_to_asn_file
 
     #say Dumper (sort keys %{$effective_ips_for_asn_list} );
 
+    say "Calculating asn level allocation";
+
     my $asn_ip_allocation = {};
     foreach my $asn_list (sort keys %{$effective_ips_for_asn_list} )
     {
@@ -351,12 +382,14 @@ sub _read_ip_prefix_to_asn_file
         my $ips_per_asn = $effective_ips/$asn_count;
         foreach my $asn (@asns) 
         {
-            die "Invalid asn: '$asn'" if $asn ne int($asn);
-            die "Invalid asn: '$asn'" if $asn ne int($asn);
+            die "Invalid asn: '$asn' from '$asn_list'" if $asn ne int($asn);
+            die "Invalid asn: '$asn' from '$asn_list'" if $asn ne int($asn);
             $asn_ip_allocation->{$asn} ||= 0;
             $asn_ip_allocation->{$asn} += $ips_per_asn;
         }
     }
+
+    say "Done calculating asn level allocation";
 
     {
         my $asn_ip_allocation_hash_sum = sum values %{$asn_ip_allocation};
@@ -397,9 +430,13 @@ sub main
 
     say "Inserting into asn_ip_counts";
 
+    my $rows_inserted = 0;
     foreach my $asn ( sort keys %$asn_counts)
     {
         $dbh->query( 'insert into asn_ip_counts (asn, ip_count) values (?, ? ) ', $asn, round($asn_counts->{$asn}) );
+        $rows_inserted++;
+
+        say "$rows_inserted rows inserted" if ($rows_inserted % 500) = 0;
     }
 
     say "Done inserting into table asn_ip_counts";

@@ -15,6 +15,7 @@ use Carp qw(confess);
 use List::Util qw(sum);
 use Math::Round qw (round);
 use Net::CIDR::Lite;
+use Net::ASN;
 
 use NetAddr::IP qw(
   Compact
@@ -242,10 +243,10 @@ sub _read_ip_prefix_to_asn_file
 
         my $asn_list_string = $line->asn;
 
-        if ($asn_list_string !~ /^[0-9_,]*$/ )
+        if ($asn_list_string !~ /^[0-9_,.]*$/ )
         {
             warn "invalid asn_list_string: '$asn_list_string' "; 
-            #die "invalid asn_list_string: '$asn_list_string' " 
+            die "invalid asn_list_string: '$asn_list_string' " ;
             next;
         }
 
@@ -380,12 +381,13 @@ sub _read_ip_prefix_to_asn_file
         my $effective_ips = $effective_ips_for_asn_list->{$asn_list};
         my $asn_count = scalar(@asns);
         my $ips_per_asn = $effective_ips/$asn_count;
-        foreach my $asn (@asns) 
+        foreach my $asn_string (@asns) 
         {
-            die "Invalid asn: '$asn' from '$asn_list'" if $asn ne int($asn);
-            die "Invalid asn: '$asn' from '$asn_list'" if $asn ne int($asn);
-            $asn_ip_allocation->{$asn} ||= 0;
-            $asn_ip_allocation->{$asn} += $ips_per_asn;
+            my $asn = Net::ASN->new($asn_string) || die;
+
+            die "Invalid asn: '$asn' from '$asn_list'" if $asn->toasplain ne int($asn->toasplain);
+            $asn_ip_allocation->{$asn->toasplain} ||= 0;
+            $asn_ip_allocation->{$asn->toasplain} += $ips_per_asn;
         }
     }
 

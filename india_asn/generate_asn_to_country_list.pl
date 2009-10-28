@@ -32,6 +32,19 @@ sub print_asn_country_map
     $csv->print;
 }
 
+#TODO figure out a better way to prevent the warning...
+sub get_asn_country_wrapper {
+    my $asn   = shift;
+    my $rr    = Net::Abuse::Utils::_return_rr("AS${asn}.asn.cymru.com", 'TXT');
+
+    return if (!$rr);
+    my $as_cc = (split (/\|/, $rr))[1];
+    if ($as_cc) {
+        return  Net::Abuse::Utils::_strip_whitespace ($as_cc);
+    }
+    return;
+}
+
 sub look_up_asn_country
 {
     my ($asn) = @_;
@@ -40,7 +53,12 @@ sub look_up_asn_country
 
     if ( !defined( $_asn_country_cache->{$asn} ) )
     {
-        $_asn_country_cache->{$asn} = get_asn_country($asn);
+        my $asn_country;
+        {
+                $asn_country = get_asn_country_wrapper($asn);
+        }
+
+        $_asn_country_cache->{$asn} = $asn_country;
     }
 }
 

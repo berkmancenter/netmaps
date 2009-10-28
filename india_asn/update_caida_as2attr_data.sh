@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -u
+set -o  errexit
+
 #
 #  This data seems to come from 2006
 #

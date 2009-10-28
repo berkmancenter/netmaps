@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -u
+set -o  errexit
 set -u
 
 DATA_DOWNLOAD_DIRECTORY=downloaded_data

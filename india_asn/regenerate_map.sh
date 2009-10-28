@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -u
+set -o  errexit
+
 source set_common_script_variables.sh
 
 ./update_caida_as_relationship_data.sh

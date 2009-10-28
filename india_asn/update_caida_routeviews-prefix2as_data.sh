@@ -1,5 +1,8 @@
 #!/bin/bash
 
+set -u
+set -o  errexit
+
 set -e
 set -u 
 

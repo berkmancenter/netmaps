@@ -3,9 +3,6 @@
 set -u
 set -o  errexit
 
-set -e
-set -u 
-
 #THIS SCRIPT DOWNLOADS the latest caida route-views -prefix2as file.
 
 source set_common_script_variables.sh

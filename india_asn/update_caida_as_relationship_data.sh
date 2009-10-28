@@ -3,8 +3,6 @@
 set -u
 set -o  errexit
 
-set -u
-set -e
 source ./set_common_script_variables.sh
 
 CAIDA_SERVER=as-rank.caida.org

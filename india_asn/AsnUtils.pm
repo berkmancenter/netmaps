@@ -5,6 +5,7 @@ use List::MoreUtils qw(uniq);
 use Net::Abuse::Utils qw( :all );
 use Class::CSV;
 use Data::Dumper;
+use Perl6::Say;
 
 my $_asn_country_cache = {};
 
@@ -71,16 +72,25 @@ sub get_asn_dig_info
 
     while (1)
     {
-        my @whois = `dig +short $asn.asn.cymru.com TXT` || die;
+        my $resolver =  Net::DNS::Resolver->new;
+        my $packet   = $resolver->query("$asn.asn.cymru.com", "TXT");
 
-        #print Dumper(@whois);
-        chomp( $whois[0] );
+        if (!defined($packet) ) {
+            print STDERR "Asn lookup failed for $asn\n";
+            last;
+        }
 
-        my $dig_response = $whois[0];
+        my @answer = $packet->answer;
 
-        $dig_response =~ s/^"(.*)"$/$1/;
+        my $answer = $answer[0];
 
-        my @whois_results = split( /\s*\|\s*/, $dig_response );
+        die unless $answer->type eq 'TXT';
+
+        #say STDERR $packet->string;
+        #say STDERR $answer->txtdata;
+
+        my @whois_results = split( /\s*\|\s*/, $answer->txtdata );
+
 
         @ret{ 'as', 'cc', 'registry', 'allocated', 'name' } = @whois_results;
 

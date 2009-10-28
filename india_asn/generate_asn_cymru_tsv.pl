@@ -26,7 +26,7 @@ sub print_asn_country_map
 
         warn Dumper($asn_info) unless ( !defined( $asn_info->{as} ) || ( $asn == $asn_info->{as} ) );
 
-        if ( $asn_info->{as} != $asn )
+        if ( !defined($asn_info->{as}) || $asn_info->{as} != $asn )
         {
             print STDERR "No info for AS$asn\n";
         }
@@ -61,6 +61,8 @@ sub _look_up_asn_info
 
 sub main
 {
+    print STDERR "starting generate_asn_cymru_tsv\n";
+
     my $trace_route_list;
 
     my $tr_list = [];
@@ -90,7 +92,7 @@ sub main
         _look_up_asn_info($asn2);
 
         $counter++;
-        if ( $counter % 300 == 0 )
+        if ( $counter % 1000 == 0 )
         {
             print STDERR "processed $counter records\n";
         }

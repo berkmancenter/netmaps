@@ -358,31 +358,6 @@ sub _get_effective_monitorable_downstream_ip_address_count
     }
 
     return $sum;
-
-    ##todo the code below should work but it doesn't
-#     if ( defined($downstream_exclude_list) && scalar( @{$downstream_exclude_list} ) )
-#     {
-
-#         #print Dumper ($customers->[0]);
-#         print "All customers\n";
-#         print join ", ", map { ref $_ } @{$customers};
-#         print "\n";
-#         my $lca = List::Compare->new( $customers, $downstream_exclude_list );
-
-#         #$customers = $lca->get_Lonly_ref;
-#         $customers = _my_exclude( $customers, $downstream_exclude_list );
-
-#         #$customers = \ @temp;
-
-#         print "Customers after exclude\n";
-#         print join ", ", map { ref $_ } @{$customers};
-#         print "\n";
-
-#         #print Dumper ($customers->[0]);
-#         return 0 if ( scalar( @{$customers} ) == 0 );
-#     }
-
-#     return sum map { ( $_->get_effective_monitorable_ip_address_count / $_->get_number_of_providers ) } @{$customers};
 }
 
 sub get_graph_label

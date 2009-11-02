@@ -294,7 +294,7 @@ sub get_effective_monitorable_ip_address_count
     {
         $self->{_effective_monitorable_ips} =
           $self->get_asn_ip_address_count() +
-          $self->get_effective_monitorable_downstream_ip_address_count($downstream_exclude_list);
+          $self->_get_effective_monitorable_downstream_ip_address_count($downstream_exclude_list);
     }
 
     return $self->{_effective_monitorable_ips};
@@ -329,7 +329,7 @@ sub _my_exclude
     return \@ret;
 }
 
-sub get_effective_monitorable_downstream_ip_address_count
+sub _get_effective_monitorable_downstream_ip_address_count
 {
 
     my ( $self, $downstream_exclude_list ) = @_;

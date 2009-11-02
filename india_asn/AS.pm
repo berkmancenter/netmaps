@@ -273,6 +273,23 @@ sub get_providers
     return $self->get_nodes_for_relationship('provider');
 }
 
+sub number_of_customers
+{
+    my ($self) = @_;
+    return scalar($self->get_customers);
+}
+
+sub get_provider_with_most_customers
+{
+    my ($self) = @_;
+    my @country_providers = grep {! $_->is_rest_of_world } $self->get_providers;
+    my @providers_sorted = sort { $a->number_of_customers <=> $b->number_of_customers or $a->as_number <=> $b->as_number   } @country_providers;
+
+    my $provider_with_most_customers = pop @providers_sorted;
+
+    return $provider_with_most_customers;
+}
+
 sub get_monitorable_ip_address_count
 {
     my ($self) = @_;
@@ -289,8 +306,6 @@ sub get_effective_monitorable_ip_address_count
 {
     my ( $self, $downstream_exclude_list ) = @_;
 
-    #todo decide on caching and make work with $downstream_exclude_list
-    #if (!defined($self->{_effective_monitorable_ips}))
     {
         $self->{_effective_monitorable_ips} =
           $self->get_asn_ip_address_count() +

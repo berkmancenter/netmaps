@@ -101,16 +101,16 @@ sub cmp
 
     return $ip_cmp if $ip_cmp != 0;
 
-    if ($self->is_start_point != $other->is_start_point)
+    if ( $self->is_start_point != $other->is_start_point )
     {
 
-        #The same ip will be both a start and end boundary is 
+        #The same ip will be both a start and end boundary is
         # when a single block has length 1
-        if ($self->ip_prefix == $other->ip_prefix)
+        if ( $self->ip_prefix == $other->ip_prefix )
         {
             die unless $self->ip_prefix->ip_count == 1;
-            
-            if ($self->is_start_point)
+
+            if ( $self->is_start_point )
             {
                 return -1;
             }
@@ -119,12 +119,13 @@ sub cmp
                 return 1;
             }
         }
-        # one of the blocks may be only a single 1
-        elsif ($self->ip_prefix->ip_count == 1 || $other->ip_prefix->ip_count == 1)
-        {
-            die if ($self->ip_prefix->ip_count == 1) && ($other->ip_prefix->ip_count == 1);
 
-            if ($self->ip_prefix->ip_count == 1)
+        # one of the blocks may be only a single 1
+        elsif ( $self->ip_prefix->ip_count == 1 || $other->ip_prefix->ip_count == 1 )
+        {
+            die if ( $self->ip_prefix->ip_count == 1 ) && ( $other->ip_prefix->ip_count == 1 );
+
+            if ( $self->ip_prefix->ip_count == 1 )
             {
                 return -1;
             }
@@ -144,8 +145,9 @@ sub cmp
 
     #TODO  end points before start -- is this necessary
 
-    if ($self->is_start_point)
+    if ( $self->is_start_point )
     {
+
         #Larger prefixes first
         my $ip_count_cmp = $other->ip_prefix->ip_count <=> $self->ip_prefix->ip_count;
         return $ip_count_cmp;
@@ -153,18 +155,18 @@ sub cmp
     else
     {
         die unless $self->is_end_point;
+
         #Larger prefixes last
         my $ip_count_cmp = $self->ip_prefix->ip_count <=> $other->ip_prefix->ip_count;
         return $ip_count_cmp;
-        
+
     }
 }
 
 sub summary
 {
     my $self = shift;
-    return $self->ip . ' ' . $self->is_start_point . ' ' 
-        . ' (' . $self->ip_prefix . ') ' . $self->ip_prefix->summary;
+    return $self->ip . ' ' . $self->is_start_point . ' ' . ' (' . $self->ip_prefix . ') ' . $self->ip_prefix->summary;
 }
 
 package IP_Prefix_Start_Boundary;
@@ -243,18 +245,17 @@ sub _read_ip_prefix_to_asn_file
 
         my $asn_list_string = $line->asn;
 
-        if ($asn_list_string !~ /^[0-9_,.]*$/ )
+        if ( $asn_list_string !~ /^[0-9_,.]*$/ )
         {
-            warn "invalid asn_list_string: '$asn_list_string' "; 
-            die "invalid asn_list_string: '$asn_list_string' " ;
+            warn "invalid asn_list_string: '$asn_list_string' ";
+            die "invalid asn_list_string: '$asn_list_string' ";
             next;
         }
 
         my $num_ips = 2**( 32 - $line->ip_prefix_length );
 
-
         my $cidr_string = $line->ip . '/' . $line->ip_prefix_length;
-        ( my $ip_range ) = Net::CIDR::cidr2range( $cidr_string );
+        ( my $ip_range ) = Net::CIDR::cidr2range($cidr_string);
 
         $cidr->add($cidr_string);
 
@@ -263,9 +264,7 @@ sub _read_ip_prefix_to_asn_file
         my $start_ip = new NetAddr::IP::Lite $ip_1;
         my $end_ip   = new NetAddr::IP::Lite $ip_2;
 
-
         #die "invalid asn_list_string: '$asn_list_string' " unless $asn_list_string =~ /^[0-9_,]*$/;
-
 
         my $prefix = IP_Prefix->new( asn_list => $line->asn, start_ip => $start_ip, end_ip => $end_ip );
 
@@ -274,7 +273,7 @@ sub _read_ip_prefix_to_asn_file
 
         push @{$prefix_boundaries}, $start_prefix, $end_prefix;
 
-        say "Read $lines_read lines" if ($lines_read % 1000) == 0;
+        say "Read $lines_read lines" if ( $lines_read % 1000 ) == 0;
     }
 
     say "Done reading file";
@@ -284,12 +283,12 @@ sub _read_ip_prefix_to_asn_file
     say "done sorting";
 
     my $index = 0;
+
     #print Dumper( [map { $index++ . ' ' . $_->summary } @{$prefix_boundaries} ] );
 
-
     my $total_allocated_ips = 0;
-    my $total_effective_ips = 0;  
-    my $total_chunk_out = 0;
+    my $total_effective_ips = 0;
+    my $total_chunk_out     = 0;
 
     my $effective_ips_for_asn_list = {};
 
@@ -297,7 +296,7 @@ sub _read_ip_prefix_to_asn_file
     {
         my $current_prefix_boundary = $prefix_boundaries->[$i];
 
-        say "i = $i" if ($i%1000 == 0 );
+        say "i = $i" if ( $i % 1000 == 0 );
 
         next if $current_prefix_boundary->is_end_point;
 
@@ -312,6 +311,7 @@ sub _read_ip_prefix_to_asn_file
         my $j = $i + 1;
         while ( $j < $current_prefix_end_idx )
         {
+
             #say "j : $j";
             my $chunk_out_prefix_boundary = $prefix_boundaries->[$j];
 
@@ -320,6 +320,7 @@ sub _read_ip_prefix_to_asn_file
             my $chunk_out_prefix = $prefix_boundaries->[$j]->ip_prefix;
             my $chunk_out_prefix_end_index =
               list_find_element_index( $j + 1, $chunk_out_prefix->get_end_point, $prefix_boundaries );
+
             #say "found end point at:  $chunk_out_prefix_end_index";
             $j = $chunk_out_prefix_end_index;
             $j++;
@@ -329,42 +330,47 @@ sub _read_ip_prefix_to_asn_file
         #say $current_prefix_boundary->ip . ' ' . $current_prefix->asn_list . ' ' .  $current_prefix;
         #say "\tAllocated size " . $current_prefix->ip_count;
         $total_allocated_ips += $current_prefix->ip_count;
+
         #say "\tChunkout size $chunk_out_size";
         $total_chunk_out += $chunk_out_size;
+
         #say "\tEffective size: " . ( $current_prefix->ip_count - $chunk_out_size );
 
         my $effective_ips = ( $current_prefix->ip_count - $chunk_out_size );
         $total_effective_ips += $effective_ips;
 
-        $effective_ips_for_asn_list->{$current_prefix_boundary->ip_prefix->asn_list} ||= 0;
-        $effective_ips_for_asn_list->{$current_prefix_boundary->ip_prefix->asn_list} += $effective_ips;
+        $effective_ips_for_asn_list->{ $current_prefix_boundary->ip_prefix->asn_list } ||= 0;
+        $effective_ips_for_asn_list->{ $current_prefix_boundary->ip_prefix->asn_list } += $effective_ips;
 
     }
 
     say "CIDR merge results";
+
     #say Dumper ($cidr->list);
-    my @prefixes_list = map { (split /\//, $_)[1] } $cidr->list;
+    my @prefixes_list = map { ( split /\//, $_ )[1] } $cidr->list;
+
     #say 'prefixes_list : ' . Dumper( @prefixes_list);
-    my @ip_counts = map { 2 ** (32 - $_ ) } @prefixes_list;
+    my @ip_counts = map { 2**( 32 - $_ ) } @prefixes_list;
+
     #say Dumper(@ip_counts);
     my $sum = sum(@ip_counts);
 
-#     say Dumper (@merged_cidr_list);
-#     my @prefixes_list = map { (split /\//, $_)[1] } @merged_cidr_list;
-#     say 'prefixes_list : ' . Dumper( @prefixes_list);
-#     my @ip_counts = map { 2 ** (32 - $_ ) } @prefixes_list;
-#     say Dumper(@ip_counts);
-     my $cidr_sum = sum(@ip_counts);
+    #     say Dumper (@merged_cidr_list);
+    #     my @prefixes_list = map { (split /\//, $_)[1] } @merged_cidr_list;
+    #     say 'prefixes_list : ' . Dumper( @prefixes_list);
+    #     my @ip_counts = map { 2 ** (32 - $_ ) } @prefixes_list;
+    #     say Dumper(@ip_counts);
+    my $cidr_sum = sum(@ip_counts);
 
-  
     say "CIDR sum is $cidr_sum";
 
     say "Total Allocated IPs $total_allocated_ips";
     say "Total Chunkout size $total_chunk_out";
     say "Toal effective Ips $total_effective_ips";
-    say "Total Allocated IPs-Total Chunkout size = " . ($total_allocated_ips - $total_chunk_out);
+    say "Total Allocated IPs-Total Chunkout size = " . ( $total_allocated_ips - $total_chunk_out );
 
-    die "Effective IPs != allocated ips - chunked out ips " unless $total_effective_ips == ($total_allocated_ips - $total_chunk_out);
+    die "Effective IPs != allocated ips - chunked out ips "
+      unless $total_effective_ips == ( $total_allocated_ips - $total_chunk_out );
 
     die "Net::Cidr::Lite ip count doesn't match our effective ip count " unless $total_effective_ips == $cidr_sum;
 
@@ -373,21 +379,21 @@ sub _read_ip_prefix_to_asn_file
     say "Calculating asn level allocation";
 
     my $asn_ip_allocation = {};
-    foreach my $asn_list (sort keys %{$effective_ips_for_asn_list} )
+    foreach my $asn_list ( sort keys %{$effective_ips_for_asn_list} )
     {
         my @asns = split( "_", $asn_list );
         @asns = map { split( ",", $_ ) } @asns;
 
         my $effective_ips = $effective_ips_for_asn_list->{$asn_list};
-        my $asn_count = scalar(@asns);
-        my $ips_per_asn = $effective_ips/$asn_count;
-        foreach my $asn_string (@asns) 
+        my $asn_count     = scalar(@asns);
+        my $ips_per_asn   = $effective_ips / $asn_count;
+        foreach my $asn_string (@asns)
         {
             my $asn = Net::ASN->new($asn_string) || die;
 
-            die "Invalid asn: '$asn' from '$asn_list'" if $asn->toasplain ne int($asn->toasplain);
-            $asn_ip_allocation->{$asn->toasplain} ||= 0;
-            $asn_ip_allocation->{$asn->toasplain} += $ips_per_asn;
+            die "Invalid asn: '$asn' from '$asn_list'" if $asn->toasplain ne int( $asn->toasplain );
+            $asn_ip_allocation->{ $asn->toasplain } ||= 0;
+            $asn_ip_allocation->{ $asn->toasplain } += $ips_per_asn;
         }
     }
 
@@ -395,7 +401,8 @@ sub _read_ip_prefix_to_asn_file
 
     {
         my $asn_ip_allocation_hash_sum = sum values %{$asn_ip_allocation};
-        die "asn_ip_allocation_hash_sum ($asn_ip_allocation_hash_sum) != total_effective_ips ($total_effective_ips)" unless $asn_ip_allocation_hash_sum eq $total_effective_ips;
+        die "asn_ip_allocation_hash_sum ($asn_ip_allocation_hash_sum) != total_effective_ips ($total_effective_ips)"
+          unless $asn_ip_allocation_hash_sum eq $total_effective_ips;
     }
 
     return $asn_ip_allocation;
@@ -428,17 +435,17 @@ sub main
 
     say "Clearing DB table";
 
-    $dbh->query(' DELETE FROM asn_ip_counts' );
+    $dbh->query(' DELETE FROM asn_ip_counts');
 
     say "Inserting into asn_ip_counts";
 
     my $rows_inserted = 0;
-    foreach my $asn ( sort keys %$asn_counts)
+    foreach my $asn ( sort keys %$asn_counts )
     {
-        $dbh->query( 'insert into asn_ip_counts (asn, ip_count) values (?, ? ) ', $asn, round($asn_counts->{$asn}) );
+        $dbh->query( 'insert into asn_ip_counts (asn, ip_count) values (?, ? ) ', $asn, round( $asn_counts->{$asn} ) );
         $rows_inserted++;
 
-        say "$rows_inserted rows inserted" if ($rows_inserted % 500) == 0;
+        say "$rows_inserted rows inserted" if ( $rows_inserted % 500 ) == 0;
     }
 
     say "Done inserting into table asn_ip_counts";

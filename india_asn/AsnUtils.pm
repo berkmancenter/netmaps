@@ -72,10 +72,11 @@ sub get_asn_dig_info
 
     while (1)
     {
-        my $resolver =  Net::DNS::Resolver->new;
-        my $packet   = $resolver->query("$asn.asn.cymru.com", "TXT");
+        my $resolver = Net::DNS::Resolver->new;
+        my $packet = $resolver->query( "$asn.asn.cymru.com", "TXT" );
 
-        if (!defined($packet) ) {
+        if ( !defined($packet) )
+        {
             print STDERR "Asn lookup failed for $asn\n";
             last;
         }
@@ -90,7 +91,6 @@ sub get_asn_dig_info
         #say STDERR $answer->txtdata;
 
         my @whois_results = split( /\s*\|\s*/, $answer->txtdata );
-
 
         @ret{ 'as', 'cc', 'registry', 'allocated', 'name' } = @whois_results;
 

@@ -26,7 +26,7 @@ sub print_asn_country_map
 
         warn Dumper($asn_info) unless ( !defined( $asn_info->{as} ) || ( $asn == $asn_info->{as} ) );
 
-        if ( !defined($asn_info->{as}) || $asn_info->{as} != $asn )
+        if ( !defined( $asn_info->{as} ) || $asn_info->{as} != $asn )
         {
             print STDERR "No info for AS$asn\n";
         }

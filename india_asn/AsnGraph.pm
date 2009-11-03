@@ -388,9 +388,6 @@ sub get_percent_controlled_by_list
     my ( $self, $asn_list ) = @_;
     my $asns = $self->{asn_nodes};
 
-    #    my $asn_list_monitorable = $self->_get_asns_monitorable_by_list($asn_list);
-    #    my $ips_monitorable = $self->get_ips_in_asn_list($asn_list_monitorable);
-
     my @asn_object_list = map { $asns->{$_} } @{$asn_list};
 
     #make sure we don't double count
@@ -529,10 +526,10 @@ sub print_connections_per_asn
 
 sub get_complexity_impl
 {
-    my ($self, $sum_monitorable_ips) = @_;
+    my ( $self, $sum_monitorable_ips ) = @_;
 
     #exclude rest_of_world node
-    my $asns = $self->{asn_nodes};
+    my $asns       = $self->{asn_nodes};
     my $total_isps = scalar( keys %{$asns} ) - 1;
 
     my $total_ips = $self->_get_total_ips();
@@ -589,8 +586,8 @@ sub _list_contains
 sub get_point_of_control_as_numbers
 {
     my ($self) = @_;
-  
-    return [ @{$self->get_asns_controlling_ninty_percent()}];
+
+    return [ @{ $self->get_asns_controlling_ninty_percent() } ];
 }
 
 sub xml_summary
@@ -607,9 +604,9 @@ sub xml_summary
 
     $self->die_if_cyclic();
 
-    $xml_graph->appendTextChild( 'total_ips',  $total_ips );
-    $xml_graph->appendTextChild( 'total_asns', $self->get_country_as_nodes_count() );
-    $xml_graph->appendTextChild( 'complexity', $self->get_complexity );
+    $xml_graph->appendTextChild( 'total_ips',      $total_ips );
+    $xml_graph->appendTextChild( 'total_asns',     $self->get_country_as_nodes_count() );
+    $xml_graph->appendTextChild( 'complexity',     $self->get_complexity );
     $xml_graph->appendTextChild( 'complexity_max', $self->get_complexity_max );
     $xml_graph->appendTextChild( 'complexity_min', $self->get_complexity_min );
 

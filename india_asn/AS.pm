@@ -276,32 +276,33 @@ sub get_providers
 sub number_of_customers
 {
     my ($self) = @_;
-    return scalar(@{$self->get_customers});
+    return scalar( @{ $self->get_customers } );
 }
 
 sub get_provider_with_most_customers
 {
     my ($self) = @_;
 
-    return if ! defined($_->get_providers);
+    return if !defined( $_->get_providers );
 
-    my @providers         = @{$self->get_providers};
+    my @providers = @{ $self->get_providers };
 
-    if (any {$_->is_rest_of_world} @providers )
+    if ( any { $_->is_rest_of_world } @providers )
     {
-        return first {$_->is_rest_of_world} @providers;
+        return first { $_->is_rest_of_world } @providers;
     }
 
-    my @providers_sorted = sort { $a->number_of_customers <=> $b->number_of_customers or $b->get_as_number <=> $a->get_as_number   } @providers;
+    my @providers_sorted =
+      sort { $a->number_of_customers <=> $b->number_of_customers or $b->get_as_number <=> $a->get_as_number } @providers;
 
     print $self->get_as_number;
     print "\n";
     print "\t";
-    print join "\t\n", (map {$_->get_as_number . " customers " . $_->number_of_customers } @providers_sorted);
+    print join "\t\n", ( map { $_->get_as_number . " customers " . $_->number_of_customers } @providers_sorted );
     my $provider_with_most_customers = pop @providers_sorted;
 
     print "\n";
-    print "Provider with most customers: " . $provider_with_most_customers->get_as_number; 
+    print "Provider with most customers: " . $provider_with_most_customers->get_as_number;
     print "\n";
     return $provider_with_most_customers;
 }
@@ -335,17 +336,15 @@ sub get_effective_monitorable_ip_address_count
 #TODO combine the get_*_monitorable_ip_address_methods
 sub get_min_complexity_monitorable_ip_address_count
 {
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     {
         $self->{_effective_monitorable_ips} =
-          $self->get_asn_ip_address_count() +
-          $self->_get_min_complexity_monitorable_downstream_ip_address_count();
+          $self->get_asn_ip_address_count() + $self->_get_min_complexity_monitorable_downstream_ip_address_count();
     }
 
     return $self->{_effective_monitorable_ips};
 }
-
 
 sub get_number_of_providers
 {
@@ -380,7 +379,7 @@ sub _my_exclude
 sub _get_min_complexity_monitorable_downstream_ip_address_count
 {
 
-    my ( $self ) = @_;
+    my ($self) = @_;
 
     return 0 if ( $self->is_rest_of_world );
 
@@ -392,7 +391,7 @@ sub _get_min_complexity_monitorable_downstream_ip_address_count
 
     foreach my $customer_asn ( @{$customers} )
     {
-        if ($customer_asn->get_provider_with_most_customers == $self)
+        if ( $customer_asn->get_provider_with_most_customers == $self )
         {
             $sum += $customer_asn->get_min_complexity_monitorable_ip_address_count();
         }

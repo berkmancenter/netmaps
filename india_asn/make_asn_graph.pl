@@ -71,6 +71,7 @@ sub main
     @country_codes = grep { defined($_) && ( $_ ne '' ) } @country_codes;
 
     @country_codes = grep { $_ ne 'US' } @country_codes;
+
     #@country_codes = grep { $_ eq 'AE' } @country_codes;
 
     #TODO this country causes a divide by zero error so skip it for now.
@@ -109,46 +110,51 @@ sub main
             $country_element->setAttribute( 'country_code',           $country_code );
             $country_element->setAttribute( 'country_name',           $country_name );
             $country_element->setAttribute( 'country_code_is_region', $country_code_is_region );
-            $country_element->appendChild( AdPlannerCountryReport::country_ad_words_xml_summary($country_code, $asn_sub_graph->get_point_of_control_as_numbers) );
+            $country_element->appendChild(
+                AdPlannerCountryReport::country_ad_words_xml_summary(
+                    $country_code, $asn_sub_graph->get_point_of_control_as_numbers
+                )
+            );
             $country_element->appendChild( $asn_sub_graph->xml_summary() );
             $root->appendChild($country_element);
-           #  my $g = $asn_sub_graph->print_graphviz();
 
-#             #die unless $g->as_svg($svg_output_file);
-#             my $svg_to_scale = $g->as_svg;
-#             die unless $svg_to_scale;
-#             $svg_to_scale =~ s/<svg width=".*" height=".*"/<svg width="100%" height="100%"/;
-#             $svg_to_scale =~ s/stroke:black;"/stroke:black;stroke-width:20"/g;
+            #  my $g = $asn_sub_graph->print_graphviz();
 
-#             my $output_file_base = "$_output_dir/graphs/asn-$country_name";
-#             my $svg_output_file  = "$output_file_base.svg";
-#             open( SVGOUTPUTFILE, ">$svg_output_file" ) || die "Could not create file:$svg_output_file ";
-#             print SVGOUTPUTFILE $svg_to_scale;
-#             close(SVGOUTPUTFILE);
+            #             #die unless $g->as_svg($svg_output_file);
+            #             my $svg_to_scale = $g->as_svg;
+            #             die unless $svg_to_scale;
+            #             $svg_to_scale =~ s/<svg width=".*" height=".*"/<svg width="100%" height="100%"/;
+            #             $svg_to_scale =~ s/stroke:black;"/stroke:black;stroke-width:20"/g;
 
-#             my $dot_output_file = "$output_file_base.dot";
-#             open( DOTOUTPUTFILE, ">$dot_output_file" ) || die "Could not create file:$dot_output_file ";
-#             my $dot_output = $g->as_dot;
-#             print DOTOUTPUTFILE $dot_output;
-#             close(DOTOUTPUTFILE);
+            #             my $output_file_base = "$_output_dir/graphs/asn-$country_name";
+            #             my $svg_output_file  = "$output_file_base.svg";
+            #             open( SVGOUTPUTFILE, ">$svg_output_file" ) || die "Could not create file:$svg_output_file ";
+            #             print SVGOUTPUTFILE $svg_to_scale;
+            #             close(SVGOUTPUTFILE);
 
-#             my $parser = Graph::Easy::Parser::Graphviz->new();
-#             my $graph  = $parser->from_file($dot_output_file);
+            #             my $dot_output_file = "$output_file_base.dot";
+            #             open( DOTOUTPUTFILE, ">$dot_output_file" ) || die "Could not create file:$dot_output_file ";
+            #             my $dot_output = $g->as_dot;
+            #             print DOTOUTPUTFILE $dot_output;
+            #             close(DOTOUTPUTFILE);
 
-#             my $graphml_output = $graph->as_graphml();
+            #             my $parser = Graph::Easy::Parser::Graphviz->new();
+            #             my $graph  = $parser->from_file($dot_output_file);
 
-#             #flex aparently doesn't like namespaces
-#             $graphml_output =~ s/<graphml.*?>/<graphml>/s;
-#             my $graphml_output_file = "$output_file_base.graphml";
+            #             my $graphml_output = $graph->as_graphml();
 
-#             open( GRAPHMLOUTPUTFILE, ">$graphml_output_file" ) || die "Could not create file:$graphml_output_file ";
-#             print GRAPHMLOUTPUTFILE $graphml_output;
-#             close(GRAPHMLOUTPUTFILE);
+            #             #flex aparently doesn't like namespaces
+            #             $graphml_output =~ s/<graphml.*?>/<graphml>/s;
+            #             my $graphml_output_file = "$output_file_base.graphml";
 
-#             my $rsvg = new Image::LibRSVG();
+       #             open( GRAPHMLOUTPUTFILE, ">$graphml_output_file" ) || die "Could not create file:$graphml_output_file ";
+       #             print GRAPHMLOUTPUTFILE $graphml_output;
+       #             close(GRAPHMLOUTPUTFILE);
 
-#             $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
-#               || die "Could not convert file to png";
+            #             my $rsvg = new Image::LibRSVG();
+
+            #             $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
+            #               || die "Could not convert file to png";
 
             if ( ( $loop_iteration % 10 ) == 0 )
             {

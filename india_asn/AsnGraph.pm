@@ -387,28 +387,28 @@ sub get_ips_in_asn_list
 
 sub _get_percent_controlled_by_list
 {
-    my ( $self, $asn_list ) = @_;
+    my ( $self, $asn_list, $control_methodology ) = @_;
     my $asns = $self->{asn_nodes};
 
     my @asn_object_list = map { $asns->{$_} } @{$asn_list};
 
     #make sure we don't double count
     my $ips_monitorable =
-      sum map { $asns->{$_}->get_effective_monitorable_ip_address_count( \@asn_object_list ) } @{$asn_list};
+      sum map { $asns->{$_}->_get_monitorable_ip_address_count_impl( \@asn_object_list, $control_methodology ) } @{$asn_list};
 
     return $ips_monitorable / $self->_get_total_ips * 100;
 }
 
-sub get_asns_controlling_ninty_percent
+sub _get_asns_controlling_ninty_percent
 {
-    my ($self) = @_;
+    my ($self, $control_methodology) = @_;
 
     my @asns = $self->_get_asn_names_sorted_by_monitoring();
 
     my $asn                = shift @asns;
     my @ninty_percent_list = ($asn);
 
-    while ( $self->_get_percent_controlled_by_list( \@ninty_percent_list ) < 90.0 )
+    while ( $self->_get_percent_controlled_by_list( \@ninty_percent_list, $control_methodology ) < 90.0 )
     {
         die if ( scalar(@asns) == 0 );
         $asn = shift @asns;
@@ -416,8 +416,6 @@ sub get_asns_controlling_ninty_percent
 
         #print " while (\n";
     }
-
-    $self->{ninty_percent_control_list} = \@ninty_percent_list;
 
     return \@ninty_percent_list;
 }
@@ -556,7 +554,22 @@ sub get_point_of_control_as_numbers
 {
     my ($self) = @_;
 
-    return [ @{ $self->get_asns_controlling_ninty_percent() } ];
+    return [ @{ $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL) } ];
+}
+
+sub _get_ninety_percent_control_list_element
+{
+    my ($self) = @_;
+
+    my $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL );
+
+    my $ninety_percent_list_xml = XML::LibXML::Element->new('ninty_percent_asns');
+    
+    $ninety_percent_list_xml->setAttribute( 'count', scalar( @{$ninety_percent_control_asns} ) );
+    
+    $ninety_percent_list_xml->appendText( join ", ", @{$ninety_percent_control_asns} );
+
+    return $ninety_percent_list_xml;
 }
 
 sub xml_summary
@@ -579,17 +592,13 @@ sub xml_summary
     $xml_graph->appendTextChild( 'complexity_max', $self->get_complexity_max );
     $xml_graph->appendTextChild( 'complexity_min', $self->get_complexity_min );
 
-    my $ninety_percent_control_asns = $self->get_asns_controlling_ninty_percent();
+    my $ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element();
 
-    my $ninty_percent_list_xml = XML::LibXML::Element->new('ninty_percent_asns');
-
-    $ninty_percent_list_xml->setAttribute( 'count', scalar( @{$ninety_percent_control_asns} ) );
-
-    $ninty_percent_list_xml->appendText( join ", ", @{$ninety_percent_control_asns} );
-
-    $xml_graph->appendChild($ninty_percent_list_xml);
+    $xml_graph->appendChild($ninety_percent_list_xml);
 
     my @asn_keys = $self->_get_asn_names_sorted_by_monitoring;
+
+    my $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL );
 
     foreach my $key (@asn_keys)
     {

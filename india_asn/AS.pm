@@ -336,8 +336,11 @@ sub _get_owned_downstream_ip_address_count
 
             given ($monitorable_calculation_type)
             {
-                when MONITORABLE_CALCULATION_PROPORTIONAL { $parent_amount = $customer_owned_ip_count / $customer_asn->get_number_of_providers; }
-                when MONITORABLE_CALCULATION_MAXIMAL      { $parent_amount = $customer_owned_ip_count; }
+                when MONITORABLE_CALCULATION_PROPORTIONAL
+                {
+                    $parent_amount = $customer_owned_ip_count / $customer_asn->get_number_of_providers;
+                }
+                when MONITORABLE_CALCULATION_MAXIMAL { $parent_amount = $customer_owned_ip_count; }
                 when MONITORABLE_CALCULATION_BIGESTPARENT
                 {
                     if ( $customer_asn->get_provider_with_most_customers == $self )
@@ -349,9 +352,9 @@ sub _get_owned_downstream_ip_address_count
                         $parent_amount = 0;
                     }
                 }
-                default { die "illegal calculation_type $_"; }
+                default { die "illegal calculation_type $_"; };
             }
-            
+
             $sum += $parent_amount;
         }
         else
@@ -377,25 +380,25 @@ sub _get_monitorable_ip_address_count_impl
 
 sub get_monitorable_ip_address_count
 {
-    my ($self, $downstream_exclude_list ) = @_;
+    my ( $self, $downstream_exclude_list ) = @_;
 
-    return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list  , MONITORABLE_CALCULATION_MAXIMAL);
+    return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list, MONITORABLE_CALCULATION_MAXIMAL );
 }
 
 sub get_effective_monitorable_ip_address_count
 {
     my ( $self, $downstream_exclude_list ) = @_;
 
-    return $self->_get_monitorable_ip_address_count_impl($downstream_exclude_list, MONITORABLE_CALCULATION_PROPORTIONAL);
+    return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list, MONITORABLE_CALCULATION_PROPORTIONAL );
 }
 
 #TODO this has too much cut & paste we need to DRY up the code
 #TODO combine the get_*_monitorable_ip_address_methods
 sub get_min_complexity_monitorable_ip_address_count
 {
-    my ($self, $downstream_exclude_list) = @_;
+    my ( $self, $downstream_exclude_list ) = @_;
 
-    return $self->_get_monitorable_ip_address_count_impl($downstream_exclude_list, MONITORABLE_CALCULATION_BIGESTPARENT);
+    return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list, MONITORABLE_CALCULATION_BIGESTPARENT );
 }
 
 sub get_number_of_providers

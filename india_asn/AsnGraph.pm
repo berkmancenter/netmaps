@@ -397,37 +397,6 @@ sub get_percent_controlled_by_list
     return $ips_monitorable / $self->_get_total_ips * 100;
 }
 
-#old code that assumed that an ASN could monitor 100% of it's customers' networks
-sub get_asns_controlling_ninty_percent_indirectly
-{
-    my ($self) = @_;
-
-    my @asns = $self->_get_asn_names_sorted_by_monitoring();
-
-    my $asn                = shift @asns;
-    my @ninty_percent_list = ($asn);
-
-    while ( $self->get_percent_controlled_by_list( \@ninty_percent_list ) < 90.0 )
-    {
-
-        #Get asns not already monitorable by our list
-        my $monitorable_asns = $self->_get_asns_monitorable_by_list( \@ninty_percent_list );
-        my $lca = List::Compare->new( '-u', '-a', \@asns, $monitorable_asns );
-        @asns = $lca->get_unique;
-
-        @asns = $self->_sort_by_monitoring( \@asns );
-
-        #add the asn that monitors the most ASNs to the list
-        die if ( scalar(@asns) == 0 );
-        $asn = shift @asns;
-        push @ninty_percent_list, $asn;
-
-        #print " while (\n";
-    }
-
-    return \@ninty_percent_list;
-}
-
 sub get_asns_controlling_ninty_percent
 {
     my ($self) = @_;

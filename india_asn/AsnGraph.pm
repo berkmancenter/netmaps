@@ -397,7 +397,7 @@ sub get_percent_controlled_by_list
     return $ips_monitorable / $self->_get_total_ips * 100;
 }
 
-#old code that assumed that an ASN could monitor 100 of it's customers' networks
+#old code that assumed that an ASN could monitor 100% of it's customers' networks
 sub get_asns_controlling_ninty_percent_indirectly
 {
     my ($self) = @_;

@@ -2,7 +2,7 @@ package AS;
 
 use strict;
 use List::MoreUtils qw(uniq none any);
-use List::Util qw(sum);
+use List::Util qw(first sum);
 use List::Pairwise qw (grepp);
 use GraphViz;
 use AsnUtils;
@@ -276,17 +276,33 @@ sub get_providers
 sub number_of_customers
 {
     my ($self) = @_;
-    return scalar($self->get_customers);
+    return scalar(@{$self->get_customers});
 }
 
 sub get_provider_with_most_customers
 {
     my ($self) = @_;
-    my @country_providers = grep {! $_->is_rest_of_world } $self->get_providers;
-    my @providers_sorted = sort { $a->number_of_customers <=> $b->number_of_customers or $a->as_number <=> $b->as_number   } @country_providers;
 
+    return if ! defined($_->get_providers);
+
+    my @providers         = @{$self->get_providers};
+
+    if (any {$_->is_rest_of_world} @providers )
+    {
+        return first {$_->is_rest_of_world} @providers;
+    }
+
+    my @providers_sorted = sort { $a->number_of_customers <=> $b->number_of_customers or $b->get_as_number <=> $a->get_as_number   } @providers;
+
+    print $self->get_as_number;
+    print "\n";
+    print "\t";
+    print join "\t\n", (map {$_->get_as_number . " customers " . $_->number_of_customers } @providers_sorted);
     my $provider_with_most_customers = pop @providers_sorted;
 
+    print "\n";
+    print "Provider with most customers: " . $provider_with_most_customers->get_as_number; 
+    print "\n";
     return $provider_with_most_customers;
 }
 
@@ -315,6 +331,22 @@ sub get_effective_monitorable_ip_address_count
     return $self->{_effective_monitorable_ips};
 }
 
+#TODO this has too much cut & paste we need to DRY up the code
+#TODO combine the get_*_monitorable_ip_address_methods
+sub get_min_complexity_monitorable_ip_address_count
+{
+    my ( $self ) = @_;
+
+    {
+        $self->{_effective_monitorable_ips} =
+          $self->get_asn_ip_address_count() +
+          $self->_get_min_complexity_monitorable_downstream_ip_address_count();
+    }
+
+    return $self->{_effective_monitorable_ips};
+}
+
+
 sub get_number_of_providers
 {
     my ($self) = @_;
@@ -342,6 +374,31 @@ sub _my_exclude
 
     #@ret = map {bless $_ , "AS"} @ret;
     return \@ret;
+}
+
+#TODO evil cutting & pasting we need to DRY this up
+sub _get_min_complexity_monitorable_downstream_ip_address_count
+{
+
+    my ( $self ) = @_;
+
+    return 0 if ( $self->is_rest_of_world );
+
+    my $customers = $self->get_customers;
+
+    return 0 if ( scalar( @{$customers} ) == 0 );
+
+    my $sum = 0;
+
+    foreach my $customer_asn ( @{$customers} )
+    {
+        if ($customer_asn->get_provider_with_most_customers == $self)
+        {
+            $sum += $customer_asn->get_min_complexity_monitorable_ip_address_count();
+        }
+    }
+
+    return $sum;
 }
 
 sub _get_effective_monitorable_downstream_ip_address_count

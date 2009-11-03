@@ -537,15 +537,12 @@ sub print_connections_per_asn
     }
 }
 
-sub get_complexity
+sub get_complexity_impl
 {
-    my ($self) = @_;
-
-    my $asns = $self->{asn_nodes};
-
-    my $sum_monitorable_ips = sum map { $_->get_effective_monitorable_ip_address_count() } values %{$asns};
+    my ($self, $sum_monitorable_ips) = @_;
 
     #exclude rest_of_world node
+    my $asns = $self->{asn_nodes};
     my $total_isps = scalar( keys %{$asns} ) - 1;
 
     my $total_ips = $self->_get_total_ips();
@@ -557,6 +554,39 @@ sub get_complexity
     #scale the results.
     $ret *= 100000;
     return $ret;
+}
+
+sub get_complexity
+{
+    my ($self) = @_;
+
+    my $asns = $self->{asn_nodes};
+
+    my $sum_monitorable_ips = sum map { $_->get_effective_monitorable_ip_address_count() } values %{$asns};
+
+    return $self->get_complexity_impl($sum_monitorable_ips);
+}
+
+sub get_complexity_max
+{
+    my ($self) = @_;
+
+    my $asns = $self->{asn_nodes};
+
+    my $sum_monitorable_ips = sum map { $_->get_monitorable_ip_address_count() } values %{$asns};
+
+    return $self->get_complexity_impl($sum_monitorable_ips);
+}
+
+sub get_complexity_min
+{
+    my ($self) = @_;
+
+    my $asns = $self->{asn_nodes};
+
+    my $sum_monitorable_ips = sum map { $_->get_min_complexity_monitorable_ip_address_count() } values %{$asns};
+
+    return $self->get_complexity_impl($sum_monitorable_ips);
 }
 
 sub _list_contains
@@ -590,6 +620,8 @@ sub xml_summary
     $xml_graph->appendTextChild( 'total_ips',  $total_ips );
     $xml_graph->appendTextChild( 'total_asns', $self->get_country_as_nodes_count() );
     $xml_graph->appendTextChild( 'complexity', $self->get_complexity );
+    $xml_graph->appendTextChild( 'complexity_max', $self->get_complexity_max );
+    $xml_graph->appendTextChild( 'complexity_min', $self->get_complexity_min );
 
     my $ninety_percent_control_asns = $self->get_asns_controlling_ninty_percent();
 

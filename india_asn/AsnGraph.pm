@@ -14,6 +14,8 @@ use List::Compare;
 use XML::LibXML;
 use Data::Dumper;
 
+use enum qw(:MONITORABLE_CALCULATION_ PROPORTIONAL MAXIMAL BIGESTPARENT);
+
 # MODULES
 
 # CONSTANTS
@@ -383,7 +385,7 @@ sub get_ips_in_asn_list
     return sum map { $asns->{$_}->get_asn_ip_address_count() } @{$asn_list};
 }
 
-sub get_percent_controlled_by_list
+sub _get_percent_controlled_by_list
 {
     my ( $self, $asn_list ) = @_;
     my $asns = $self->{asn_nodes};
@@ -406,7 +408,7 @@ sub get_asns_controlling_ninty_percent
     my $asn                = shift @asns;
     my @ninty_percent_list = ($asn);
 
-    while ( $self->get_percent_controlled_by_list( \@ninty_percent_list ) < 90.0 )
+    while ( $self->_get_percent_controlled_by_list( \@ninty_percent_list ) < 90.0 )
     {
         die if ( scalar(@asns) == 0 );
         $asn = shift @asns;

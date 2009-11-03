@@ -320,7 +320,7 @@ sub _get_owned_downstream_ip_address_count
 
     return 0 if ( scalar( @{$customers} ) == 0 );
 
-    return $self->get_downstream_ip_address_count() if $monitorable_calculation_type == MONITORABLE_CALCULATION_MAXIMAL;
+    #return $self->get_downstream_ip_address_count() if $monitorable_calculation_type == MONITORABLE_CALCULATION_MAXIMAL;
 
     my $sum = 0;
 
@@ -340,7 +340,11 @@ sub _get_owned_downstream_ip_address_count
                 {
                     $parent_amount = $customer_owned_ip_count / $customer_asn->get_number_of_providers;
                 }
-                when MONITORABLE_CALCULATION_MAXIMAL { $parent_amount = $customer_owned_ip_count; }
+                when MONITORABLE_CALCULATION_MAXIMAL
+                {
+                    push @{$downstream_exclude_list}, $customer_asn;
+                    $parent_amount = $customer_owned_ip_count;
+                }
                 when MONITORABLE_CALCULATION_BIGESTPARENT
                 {
                     if ( $customer_asn->get_provider_with_most_customers == $self )
@@ -381,6 +385,12 @@ sub _get_monitorable_ip_address_count_impl
 sub get_monitorable_ip_address_count
 {
     my ( $self, $downstream_exclude_list ) = @_;
+
+    $downstream_exclude_list = [] if !defined($downstream_exclude_list);
+
+    my @temp_array = @{$downstream_exclude_list};
+
+    push( @temp_array, $self );
 
     return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list, MONITORABLE_CALCULATION_MAXIMAL );
 }

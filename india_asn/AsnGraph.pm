@@ -401,8 +401,6 @@ sub get_asns_controlling_ninty_percent
 {
     my ($self) = @_;
 
-    #return $self->{ninty_percent_control_list} if (defined ($self->{ninty_percent_control_list}) );
-
     my @asns = $self->_get_asn_names_sorted_by_monitoring();
 
     my $asn                = shift @asns;

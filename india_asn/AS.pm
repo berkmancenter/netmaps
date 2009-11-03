@@ -14,6 +14,8 @@ use Scalar::Util qw ( weaken);
 use Encode;
 use Set::Intersection;
 use Readonly;
+use Switch 'Perl6';
+use enum qw(:MONITORABLE_CALCULATION_ PROPORTIONAL MAXIMAL BIGESTPARENT);
 
 # MODULES
 
@@ -363,43 +365,93 @@ sub _get_effective_monitorable_downstream_ip_address_count
     return $sum;
 }
 
-sub get_monitorable_ip_address_count
+sub _get_owned_downstream_ip_address_count
 {
-    my ($self) = @_;
 
-    if ( !defined( $self->{_monitorable_ips} ) )
+    my ( $self, $downstream_exclude_list, $monitorable_calculation_type ) = @_;
+
+    return 0 if ( $self->is_rest_of_world );
+
+    my $customers = $self->get_customers;
+
+    return 0 if ( scalar( @{$customers} ) == 0 );
+
+    return $self->get_downstream_ip_address_count() if $monitorable_calculation_type == MONITORABLE_CALCULATION_MAXIMAL;
+
+    my $sum = 0;
+
+    foreach my $customer_asn ( @{$customers} )
     {
-        $self->{_monitorable_ips} = $self->get_asn_ip_address_count() + $self->get_downstream_ip_address_count();
+        if ( !_is_inlist( $customer_asn, $downstream_exclude_list ) )
+        {
+            my $customer_owned_ip_count =
+              $customer_asn->_get_monitorable_ip_address_count_impl( $downstream_exclude_list,
+                $monitorable_calculation_type );
+
+            my $parent_amount;
+
+            given ($monitorable_calculation_type)
+            {
+                when MONITORABLE_CALCULATION_PROPORTIONAL { $parent_amount = $customer_owned_ip_count / $customer_asn->get_number_of_providers; }
+                when MONITORABLE_CALCULATION_MAXIMAL      { $parent_amount = $customer_owned_ip_count; }
+                when MONITORABLE_CALCULATION_BIGESTPARENT
+                {
+                    if ( $customer_asn->get_provider_with_most_customers == $self )
+                    {
+                        $parent_amount += $customer_asn->get_min_complexity_monitorable_ip_address_count();
+                    }
+                    else
+                    {
+                        $parent_amount = 0;
+                    }
+                }
+                default { die "illegal calculation_type $_"; }
+            }
+            
+            $sum += $parent_amount;
+        }
+        else
+        {
+
+            #print "Not double counting " . $customer_asn->get_as_number() . "\n";
+        }
     }
 
-    return $self->{_monitorable_ips};
+    return $sum;
+}
+
+sub _get_monitorable_ip_address_count_impl
+{
+    my ( $self, $downstream_exclude_list, $monitorable_calculation_type ) = @_;
+
+    my $ret =
+      $self->get_asn_ip_address_count() +
+      $self->_get_owned_downstream_ip_address_count( $downstream_exclude_list, $monitorable_calculation_type );
+
+    return $ret;
+}
+
+sub get_monitorable_ip_address_count
+{
+    my ($self, $downstream_exclude_list ) = @_;
+
+    return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list  , MONITORABLE_CALCULATION_MAXIMAL);
 }
 
 sub get_effective_monitorable_ip_address_count
 {
     my ( $self, $downstream_exclude_list ) = @_;
 
-    {
-        $self->{_effective_monitorable_ips} =
-          $self->get_asn_ip_address_count() +
-          $self->_get_effective_monitorable_downstream_ip_address_count($downstream_exclude_list);
-    }
-
-    return $self->{_effective_monitorable_ips};
+    return $self->_get_monitorable_ip_address_count_impl($downstream_exclude_list, MONITORABLE_CALCULATION_PROPORTIONAL);
 }
 
 #TODO this has too much cut & paste we need to DRY up the code
 #TODO combine the get_*_monitorable_ip_address_methods
 sub get_min_complexity_monitorable_ip_address_count
 {
-    my ($self) = @_;
+    my ($self, $downstream_exclude_list) = @_;
 
-    {
-        $self->{_effective_monitorable_ips} =
-          $self->get_asn_ip_address_count() + $self->_get_min_complexity_monitorable_downstream_ip_address_count();
-    }
-
-    return $self->{_effective_monitorable_ips};
+    return $self->_get_monitorable_ip_address_count_impl($downstream_exclude_list, MONITORABLE_CALCULATION_BIGESTPARENT);
 }
 
 sub get_number_of_providers

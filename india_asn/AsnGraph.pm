@@ -444,16 +444,6 @@ sub get_asns_controlling_ninty_percent
 
     while ( $self->get_percent_controlled_by_list( \@ninty_percent_list ) < 90.0 )
     {
-
-        #         #Get asns not already monitorable by our list
-        #         my $monitorable_asns = $self->_get_asns_monitorable_by_list( \@ninty_percent_list );
-        #         my $lca = List::Compare->new( '-u', '-a', \@asns, $monitorable_asns );
-        #         @asns = $lca->get_unique;
-
-        #         @asns = $self->_sort_by_monitoring( \@asns )
-        #            ;
-
-        #add the asn that monitors the most ASNs to the list
         die if ( scalar(@asns) == 0 );
         $asn = shift @asns;
         push @ninty_percent_list, $asn;

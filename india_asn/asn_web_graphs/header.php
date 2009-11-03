@@ -113,7 +113,7 @@ function get_page_title() {
         break;
 
     case $path . '/asn_diagram_comparison.php':
-        return "AUTNOMOUS SYSTEMS COMPARISON";
+        return "AUTONOMOUS SYSTEMS COMPARISON";
         break;
 
     default:

@@ -18,7 +18,7 @@ function embed_flash_object($country_code) {
 
        <div id="asn_diagram_wrapper">
        <div class="vis_head">
-          <span id='country_flash_map_header' class="vis_heading">AUTNOMOUS SYSTEM DIAGRAM - <? echo $country_name ?></span> <span class="vis_sub_heading">&nbsp;&nbsp; mouse over and click on nodes</span></div>
+          <span id='country_flash_map_header' class="vis_heading">AUTONOMOUS SYSTEM DIAGRAM - <? echo $country_name ?></span> <span class="vis_sub_heading">&nbsp;&nbsp; mouse over and click on nodes</span></div>
 
        <object classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000"
 			id="demos" width="600" height="490"

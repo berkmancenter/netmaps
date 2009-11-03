@@ -514,7 +514,7 @@ function update_asn_graph_country(country_code, asn_diagram_wrapper_id) {
 
     var country_name = country_code_to_name(country_code);
     country_flash_map_header.innerHTML = '';
-    country_flash_map_header.innerHTML = 'AUTNOMOUS SYSTEM DIAGRAM - ' + country_name;
+    country_flash_map_header.innerHTML = 'AUTONOMOUS SYSTEM DIAGRAM - ' + country_name;
 
     var asn_diagram_wrapper_html = asn_diagram_wrapper.innerHTML;
     asn_diagram_wrapper.innerHTML = '';

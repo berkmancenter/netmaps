@@ -392,8 +392,6 @@ sub get_effective_monitorable_ip_address_count
     return $self->_get_monitorable_ip_address_count_impl( $downstream_exclude_list, MONITORABLE_CALCULATION_PROPORTIONAL );
 }
 
-#TODO this has too much cut & paste we need to DRY up the code
-#TODO combine the get_*_monitorable_ip_address_methods
 sub get_min_complexity_monitorable_ip_address_count
 {
     my ( $self, $downstream_exclude_list ) = @_;
@@ -418,16 +416,6 @@ sub _is_inlist
     #print "list: $list->[0]\n";
 
     return any { $_->get_as_number() eq $val->get_as_number() } @{$list};
-}
-
-sub _my_exclude
-{
-    my ( $list1, $list2 ) = @_;
-
-    my @ret = grep { !_is_inlist( $_, $list2 ) } $list1;
-
-    #@ret = map {bless $_ , "AS"} @ret;
-    return \@ret;
 }
 
 sub get_graph_label

@@ -307,6 +307,62 @@ sub get_provider_with_most_customers
     return $provider_with_most_customers;
 }
 
+#TODO evil cutting & pasting we need to DRY this up
+sub _get_min_complexity_monitorable_downstream_ip_address_count
+{
+
+    my ($self) = @_;
+
+    return 0 if ( $self->is_rest_of_world );
+
+    my $customers = $self->get_customers;
+
+    return 0 if ( scalar( @{$customers} ) == 0 );
+
+    my $sum = 0;
+
+    foreach my $customer_asn ( @{$customers} )
+    {
+        if ( $customer_asn->get_provider_with_most_customers == $self )
+        {
+            $sum += $customer_asn->get_min_complexity_monitorable_ip_address_count();
+        }
+    }
+
+    return $sum;
+}
+
+sub _get_effective_monitorable_downstream_ip_address_count
+{
+
+    my ( $self, $downstream_exclude_list ) = @_;
+
+    return 0 if ( $self->is_rest_of_world );
+
+    my $customers = $self->get_customers;
+
+    return 0 if ( scalar( @{$customers} ) == 0 );
+
+    my $sum = 0;
+
+    foreach my $customer_asn ( @{$customers} )
+    {
+        if ( !_is_inlist( $customer_asn, $downstream_exclude_list ) )
+        {
+            $sum +=
+              $customer_asn->get_effective_monitorable_ip_address_count($downstream_exclude_list) /
+              $customer_asn->get_number_of_providers;
+        }
+        else
+        {
+
+            #print "Not double counting " . $customer_asn->get_as_number() . "\n";
+        }
+    }
+
+    return $sum;
+}
+
 sub get_monitorable_ip_address_count
 {
     my ($self) = @_;
@@ -373,62 +429,6 @@ sub _my_exclude
 
     #@ret = map {bless $_ , "AS"} @ret;
     return \@ret;
-}
-
-#TODO evil cutting & pasting we need to DRY this up
-sub _get_min_complexity_monitorable_downstream_ip_address_count
-{
-
-    my ($self) = @_;
-
-    return 0 if ( $self->is_rest_of_world );
-
-    my $customers = $self->get_customers;
-
-    return 0 if ( scalar( @{$customers} ) == 0 );
-
-    my $sum = 0;
-
-    foreach my $customer_asn ( @{$customers} )
-    {
-        if ( $customer_asn->get_provider_with_most_customers == $self )
-        {
-            $sum += $customer_asn->get_min_complexity_monitorable_ip_address_count();
-        }
-    }
-
-    return $sum;
-}
-
-sub _get_effective_monitorable_downstream_ip_address_count
-{
-
-    my ( $self, $downstream_exclude_list ) = @_;
-
-    return 0 if ( $self->is_rest_of_world );
-
-    my $customers = $self->get_customers;
-
-    return 0 if ( scalar( @{$customers} ) == 0 );
-
-    my $sum = 0;
-
-    foreach my $customer_asn ( @{$customers} )
-    {
-        if ( !_is_inlist( $customer_asn, $downstream_exclude_list ) )
-        {
-            $sum +=
-              $customer_asn->get_effective_monitorable_ip_address_count($downstream_exclude_list) /
-              $customer_asn->get_number_of_providers;
-        }
-        else
-        {
-
-            #print "Not double counting " . $customer_asn->get_as_number() . "\n";
-        }
-    }
-
-    return $sum;
 }
 
 sub get_graph_label

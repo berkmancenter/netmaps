@@ -13,6 +13,7 @@ use AsnTaxonomyClass;
 use List::Compare;
 use XML::LibXML;
 use Data::Dumper;
+use Perl6::Say;
 
 use enum qw(:MONITORABLE_CALCULATION_ PROPORTIONAL MAXIMAL BIGESTPARENT);
 
@@ -327,7 +328,10 @@ sub die_if_cyclic
 
 sub _sort_by_monitoring
 {
-    my ( $self, $asn_names ) = @_;
+    my ( $self, $asn_names, $control_methodology ) = @_;
+
+    say "Start sort by monitoring";
+
     my $asns = $self->{asn_nodes};
 
     $self->die_if_cyclic();
@@ -335,8 +339,8 @@ sub _sort_by_monitoring
     my @ret =
       reverse
       sort {
-        $asns->{$a}->get_effective_monitorable_ip_address_count()
-          <=> $asns->{$b}->get_effective_monitorable_ip_address_count()
+        $asns->{$a}->_get_monitorable_ip_address_count_impl(undef, $control_methodology)
+          <=> $asns->{$b}->_get_monitorable_ip_address_count_impl(undef, $control_methodology)
       } @{$asn_names};
 
     return @ret;
@@ -344,11 +348,11 @@ sub _sort_by_monitoring
 
 sub _get_asn_names_sorted_by_monitoring
 {
-    my ($self) = @_;
+    my ($self, $control_methodology) = @_;
     my $asns = $self->{asn_nodes};
 
     $self->die_if_cyclic();
-    my @ret = $self->_sort_by_monitoring( [ keys %{$asns} ] );
+    my @ret = $self->_sort_by_monitoring( [ keys %{$asns} ], $control_methodology );
 
     @ret = grep { !$asns->{$_}->is_rest_of_world() } @ret;
     return @ret;
@@ -403,7 +407,7 @@ sub _get_asns_controlling_ninty_percent
 {
     my ($self, $control_methodology) = @_;
 
-    my @asns = $self->_get_asn_names_sorted_by_monitoring();
+    my @asns = $self->_get_asn_names_sorted_by_monitoring($control_methodology);
 
     my $asn                = shift @asns;
     my @ninty_percent_list = ($asn);
@@ -428,7 +432,7 @@ sub _get_top_country_asns
 
     $self->die_if_cyclic();
 
-    my @asn_keys = $self->_get_asn_names_sorted_by_monitoring;
+    my @asn_keys = $self->_get_asn_names_sorted_by_monitoring(MONITORABLE_CALCULATION_PROPORTIONAL);
 
     keys(%$asns);
     if ( scalar(@asn_keys) > 50 )
@@ -596,7 +600,7 @@ sub xml_summary
 
     $xml_graph->appendChild($ninety_percent_list_xml);
 
-    my @asn_keys = $self->_get_asn_names_sorted_by_monitoring;
+    my @asn_keys = $self->_get_asn_names_sorted_by_monitoring(MONITORABLE_CALCULATION_PROPORTIONAL);
 
     my $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL );
 

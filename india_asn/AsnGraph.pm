@@ -559,11 +559,11 @@ sub get_point_of_control_as_numbers
 
 sub _get_ninety_percent_control_list_element
 {
-    my ($self) = @_;
+    my ($self, $element_name, $control_methodology ) = @_;
 
-    my $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL );
+    my $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent($control_methodology );
 
-    my $ninety_percent_list_xml = XML::LibXML::Element->new('ninty_percent_asns');
+    my $ninety_percent_list_xml = XML::LibXML::Element->new($element_name);
     
     $ninety_percent_list_xml->setAttribute( 'count', scalar( @{$ninety_percent_control_asns} ) );
     
@@ -592,7 +592,7 @@ sub xml_summary
     $xml_graph->appendTextChild( 'complexity_max', $self->get_complexity_max );
     $xml_graph->appendTextChild( 'complexity_min', $self->get_complexity_min );
 
-    my $ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element();
+    my $ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('ninty_percent_asns', MONITORABLE_CALCULATION_PROPORTIONAL);
 
     $xml_graph->appendChild($ninety_percent_list_xml);
 

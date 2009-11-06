@@ -341,6 +341,8 @@ sub _sort_by_monitoring
       sort {
         $asns->{$a}->_get_monitorable_ip_address_count_impl(undef, $control_methodology)
           <=> $asns->{$b}->_get_monitorable_ip_address_count_impl(undef, $control_methodology)
+              or
+                  $a <=> $b
       } @{$asn_names};
 
     return @ret;
@@ -599,6 +601,12 @@ sub xml_summary
     my $ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('ninty_percent_asns', MONITORABLE_CALCULATION_PROPORTIONAL);
 
     $xml_graph->appendChild($ninety_percent_list_xml);
+
+    my $max_ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('max_ninty_percent_asns', MONITORABLE_CALCULATION_MAXIMAL);
+    $xml_graph->appendChild($max_ninety_percent_list_xml);
+
+    my $min_ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('min_ninty_percent_asns', MONITORABLE_CALCULATION_BIGESTPARENT);
+    $xml_graph->appendChild($min_ninety_percent_list_xml);
 
     my @asn_keys = $self->_get_asn_names_sorted_by_monitoring(MONITORABLE_CALCULATION_PROPORTIONAL);
 

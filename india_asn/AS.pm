@@ -5,6 +5,7 @@ use List::MoreUtils qw(uniq none any);
 use List::Util qw(first sum);
 use List::Pairwise qw (grepp);
 use GraphViz;
+use Carp;
 use AsnUtils;
 use AsnInfo;
 use AsnIPCount;
@@ -285,7 +286,7 @@ sub get_provider_with_most_customers
 {
     my ($self) = @_;
 
-    return if !defined( $_->get_providers );
+    return if !defined( $self->get_providers );
 
     my @providers = @{ $self->get_providers };
 
@@ -297,15 +298,15 @@ sub get_provider_with_most_customers
     my @providers_sorted =
       sort { $a->number_of_customers <=> $b->number_of_customers or $b->get_as_number <=> $a->get_as_number } @providers;
 
-    print $self->get_as_number;
-    print "\n";
-    print "\t";
-    print join "\t\n", ( map { $_->get_as_number . " customers " . $_->number_of_customers } @providers_sorted );
+#     print $self->get_as_number;
+#     print "\n";
+#     print "\t";
+#     print join "\t\n", ( map { $_->get_as_number . " customers " . $_->number_of_customers } @providers_sorted );
     my $provider_with_most_customers = pop @providers_sorted;
 
-    print "\n";
-    print "Provider with most customers: " . $provider_with_most_customers->get_as_number;
-    print "\n";
+#     print "\n";
+#     print "Provider with most customers: " . $provider_with_most_customers->get_as_number;
+#     print "\n";
     return $provider_with_most_customers;
 }
 
@@ -326,6 +327,8 @@ sub _get_owned_downstream_ip_address_count
 
     foreach my $customer_asn ( @{$customers} )
     {
+        die unless defined($customer_asn);
+
         if ( !_is_inlist( $customer_asn, $downstream_exclude_list ) )
         {
             my $customer_owned_ip_count =

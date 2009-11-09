@@ -431,26 +431,86 @@ sub _monitorable_increase_gt
     }
 }
 
+# sub _get_max_monitorable_increase_asn_bak
+# {
+#     my $self = shift;
+#     my $control_methodology = shift;
+#     my $ninty_percent_list = shift;
+#     my $asns = shift;
+#         my $asn = reduce { 
+# $self->_monitorable_increase_gt( $ninty_percent_list, $a, $b,  $control_methodology  ) ? $a : $b  } @{$asns};
+#     return $asn;    
+# }
+
+# sub _get_max_monitorable_increase_asn_map
+# {
+#     my $self = shift;
+#     my $control_methodology = shift;
+#     my $ninty_percent_list = shift;
+#     my $asns = shift;
+#     my ($asn) = map $_->[0],
+#     reduce { $a->[1] > $b->[1] ? $a : $b }
+#     map [ $_, $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $_] , $control_methodology) ],
+#     @{$asns};
+
+# reduce { 
+# $self->_monitorable_increase_gt( $ninty_percent_list, $a, $b,  $control_methodology  ) ? $a : $b  } @{$asns};
+#     return $asn;    
+# }
+
+sub _get_max_monitorable_increase_asn
+{
+    my $self = shift;
+    my $control_methodology = shift;
+    my $ninty_percent_list = shift;
+    my $asns = shift;
+
+    my $start_time = time;
+    say "Starting _get_max_monitorable_increase_asn -- $start_time";
+
+    my $max = $asns->[0];
+    my $max_c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $max] , $control_methodology);
+
+    for (my $i = 1; $i < scalar(@$asns); $i++)
+    {
+        my $c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $asns->[$i]] , $control_methodology);  
+        if ($c > $max_c)
+        {
+            $max = $asns->[$i];
+            $max_c = $c;
+        }
+    }
+
+    my $end_time = time;
+
+    say "Ending __get_max_monitorable_increase_asn -- $end_time";
+    
+    say "Total time " . ($end_time-$start_time);
+
+    return $max;    
+}
+
+
 sub _get_asns_controlling_ninty_percent
 {
     my ($self, $control_methodology) = @_;
 
     my $start_time = time;
     say "Starting _get_asns_controlling_ninty_percent -- $start_time";
-    my @asns = $self->_get_asn_names_sorted_by_monitoring($control_methodology);
+    my $asns = [$self->_get_asn_names_sorted_by_monitoring($control_methodology)];
 
-    my $asn                = shift @asns;
+    my $asn                = shift @$asns;
     my @ninty_percent_list = ($asn);
 
     while ( $self->_get_percent_controlled_by_list( \@ninty_percent_list, $control_methodology ) < 90.0 )
     {
-        die if ( scalar(@asns) == 0 );
-        #say Dumper ( [@asns]);
-        $asn = reduce { 
-$self->_monitorable_increase_gt( \@ninty_percent_list, $a, $b,  $control_methodology  ) ? $a : $b  } @asns;
+        die if ( scalar(@$asns) == 0 );
+        #say Dumper ( $asns);
+        my $asn = $self->_get_max_monitorable_increase_asn($control_methodology, \@ninty_percent_list, $asns);
+
         push @ninty_percent_list, $asn;
 
-        @asns = grep { $_ != $asn } @asns;
+        $asns = [grep { $_ != $asn } @$asns];
 
         #print " while (\n";
     }

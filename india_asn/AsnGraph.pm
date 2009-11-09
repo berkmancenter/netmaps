@@ -3,7 +3,7 @@ package AsnGraph;
 use strict;
 use List::MoreUtils qw(uniq any);
 use List::Pairwise qw (grepp);
-use List::Util qw (sum);
+use List::Util qw (reduce sum max);
 use GraphViz;
 use AsnUtils;
 use AS;
@@ -271,7 +271,8 @@ sub die_if_cyclic
 
     return if ( $self->{_verified_acyclic} );
 
-    print "Checking whether graph is acyclic...\n";
+    my $start_time = time;
+    print "Checking whether graph is acyclic... -- $start_time \n";
     my $g = $self->_get_graph_object();
 
     if ( $g->has_a_cycle() )
@@ -322,15 +323,14 @@ sub die_if_cyclic
 
     $self->{_verified_acyclic} = 1;
 
-    #print "Graph is not cyclic\n";
-
+    my $end_time = time;
+    print "Graph is not cyclic -- $end_time\n";
+    say "Graph is not cyclic -- total time " . ($end_time-$start_time);
 }
 
 sub _sort_by_monitoring
 {
     my ( $self, $asn_names, $control_methodology ) = @_;
-
-    say "Start sort by monitoring";
 
     my $asns = $self->{asn_nodes};
 
@@ -405,10 +405,38 @@ sub _get_percent_controlled_by_list
     return $ips_monitorable / $self->_get_total_ips * 100;
 }
 
+sub _monitorable_increase_gt
+{
+    my ($self, $poc_list, $a, $b, $control_methodology) = @_;
+
+    #say "in _monitorable_increase_get";
+    #print Dumper ($poc_list);
+    #say "a = '$a'";
+    #say "b = '$b'";
+
+    my $monitorable_increase_a = $self->_get_percent_controlled_by_list( [ $a, @$poc_list] , $control_methodology);
+    my $monitorable_increase_b = $self->_get_percent_controlled_by_list( [ $b, @$poc_list] , $control_methodology);
+
+    if ($monitorable_increase_a > $monitorable_increase_b)
+    {
+        return 1;
+    }
+    elsif ($monitorable_increase_a < $monitorable_increase_b)
+    {
+        return 0;
+    }
+    else
+    {
+        return $a > $b;
+    }
+}
+
 sub _get_asns_controlling_ninty_percent
 {
     my ($self, $control_methodology) = @_;
 
+    my $start_time = time;
+    say "Starting _get_asns_controlling_ninty_percent -- $start_time";
     my @asns = $self->_get_asn_names_sorted_by_monitoring($control_methodology);
 
     my $asn                = shift @asns;
@@ -417,12 +445,21 @@ sub _get_asns_controlling_ninty_percent
     while ( $self->_get_percent_controlled_by_list( \@ninty_percent_list, $control_methodology ) < 90.0 )
     {
         die if ( scalar(@asns) == 0 );
-        $asn = shift @asns;
+        #say Dumper ( [@asns]);
+        $asn = reduce { 
+$self->_monitorable_increase_gt( \@ninty_percent_list, $a, $b,  $control_methodology  ) ? $a : $b  } @asns;
         push @ninty_percent_list, $asn;
+
+        @asns = grep { $_ != $asn } @asns;
 
         #print " while (\n";
     }
 
+    my $end_time = time;
+
+    say "Ending _get_asns_controlling_ninty_percent -- $end_time";
+    
+    say "Total time " . ($end_time-$start_time);
     return \@ninty_percent_list;
 }
 

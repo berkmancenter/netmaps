@@ -483,9 +483,9 @@ sub _get_max_monitorable_increase_asn
 
     my $end_time = time;
 
-    say "Ending __get_max_monitorable_increase_asn -- $end_time";
+    say "Ending _get_max_monitorable_increase_asn -- $end_time";
     
-    say "Total time " . ($end_time-$start_time);
+    say "Total time _get_max_monitorable_increase_asn " . ($end_time-$start_time);
 
     return $max;    
 }
@@ -519,7 +519,7 @@ sub _get_asns_controlling_ninty_percent
 
     say "Ending _get_asns_controlling_ninty_percent -- $end_time";
     
-    say "Total time " . ($end_time-$start_time);
+    say "Total time  _get_asns_controlling_ninty_percent " . ($end_time-$start_time);
     return \@ninty_percent_list;
 }
 

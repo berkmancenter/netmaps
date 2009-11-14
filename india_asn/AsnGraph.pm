@@ -305,8 +305,8 @@ sub die_if_cyclic
 
             @cycle = reverse @cycle;
 
-            print "Path Lengths: "
-              . join( ", ", map { $apsp->path_length( $_, AS::get_rest_of_the_world_name() ) } @cycle ) . "\n";
+            print "Path Lengths: ";
+            say '' . join( ", ", map { "$_ -> " . $apsp->path_length( $_, AS::get_rest_of_the_world_name() ) } @cycle );
 
             my $asn_to_purge = pop @cycle;
             foreach my $asn_to_purge_from (@cycle)
@@ -468,11 +468,17 @@ sub _get_max_monitorable_increase_asn
     my $start_time = time;
     say "Starting _get_max_monitorable_increase_asn -- $start_time";
 
+    my $base_list_controlling_percent = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list] , $control_methodology);
+
     my $max = $asns->[0];
     my $max_c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $max] , $control_methodology);
 
     for (my $i = 1; $i < scalar(@$asns); $i++)
     {
+        my $possible_c =  $self->_get_percent_controlled_by_list( [ $asns->[$i]] , $control_methodology) + $base_list_controlling_percent;
+
+        next if ($possible_c < $max_c);
+
         my $c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $asns->[$i]] , $control_methodology);  
         if ($c > $max_c)
         {

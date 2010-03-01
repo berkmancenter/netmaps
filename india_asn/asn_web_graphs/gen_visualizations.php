@@ -6,7 +6,7 @@
  *
  * @param unknown $country_code
  */
-function embed_flash_object($country_code) {
+function embed_flash_object($country_code, $print_mode=0) {
     $xml_file_location = 'results/results.xml';
 
     $xml = new SimpleXMLElement(file_get_contents($xml_file_location));
@@ -27,7 +27,7 @@ function embed_flash_object($country_code) {
 			<param name="quality" value="high" />
 			<param name="bgcolor" value="#ffffff" />
 			<param name="allowScriptAccess" value="sameDomain" />
-                        <param id='json_url_parm' name="FlashVars" value="json_url=<? echo get_json_summary_url($country_xml) ?>" />
+                        <param id='json_url_parm' name="FlashVars" value="json_url=<? echo get_json_summary_url($country_xml) ?>&print_mode=<? echo $print_mode ?>" />
 			<embed name='flash_embed_tag_id' src="<? echo get_flash_url() ?>" bgcolor="#ffffff"
 				width="600" height="490" name="demos" align="middle"
 				play="true"
@@ -35,7 +35,7 @@ function embed_flash_object($country_code) {
 				quality="high"
 				allowScriptAccess="sameDomain"
 				type="application/x-shockwave-flash"
-                                FlashVars="json_url=<? echo get_json_summary_url($country_xml) ?>"
+                                FlashVars="json_url=<? echo get_json_summary_url($country_xml) ?>&print_mode=<? echo $print_mode ?>"
 				pluginspage="http://www.adobe.com/go/getflashplayer">
 			</embed>
 	</object>

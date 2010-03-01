@@ -11,6 +11,11 @@ text-align: left;
   margin: 10px; 
 }
 
+a:link { 
+	color: #336699;
+	}
+
+
 h1{
    font-weight:bold;
    font-size:x-large;

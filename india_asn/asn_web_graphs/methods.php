@@ -2,7 +2,7 @@
 
 
 global $header_text;
-$header_text="RESEARCH METHODS";
+$header_text="RESEARCH";
 include "./info_page_header.php";
 
 ?>

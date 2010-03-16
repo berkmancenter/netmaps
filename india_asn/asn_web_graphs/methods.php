@@ -112,12 +112,16 @@ example, we have found that in <a href="country_detail.php/?cc=CN">China</a> ove
 
 <li>The AS Relationships data set only finds 38.7% of peer-to-peer relationships.  Because of the lack of peer relationships in the data set, we ignore them completely for this analysis.  If most of the traffic we care about is served either from within one of the ASs we categorize as points of control, or if most of the traffic is in the Rest of World for the country, then the peer relationships will not strongly effect the set of points of control (since the traffic will ultimately need to flow through the points of control in any case).  But whatever portion of traffic for the country is served by ASs near the edges of the network could potentially avoid the points of control by flowing through peer connections.  Likewise, a higher or lower proportion of peer connections than customer-provider connections within a country network could increase or lower the complexity of the country in relation to other countries. </li>
 
-<li>We omit the United States because the U.S. has a large number of sparse Class A networks, vastly inflating the IP address numbers (1.2 billion addresses compared to 210 million for China, even though China and the U.S. have about the same number of Internet users).  Our current, simple visualization system (graphviz) also will not work on a graph the size of the U.S. autonomous systems set.</li>
+<li>We omit the United States because the U.S. has a large number of sparse Class A networks, vastly inflating the IP address numbers (1.2 billion addresses compared to 210 million for China, even though China and the U.S. have about the same number of Internet users).</li>
 
 <li>We omit from the maps all customer -&gt; provider relationships from the rest of the world to an AS within a country in order to make the links out to the rest of the world (the red node in the maps) much clearer.</li>
 
 </ul>
 
+<h1>Paper</h1>
+
+     <p> Hal Roberts and David Larochelle, <a href="mlic.pdf">Mapping Local Internet Control</a>, 2010.</p>
+</p>
 <? 
   include "./info_page_footer.php";
 

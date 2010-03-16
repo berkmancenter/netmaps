@@ -1,7 +1,7 @@
 <?
 
 global $header_text;
-$header_text="RAW DATA";
+$header_text="DATA";
 include "./info_page_header.php";
 
 ?>

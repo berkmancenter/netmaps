@@ -7,7 +7,7 @@ It is well understood now that governments exert various kinds of control over t
  <a href="http://eur-lex.europa.eu/LexUriServ/site/en/oj/2006/l_105/l_10520060413en00540063.pdf">surveilling the activities of users</a>,
 and <a href="http://arstechnica.com/tech-policy/news/2009/04/korea-fits-itself-for-a-3-strikes-jackboot.ars">controlling which users  can access the Internet at all</a>.  When broken down into individual countries,
 the number of ASs that have access to almost all of the traffic within a given country is at most a few dozen ASs and often only a few ASs, even for the biggest countries.  For
-example, we have found that in <a href="geo_map_home.php/?cc=CN">China</a> over 90% of the country's 210 million IP addresses ultimately connect to the wider Internet through one of only 3 ASs, while in <a href="geo_map_home.php/?cc=RU">Russia</a> 90% of the country's 22 million IP addresses connect through one of 51 ASs.
+example, we have found that in <a href="geo_map_home.php/?cc=CN">China</a> over 90% of the country's 193 million IP addresses ultimately connect to the wider Internet through one of only 4 ASs, while in <a href="geo_map_home.php/?cc=RU">Russia</a> 90% of the country's 23 million IP addresses connect through one of 36 ASs.
 </p>
 
 
@@ -21,5 +21,5 @@ example, we have found that in <a href="geo_map_home.php/?cc=CN">China</a> over 
 </ul>
 
 <p>
-To see the map for a given country, click on either of the lists below and then click on the desired country name.  For more information about the methodology used for the metrics and the maps, see the <a href="methods.php">Methods</a> page.  For an xml file containing the raw data, including the network connections and the metrics for every country, see the <a href="raw_data.php">Raw Data</a> page.
+To see the map for a given country, click on either of the lists below and then click on the desired country name.  For more information about the methodology used for the metrics and the maps, see the <a href="methods.php">Research</a> page.  For an xml file containing the raw data, including the network connections and the metrics for every country, see the <a href="raw_data.php">Raw Data</a> page.
 </p>

@@ -15,7 +15,7 @@
 
 ?>
 <div class=footer>
-<a href="geo_map_home.php">SEE MAPS</a> / <a href="about.php">ABOUT PROJECT</a> / <a href="methods.php">RESEARCH METHODS</a> / <a href="raw_data.php">RAW DATA</a>
+<a href="geo_map_home.php">SEE MAPS</a> / <a href="about.php">ABOUT PROJECT</a> / <a href="methods.php">RESEARCH</a> / <a href="raw_data.php">DATA</a>
 </div>
 </body>
 </html>

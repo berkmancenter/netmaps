@@ -343,8 +343,8 @@ function get_excluded_country_names() {
     $countries_xml = get_all_countries();
     $countries_xml_included =  array_filter($countries_xml, "country_ip_address_count_gt_noise_threshold");
 
-    print count( $countries_xml) . " total countries\n";
-    print count( $countries_xml_included) . " included countries\n";
+    #print count( $countries_xml) . " total countries\n";
+    #print count( $countries_xml_included) . " included countries\n";
 
     $countries_xml_excluded = array();
     //array_diff doesn't work on object arrays so write our own

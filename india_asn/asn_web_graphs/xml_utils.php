@@ -24,6 +24,13 @@ function get_points_of_control($country_xml) {
     return (string)$country_xml->summary->ninty_percent_asns["count"];
 }
 
+function get_max_points_of_control($country_xml) {
+    return (string)$country_xml->summary->max_ninty_percent_asns["count"];
+}
+
+function get_min_points_of_control($country_xml) {
+    return (string)$country_xml->summary->min_ninty_percent_asns["count"];
+}
 
 function get_complexity($country_xml) {
     $complexity = $country_xml->summary->complexity;
@@ -31,6 +38,17 @@ function get_complexity($country_xml) {
     return (double) $complexity;
 }
 
+function get_max_complexity($country_xml) {
+    $complexity = $country_xml->summary->complexity_max;
+
+    return (double) $complexity;
+}
+
+function get_min_complexity($country_xml) {
+    $complexity = $country_xml->summary->complexity_min;
+
+    return (double) $complexity;
+}
 
 function get_ip_address_count($country_xml) {
     return (string)$country_xml->summary->total_ips;
@@ -91,6 +109,18 @@ function get_country_name_x(SimpleXMLElement $country) {
 function get_ips_per_points_of_control(SimpleXMLElement $country) {
     $total_ips =  get_ip_address_count($country);
     $points_of_control         =  get_points_of_control($country);
+    return (integer) ($total_ips/$points_of_control);
+}
+
+function get_ips_per_max_points_of_control(SimpleXMLElement $country) {
+    $total_ips =  get_ip_address_count($country);
+    $points_of_control         =  get_max_points_of_control($country);
+    return (integer) ($total_ips/$points_of_control);
+}
+
+function get_ips_per_min_points_of_control(SimpleXMLElement $country) {
+    $total_ips =  get_ip_address_count($country);
+    $points_of_control         =  get_min_points_of_control($country);
     return (integer) ($total_ips/$points_of_control);
 }
 

@@ -75,6 +75,8 @@ sub main
 
     my $counter = 0;
 
+    my $line_num = 0;
+
     while (<>)
     {
         if (/^#/)
@@ -84,9 +86,15 @@ sub main
             #skip comment lines
         }
 
-        my ( $asn1, $asn2, $relationship ) = split;
+	chomp;
+	my $line = $_;
+
+        my ( $asn1, $asn2, $relationship ) = split '\|';
 
         die "defined value " unless defined($asn1) && defined($asn2) && defined($relationship);
+
+	die "Line '$line': Not number '$asn1'" unless $asn1 =~ /^\d*$/;
+	die "Line '$line': Not number '$asn2'" unless $asn2 =~ /^\d*$/;
 
         _look_up_asn_info($asn1);
         _look_up_asn_info($asn2);

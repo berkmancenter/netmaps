@@ -140,11 +140,11 @@ $country_png_url = get_country_png_image_url($country_xml);
 </tr>
 <?
 foreach ($country_xml->summary->as as $as) {
-    $percent_monitorable_str = number_format($as->percent_monitorable, 1);
-    $total_monitorable_str   = number_format($as->effective_monitorable_ips);
+    $percent_monitorable_str = number_format((float) $as->percent_monitorable, 1);
+    $total_monitorable_str   = number_format((float) $as->effective_monitorable_ips);
 
-    $percent_direct_str = number_format($as->percent_direct_ips, 1);
-    $total_direct_str   = number_format($as->direct_ips);
+    $percent_direct_str = number_format((float) $as->percent_direct_ips, 1);
+    $total_direct_str   = number_format((float) $as->direct_ips);
     $is_point_of_control = $as["point_of_control" ]==1;
 ?>
 <tr <? if ($is_point_of_control) { ?> id="poc_asn_row" <? } ?> >

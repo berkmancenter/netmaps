@@ -11,9 +11,9 @@ function download_for_year
 {
 local YEAR=$1
 
-CAIDA_DATA_DIRECTORY_URL=http://$CAIDA_SERVER/data/$YEAR
+CAIDA_DATA_DIRECTORY_URL=http://$CAIDA_SERVER/data/$YEAR.01
 
-wget  -P $DATA_DOWNLOAD_DIRECTORY -q -N  -r -l 1 $CAIDA_DATA_DIRECTORY_URL 
+wget  -P $DATA_DOWNLOAD_DIRECTORY -q -N  -R 'paths.*.txt' -r -l 1 $CAIDA_DATA_DIRECTORY_URL 
 }
 
 YEAR=`date +%Y`

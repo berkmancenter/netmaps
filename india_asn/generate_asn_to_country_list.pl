@@ -76,8 +76,11 @@ sub main
 
     my $asns = {};
 
+    my $line_num = 0;
+    
     while (<>)
     {
+	$line_num++;
         if (/^#/)
         {
             next;
@@ -85,9 +88,15 @@ sub main
             #skip comment lines
         }
 
-        my ( $asn1, $asn2, $relationship ) = split;
+	chomp;
+	my $line = $_;
+
+        my ( $asn1, $asn2, $relationship ) = split '\|';
 
         die "defined value " unless defined($asn1) && defined($asn2) && defined($relationship);
+
+	die "Line '$line': Not number '$asn1'" unless $asn1 =~ /^\d*$/;
+	die "Line '$line': Not number '$asn2'" unless $asn2 =~ /^\d*$/;
 
         look_up_asn_country($asn1);
         look_up_asn_country($asn2);

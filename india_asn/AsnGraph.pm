@@ -75,6 +75,16 @@ sub get_as_node
     return $self->{asn_nodes}->{$as_number};
 }
 
+sub get_as_node_objects
+{
+
+  my ($self) = @_;
+
+  my $asns = $self->{asn_nodes};
+
+  return [ values %{$asns} ];
+}
+
 sub get_country_as_nodes_count
 {
     my ($self) = @_;
@@ -464,22 +474,49 @@ sub _get_max_monitorable_increase_asn
     my $control_methodology = shift;
     my $ninty_percent_list = shift;
     my $asns = shift;
+    my $asn_monitor_percent_increase_mappings = shift;
 
     my $start_time = time;
+
     say "Starting _get_max_monitorable_increase_asn -- $start_time";
 
+    say Dumper([ @$ninty_percent_list]);
     my $base_list_controlling_percent = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list] , $control_methodology);
+
+    print "base_list_controlling_percent $base_list_controlling_percent\n";
+
+    print "asn  $asns->[0]\n";
 
     my $max = $asns->[0];
     my $max_c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $max] , $control_methodology);
+    print "max_c  $max_c\n";
+
+    $asn_monitor_percent_increase_mappings->{ $asns->[0] } = $max_c - $base_list_controlling_percent;
+
+    my $total_ips = $self->_get_total_ips();
 
     for (my $i = 1; $i < scalar(@$asns); $i++)
     {
-        my $possible_c =  $self->_get_percent_controlled_by_list( [ $asns->[$i]] , $control_methodology) + $base_list_controlling_percent;
+        # print "i: $i \n";
+	# print "asn: " . $asns->[$i] . "\n";
+
+	if ( ! defined ($asn_monitor_percent_increase_mappings->{ $asns->[$i] } ) )
+	{
+	   $asn_monitor_percent_increase_mappings->{ $asns->[$i] } =  $self->_get_percent_controlled_by_list( [ $asns->[$i]] , $control_methodology);
+	}
+
+        my $possible_c = $asn_monitor_percent_increase_mappings->{ $asns->[$i] } + $base_list_controlling_percent;
+
+	# print "possible_c: $possible_c\n";
 
         next if ($possible_c < $max_c);
 
-        my $c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $asns->[$i]] , $control_methodology);  
+        my $c = $self->_get_percent_controlled_by_list( [ @$ninty_percent_list, $asns->[$i]] , $control_methodology);
+
+	# print "c: $c\n";
+
+	$asn_monitor_percent_increase_mappings->{ $asns->[$i] } = $c - $base_list_controlling_percent;
+
         if ($c > $max_c)
         {
             $max = $asns->[$i];
@@ -497,6 +534,17 @@ sub _get_max_monitorable_increase_asn
 }
 
 
+sub _hash_value_compare
+{
+    my ($a, $b, $hash) = @_;
+ 
+    my $ret =
+        ($hash->{$a} <=> $hash->{$b})
+              or ($a <=> $b);
+
+    return $ret;
+}
+
 sub _get_asns_controlling_ninty_percent
 {
     my ($self, $control_methodology) = @_;
@@ -508,16 +556,23 @@ sub _get_asns_controlling_ninty_percent
     my $asn                = shift @$asns;
     my @ninty_percent_list = ($asn);
 
+    my $asn_monitor_percent_increase_mappings = {};
+
     while ( $self->_get_percent_controlled_by_list( \@ninty_percent_list, $control_methodology ) < 90.0 )
     {
         die if ( scalar(@$asns) == 0 );
         #say Dumper ( $asns);
-        my $asn = $self->_get_max_monitorable_increase_asn($control_methodology, \@ninty_percent_list, $asns);
+        my $asn = $self->_get_max_monitorable_increase_asn($control_methodology, \@ninty_percent_list, $asns, $asn_monitor_percent_increase_mappings );
 
         push @ninty_percent_list, $asn;
 
         $asns = [grep { $_ != $asn } @$asns];
 
+	say "Resort -- " . time ;
+	$asns = [ reverse sort { _hash_value_compare( $a, $b, $asn_monitor_percent_increase_mappings ) } @$asns ];
+	say "Done resort -- " . time ;
+
+	say Dumper ( [map { $_ . ' --- ' . $asn_monitor_percent_increase_mappings->{ $_ } }  (@$asns)[0 .. 10] ] );
         #print " while (\n";
     }
 
@@ -681,6 +736,8 @@ sub _get_ninety_percent_control_list_element
     return $ninety_percent_list_xml;
 }
 
+my $direct_info_only = 0;
+
 sub xml_summary
 {
     my ($self) = @_;
@@ -693,27 +750,50 @@ sub xml_summary
 
     die "Could not get total ips" unless defined($total_ips);
 
-    $self->die_if_cyclic();
+    my $ninety_percent_control_asns = [];
+
+    unless ($direct_info_only) 
+    {
+      $self->die_if_cyclic();
 
     $xml_graph->appendTextChild( 'total_ips',      $total_ips );
     $xml_graph->appendTextChild( 'total_asns',     $self->get_country_as_nodes_count() );
     $xml_graph->appendTextChild( 'complexity',     $self->get_complexity );
-    $xml_graph->appendTextChild( 'complexity_max', $self->get_complexity_max );
-    $xml_graph->appendTextChild( 'complexity_min', $self->get_complexity_min );
+    #$xml_graph->appendTextChild( 'complexity_max', $self->get_complexity_max );
+    #$xml_graph->appendTextChild( 'complexity_min', $self->get_complexity_min );
 
-    my $ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('ninty_percent_asns', MONITORABLE_CALCULATION_PROPORTIONAL);
+    #my $ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('ninty_percent_asns', MONITORABLE_CALCULATION_PROPORTIONAL);
+
+
+    print "XML_summary Starting _get_asns_controlling_ninty_percent\n";
+    unless  ($direct_info_only)
+      {
+    $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL );
+     }
+    print "XML_summary finished _get_asns_controlling_ninty_percent\n";
+
+    my $ninety_percent_list_xml = XML::LibXML::Element->new('ninty_percent_asns');
+    
+    $ninety_percent_list_xml->setAttribute( 'count', scalar( @{$ninety_percent_control_asns} ) );
+    
+    $ninety_percent_list_xml->appendText( join ", ", @{$ninety_percent_control_asns} );
 
     $xml_graph->appendChild($ninety_percent_list_xml);
 
-    my $max_ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('max_ninty_percent_asns', MONITORABLE_CALCULATION_MAXIMAL);
-    $xml_graph->appendChild($max_ninety_percent_list_xml);
+    #my $max_ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('max_ninty_percent_asns', MONITORABLE_CALCULATION_MAXIMAL);
+    #$xml_graph->appendChild($max_ninety_percent_list_xml);
 
-    my $min_ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('min_ninty_percent_asns', MONITORABLE_CALCULATION_BIGESTPARENT);
-    $xml_graph->appendChild($min_ninety_percent_list_xml);
+    #my $min_ninety_percent_list_xml = $self->_get_ninety_percent_control_list_element('min_ninty_percent_asns', MONITORABLE_CALCULATION_BIGESTPARENT);
+    #$xml_graph->appendChild($min_ninety_percent_list_xml);
+    }
 
-    my @asn_keys = $self->_get_asn_names_sorted_by_monitoring(MONITORABLE_CALCULATION_PROPORTIONAL);
+    my @asn_keys = keys %{$asns};
 
-    my $ninety_percent_control_asns = $self->_get_asns_controlling_ninty_percent(MONITORABLE_CALCULATION_PROPORTIONAL );
+    unless ($direct_info_only)
+      {
+    @asn_keys = $self->_get_asn_names_sorted_by_monitoring(MONITORABLE_CALCULATION_PROPORTIONAL);
+    }
+
 
     foreach my $key (@asn_keys)
     {
@@ -746,8 +826,12 @@ sub get_as_node_xml
     my $is_point_of_countrol = _list_contains( $asn, $ninety_percent_control_asns );
 
     $asn_xml->setAttribute( 'point_of_control', $is_point_of_countrol );
-
+ 
+    unless ($direct_info_only)
+      {
     $asn_xml->appendTextChild( 'percent_monitorable', $asn_info->{effective_monitorable_ips} / $total_ips * 100.0 );
+    }
+
     $asn_xml->appendTextChild( 'percent_direct_ips',  $asn_info->{direct_ips} / $total_ips * 100.0 );
 
     return $asn_xml;
@@ -804,6 +888,13 @@ sub get_country_specific_sub_graph
             push @{ $new_asn->{$relationship_type} }, @rel_list;
             $new_asn->{$relationship_type} = [ uniq @{ $new_asn->{$relationship_type} } ];
 
+	    if ($new_asn->is_rest_of_world() )
+            {
+	        $new_asn->{$relationship_type} = [ grep { ! $_->is_rest_of_world } @{ $new_asn->{$relationship_type} } ];
+	    }
+
+	    #die "AS cannot be its own $relationship_type " if any {$_ == $new_asn}  @{ $new_asn->{$relationship_type} } ;
+ 
 # $new_asn->{$relationship_type} = [ grep {$_->get_as_number  ne AS::get_rest_of_the_world_name()}   @{ $new_asn->{$relationship_type} } ];
         }
     }

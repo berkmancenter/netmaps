@@ -1,14 +1,19 @@
 #!/usr/bin/perl -w
 
 use strict;
+use warnings;
+
 use Getopt::Long;
 use AsnGraph;
 use AdPlannerCountryReport;
-use List::Util qw(max min);
+use List::Util qw(max min sum);
+use List::MoreUtils qw(any after after_incl before);
 use Locale::Country qw(code2country);
 use Readonly;
 use Image::LibRSVG;
 use Graph::Easy::Parser::Graphviz;
+use Perl6::Say;
+use Data::Dumper;
 
 my $get_relationship_name = {
     -1 => 'customer',
@@ -55,11 +60,18 @@ sub main
             #skip comment lines
         }
 
-        my ( $asn1, $asn2, $relationship ) = split;
+	chomp;
+
+        my ( $asn1, $asn2, $relationship ) = split '\|';
 
         my $as1 = $asn_graph->get_as_node($asn1);
         my $as2 = $asn_graph->get_as_node($asn2);
-        $as2->add_relationship( $as1, $get_relationship_name->{$relationship} );
+        $as1->add_relationship( $as2, $get_relationship_name->{$relationship} );
+	#The new CAIDA format no longer lists customer relationship so we explicitly add them
+	if ( $get_relationship_name->{$relationship} eq 'customer' )
+	{
+	  $as2->add_relationship( $as1, 'provider' );
+	}
     }
 
     #$asn_graph->print_connections_per_asn($asns);
@@ -76,8 +88,13 @@ sub main
 
     #TODO this country causes a divide by zero error so skip it for now.
     @country_codes = grep { $_ ne 'GG' } @country_codes;
+    @country_codes = grep { $_ ne 'AD' } @country_codes;
+
+    #@country_codes = grep { $_ eq 'NL' } @country_codes;
 
     #@country_codes = @country_codes[0..10];
+
+    #@country_codes  = qw ( ES US );
 
     my $doc  = XML::LibXML::Document->new();
     my $root = $doc->createElement('asn_results');
@@ -102,6 +119,8 @@ sub main
         }
 
         print "Country: $country_name($country_code)\n";
+
+#	eval {
         my $asn_sub_graph = $asn_graph->get_country_specific_sub_graph($country_code);
 
         if ($xml_output)
@@ -110,11 +129,11 @@ sub main
             $country_element->setAttribute( 'country_code',           $country_code );
             $country_element->setAttribute( 'country_name',           $country_name );
             $country_element->setAttribute( 'country_code_is_region', $country_code_is_region );
-            $country_element->appendChild(
-                AdPlannerCountryReport::country_ad_words_xml_summary(
-                    $country_code, $asn_sub_graph->get_point_of_control_as_numbers
-                )
-            );
+            # $country_element->appendChild(
+            #     AdPlannerCountryReport::country_ad_words_xml_summary(
+            #         $country_code, $asn_sub_graph->get_point_of_control_as_numbers
+            #     )
+            # );
             $country_element->appendChild( $asn_sub_graph->xml_summary() );
             $root->appendChild($country_element);
 
@@ -156,10 +175,11 @@ sub main
             #             $rsvg->convertAtSize( $svg_output_file, "$output_file_base.png", 800, 800 )
             #               || die "Could not convert file to png";
 
-            if ( ( $loop_iteration % 10 ) == 0 )
+            if ( ( $loop_iteration % 2 ) == 0 )
             {
                 print "Dumping current results\n";
                 print $doc->toFile( "$_output_dir/$_xml_output_file", 1 );
+                print "Dumped current results\n";
             }
 
             #if ($loop_iteration == 11) { exit; }
@@ -182,6 +202,13 @@ sub main
         {
             die "SHOULD NOT BE REACHED";
         }
+
+    #  };
+
+	if (@$)
+	{
+	   print STDERR "ERROR PROCESSING COUNTRY - $country_name($country_code)\: $@\n";
+	}
     }
 
     if ($xml_output)

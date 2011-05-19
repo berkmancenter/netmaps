@@ -129,11 +129,11 @@ sub main
             $country_element->setAttribute( 'country_code',           $country_code );
             $country_element->setAttribute( 'country_name',           $country_name );
             $country_element->setAttribute( 'country_code_is_region', $country_code_is_region );
-            # $country_element->appendChild(
-            #     AdPlannerCountryReport::country_ad_words_xml_summary(
-            #         $country_code, $asn_sub_graph->get_point_of_control_as_numbers
-            #     )
-            # );
+            $country_element->appendChild(
+                AdPlannerCountryReport::country_ad_words_xml_summary(
+                    $country_code, $asn_sub_graph->get_point_of_control_as_numbers
+                )
+            );
             $country_element->appendChild( $asn_sub_graph->xml_summary() );
             $root->appendChild($country_element);
 

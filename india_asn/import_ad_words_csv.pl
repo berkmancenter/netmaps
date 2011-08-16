@@ -101,13 +101,17 @@ sub parse_file
 
 #print Dumper ($line->get(qw / site_name category composition_index audience_reach audience_unique_users country_unique_users country_page_views gcn_text gcn_images gcn_videos gcn_gadgets gcn_impressions_per_day/));
 
-        $dbh->query(
+       #Purge ',' from fields.
+       my $line_db_fields =       [   $line->get(
+                qw / site_name category composition_index audience_reach audience_unique_users country_unique_users country_page_views gcn_text gcn_images gcn_videos gcn_gadgets gcn_impressions_per_day/
+            ) ];
+       $line_db_fields = [ map { $_ =~ s/,//g; $_; } @ { $line_db_fields } ];
+
+       $dbh->query(
 'insert into adwords_country_data ( country, country_code, site_name,  category, composition_index, audience_reach, audience_unique_users, country_unique_users, country_page_views, gcn_text,gcn_images,gcn_videos,gcn_gadgets, gcn_impressions_per_day) values (?, ?, ?, ?, ?,?, ?, ?,?, ?, ?, ?, ?, ? )',
             $country_name,
             $country_code,
-            $line->get(
-                qw / site_name category composition_index audience_reach audience_unique_users country_unique_users country_page_views gcn_text gcn_images gcn_videos gcn_gadgets gcn_impressions_per_day/
-            )
+            @{ $line_db_fields }
         );
     }
 }

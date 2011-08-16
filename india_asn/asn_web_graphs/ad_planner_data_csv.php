@@ -13,18 +13,18 @@ function  get_site_info_columns()
 {
 
 $column_headings = array(
+		 'site_name',
+		 'ip',
 		 'asn',
 		 'audience_unique_users',
-		 'category',
-		 'composition_index',
+		// 'category',
+		// 'composition_index',
 		 'country',
 		 'country_code',
 		 'country_page_views',
-		 'country_unique_users',
-		 'gcn_images',
-		 'gcn_videos',
-		 'ip',
-		 'site_name' 
+		 'country_unique_users'
+		// 'gcn_images',
+		// 'gcn_videos',
 		 );
 
  return $column_headings;
@@ -48,7 +48,7 @@ function ad_planner_csv_dump($sites_xml)
 
   $stdout = fopen("php://output", "w+");
 
-  fputs( $stdout, "foo" );
+  fputcsv( $stdout, get_site_info_columns() );
   //echo "dfdfdf";
 
   //return;

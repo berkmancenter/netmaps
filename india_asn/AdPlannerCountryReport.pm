@@ -210,6 +210,10 @@ sub process_country_ad_words_sites
     $ret->{top_site_count}        = scalar( @{$valid_sites} );
     $ret->{top_sites_in_country}  = scalar( @{$in_country_sites} );
     $ret->{top_sites_in_poc}      = scalar( @{$poc_hosted_sites} );
+
+    $ret->{invalid_site_count}    = scalar( @{$adwords_data} ) - scalar ( @ { $valid_sites} );
+    $ret->{all_sites}             = $adwords_data;
+
     $ret->{page_views_in_country} = sum map { $_->{country_page_views} } @{$in_country_sites};
     $ret->{page_views_in_poc}     = sum map { $_->{country_page_views} } @{$poc_hosted_sites};
     $ret->{total_page_views}      = sum map { $_->{country_page_views} } @{$valid_sites};
@@ -245,10 +249,28 @@ sub country_ad_words_xml_summary
         $xml_graph->appendTextChild( 'top_site_count',        $ad_words_info->{top_site_count} );
         $xml_graph->appendTextChild( 'top_sites_in_country',  $ad_words_info->{top_sites_in_country} );
         $xml_graph->appendTextChild( 'top_sites_in_poc',      $ad_words_info->{top_sites_in_poc} );
+
+	$xml_graph->appendTextChild( 'invalid_site_count',    $ad_words_info->{ invalid_site_count} );
+
         $xml_graph->appendTextChild( 'page_views_in_country', $ad_words_info->{page_views_in_country} );
         $xml_graph->appendTextChild( 'page_views_in_poc',     $ad_words_info->{page_views_in_poc} );
         $xml_graph->appendTextChild( 'total_page_views',      $ad_words_info->{total_page_views} );
         $xml_graph->appendTextChild( 'country_code',          $ad_words_info->{country_code} );
+
+	my $sites = XML::LibXML::Element->new( 'sites' );
+	
+	foreach my $site ( @ { $ad_words_info->{ all_sites } } )
+	{
+	     my $site_xml = XML::LibXML::Element->new( 'site' );
+	     foreach my $key ( sort keys % { $site } )
+	     {
+	         $site_xml->appendTextChild( $key, $site->{ $key } );
+	     }
+	     
+	     $sites->appendChild( $site_xml );
+	}
+
+	$xml_graph->appendChild( $sites );
     }
 
     return $xml_graph;

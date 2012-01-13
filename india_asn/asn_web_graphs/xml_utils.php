@@ -352,6 +352,14 @@ function get_all_countries() {
     return $countries_xml;
 }
 
+function get_ad_planner_sites()
+{
+    $xml = get_xml_file();
+    $sites_xml = $xml->xpath("//ad_words_summary/sites/site");	
+    
+    return $sites_xml;	 
+}
+
 function get_unsorted_country_list()
 {
     $countries_xml = get_all_countries();

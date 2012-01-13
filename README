@@ -1,6 +1,6 @@
 This is the source used for http://cyber.law.harvard.edu/netmaps/
 
-Running netmaps/regenerat_map.sh will cause data to be downloaded from CAIDA and other sources that will then be analyzed to generate the netmap site.
+Running netmaps/full_regeneration.sh will cause data to be downloaded from CAIDA and other sources that will then be analyzed to generate the netmap site.
 
 Please be aware that this script takes a very long time to run. 
 

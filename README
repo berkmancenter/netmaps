@@ -6,7 +6,7 @@ Please be aware that this script takes a very long time to run.
 
 After the script is complete, results are stored in netmaps/asn_web_graphs/results/results.xml
 
-The directory netmaps/asn_web_graphs/ is the root of a php driven site that will display interactive visiualizes of the data similar to those found on  http://cyber.law.harvard.edu/netmaps/
+The directory netmaps/asn_web_graphs/ is the root of a PHP driven site that will display interactive visualizations of the data similar to those found on  http://cyber.law.harvard.edu/netmaps/
 
-See also the git repo for the flash based visualization that we use. If source is available at: https://github.com/berkmancenter/netmaps-visualization
+See also the git repo for the Flash based visualization used on the site. Its source is available at: https://github.com/berkmancenter/netmaps-visualization
 

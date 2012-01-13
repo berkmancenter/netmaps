@@ -151,7 +151,7 @@ sub process_country_ad_words_sites
     my $dbh = DBIx::Simple->connect( DBI->connect( "dbi:SQLite:dbname=db/ad_words.db", "", "", $dbargs ) );
 
     my $adwords_data =
-      $dbh->query( "select * from adwords_country_data where country_code = ? order by audience_reach desc ", $country_code )
+      $dbh->query( "select * from adwords_country_data where country_code = ? order by country_page_views desc ", $country_code )
       ->hashes;
 
     return unless scalar( @{$adwords_data} );
